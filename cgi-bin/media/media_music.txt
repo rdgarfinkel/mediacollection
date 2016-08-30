@@ -1,0 +1,11 @@
+#folderid#|#ebay#|#status#|#description#|
+jensenjr800|140160333603|closed|This Universal Remote Control controls up to eight devices; Dedicated on-screen menu controls; Individual key learning capabilities; Macro keys permit user to program a series of functions; Dedicated keys for satellite receivers and cable boxes|
+belkinwirelesscard|140161656800|closed||
+delldj20gb|007108553744|closed||
+linksyswirelesscard|140161655795|closed||
+belkinminihub|140218879539|closed|Belkin Mini Hub, USB/Firewire Hub|
+visteonhdradiocarkit|140218881201|closed|test|
+seacretnailcare|140218883348|closed|test|
+jvckthdp1|140218888313|closed|test|
+kyocerausb|140237294734|closed|test|
+jvcksu57|140237296212|closed|test|
