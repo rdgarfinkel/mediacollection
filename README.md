@@ -9,5 +9,5 @@ http://rgarfinkel.heliohost.org/cgi-bin/mediademo/index.pl
 for this script to run, you'll need to have a web server capable of running Perl scripts.
 
 # still to do
-make music section functioning
+make music section functioning<br>
 automatic item fill in with UPC code??
