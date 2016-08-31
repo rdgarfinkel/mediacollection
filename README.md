@@ -7,7 +7,7 @@ things should work "directly out of the box." you'll probably need to edit the $
 
 # demonstration
 a demonstration of the script and it's abilities is online and available, with editing abilities enabled, and no password required for the admin side. test it out as you wish:
-http://rgarfinkel.heliohost.org/cgi-bin/mediademo/index.pl
+http://rgarfinkel.heliohost.org/cgi-bin/mediademo/index.cgi
 
 # requirements
 for this script to run, you'll need to have a web server capable of running Perl scripts.
