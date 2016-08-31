@@ -1,9 +1,13 @@
 # mediacollection
-video (movies/tv), books, and games media collection display and management
+physical and digital video (movies/tv), books, and games collection display and management<br>
+<br>
+each media type has it's own table headers, and is dynamically sortable by the table headers when you are at the top of the resulting page.<br>
+in the non-administrative pages, at the top left, you'll see the date that the text database was last updated.<br>
+in the adminstrative pages, you'll see the date the text database was last updated at the bottom of the page, as well as an overall count of the media currently displayed, as well as a breakdown of each individual category. here, you can also edit and delete media items.
 
 # first things first
-if you will be using this on a public server, put the /cgi-bin/media/media.pl file within a separate directory that is password protected so that only you can add/amend/delete your database<br>
-things should work "directly out of the box." you'll probably need to edit the $basedir variable in the index.cgi and media.pl scripts
+if you will be using this on a public server, put the /cgi-bin/media/media.pl file within a separate directory that is password protected so that only you can add/amend/delete your database entries<br>
+things should work "directly out of the box." you'll probably need to edit the $basedir variable in the index.cgi and media.pl scripts, and maybe the "#!/usr/bin/perl" line at the top of each script
 
 # demonstration
 a demonstration of the script and it's abilities is online and available, with editing abilities enabled, and no password required for the admin side. test it out as you wish:
@@ -17,6 +21,9 @@ for this script to run, you'll need to have a web server capable of running Perl
 /javascripts/jquery-1.5.1.min.js, http://jquery.com/, http://sizzlejs.com/: required for use of freezeheader below<br>
 /javascripts/jquery.freezeheader.js, http://brentmuir.com/projects/freezeheader: freezes table header at the top of the screen when scrolling down
 
-# still to do
-make music section functioning<br>
-automatic item fill in with UPC code??
+# still to do!
+add music section, debating on how to implement this, ie sort by artist or album title, or artist and album title
+
+# may do/fix?
+automatic item fill in with UPC code<br>
+when items are added, they'll be added to the bottom of the list, disregarding any type of sort. currently, the only way to organize the list is to go into an item to edit, do not make any changes, then submit the edit.
