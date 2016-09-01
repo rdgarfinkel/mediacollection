@@ -1,5 +1,5 @@
 # mediacollection
-physical and digital video (movies/tv), books, and games collection display and management<br>
+physical and digital music, video (movies/tv), books, and games collection display and management<br>
 <br>
 each media type has it's own table headers, and is dynamically sortable by the table headers when you are at the top of the resulting page.<br>
 in the non-administrative pages, at the top left, you'll see the date that the text database was last updated.<br>
@@ -24,9 +24,6 @@ for this script to run, you'll need to have a web server capable of running Perl
 /javascripts/gs_sortable.js, http://www.allmyscripts.com/Table_Sort/index.html: allows for the dynamic sorting of table headers (only accessible when page has not been scrolled down)<br>
 /javascripts/jquery-1.5.1.min.js, http://jquery.com/, http://sizzlejs.com/: required for use of freezeheader below<br>
 /javascripts/jquery.freezeheader.js, http://brentmuir.com/projects/freezeheader: freezes table header at the top of the screen when scrolling down
-
-# still to do!
-add music section, debating on how to implement this, ie sort by artist or album title, or artist and album title
 
 # may do/fix?
 automatic item fill in with UPC code<br>
