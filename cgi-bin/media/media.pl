@@ -214,8 +214,8 @@ sub media {
 
 			foreach $line(@in) {
 				$line=~s/\n//g;
-				($title,$artist,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$line);
-				if ($title ne "#DATE#") {
+				($artist,$title,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$line);
+				if ($artist ne "#DATE#") {
 					if ($cd eq "X") {
 						$count_cd=$count_cd+1;
 					}
@@ -246,7 +246,7 @@ sub media {
 					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><a href=\"$thispage?gopage=media&dotype=$dotype&dowhat=mediaedit&showline=$line\">$artist &ndash; $title</a></td>\n     <td>$upc</td>\n     <td>$cd</td>\n     <td>$amazon</td>\n     <td>$djbooth</td>\n     <td>$googleplay</td>\n     <td>$groove</td>\n     <td>$itunes</td>\n     <td>$reverbnation</td>\n     <td>$topspin</td>\n     <td>$rhapsody</td>\n     <td><a href=\"$thispage?gopage=media&dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
 					$count_title=$count_title+1;
 				} else {
-					$update=$artist;
+					$update=$title;
 				}
 			}
 			$count_title=$count_title-1;
@@ -596,7 +596,7 @@ sub media {
 			print "     <tr>\n      <th align=right>upc:</th>\n      <td><input type=text name=newupc value=\"$upc\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>isbn:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
 		} elsif ($dotype eq 'music'){
-			($title,$artist,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody)=split(/\|/,$showline);
+			($artist,$title,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody)=split(/\|/,$showline);
 
 			print "     <tr>\n      <th align=right width=30%>artist:</th>\n      <td><input type=text name=newartist value=\"$artist\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
@@ -741,6 +741,10 @@ sub media {
 		print "     <tr>\n      <td colspan=2 align=center>\n       <input type=button value=\"Cancel\" onClick=\"history.back()\">\n       <input type=submit value=\"Submit\">\n      </td>\n     </tr>\n";
 		print "     <input type=hidden name=dowhat value=mediawrite>\n     <input type=hidden name=dotype value=$dotype>\n     <input type=hidden name=oldtitle value=\"$title\">\n";
 
+		if ($dotype eq 'music'){
+			print "     <input type=hidden name=oldartist value=\"$artist\">\n";
+		}
+
 		print "    </table>";
 
 		&footer;
@@ -760,7 +764,11 @@ sub media {
 		($thisentry1,$thisentry2) = split(/\|/,$showline);
 
 		if ($continue ne 'Yes') {
-			print "\n   <P>Continuing this action will remove the entry for<br><br><b>$thisentry1</b><br><br>Are you sure you want to do this?</P>\n   <input type=submit name=continue value=Yes>\n   <input type=button value=No onClick=\"history.back()\">\n   <input type=hidden name=gopage value=media>\n   <input type=hidden name=dotype value=$dotype>\n   <input type=hidden name=dowhat value=mediadelete>\n   <input type=hidden name=showline value=\"$showline\">";
+			print "\n   <P>Continuing this action will remove the entry for<br><br><b>$thisentry1";
+			if ($dotype eq "music") {
+				print " -  $thisentry2";
+			}
+			print "</b><br><br>Are you sure you want to do this?</P>\n   <input type=submit name=continue value=Yes>\n   <input type=button value=No onClick=\"history.back()\">\n   <input type=hidden name=gopage value=media>\n   <input type=hidden name=dotype value=$dotype>\n   <input type=hidden name=dowhat value=mediadelete>\n   <input type=hidden name=showline value=\"$showline\">";
 			&footer;
 		} else {
 			$changed=0;
@@ -827,22 +835,22 @@ sub media {
 				}
 			}
 		} elsif ($dotype eq 'music'){
-			($thistitle,$thisartist,$thisupc,$thiscd,$thisamazon,$thisdjbooth,$thisgoogleplay,$thisgroove,$thisitunes,$thisreverbnation,$thistopspin,$thisrhapsody)=split(/\|/,$showline);
+			($thisartist,$thistitle,$thisupc,$thiscd,$thisamazon,$thisdjbooth,$thisgoogleplay,$thisgroove,$thisitunes,$thisreverbnation,$thistopspin,$thisrhapsody)=split(/\|/,$showline);
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
-			$new="$thistitle|$thisartist|$thisupc|$thiscd|$thisamazon|$thisdjbooth|$thisgoogleplay|$thisgroove|$thisitunes|$thisreverbnation|$thistopspin|$thisrhapsody|\n";
+			$new="$thisartist|$thistitle|$thisupc|$thiscd|$thisamazon|$thisdjbooth|$thisgoogleplay|$thisgroove|$thisitunes|$thisreverbnation|$thistopspin|$thisrhapsody|\n";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				#print "$line\n";
-				($intitle,$inartist,$inupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody) = split(/\|/,$line);
-				if ($intitle eq "#DATE#") {
+				($inartist,$intitle,$inupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody) = split(/\|/,$line);
+				if ($inartist eq "#DATE#") {
 					#skip
 				} elsif ($intitle eq $thistitle) {
 					$changed=1;
-					print "$thistitle removed<br><br>\n";
+					print "$thisartist, $thistitle removed<br><br>\n";
 				} else {
-					$writenew.="$intitle|$inartist|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n";
-					$preview.="$intitle|$inartist|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|<br>\n";
+					$writenew.="$inartist|$intitle|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n";
+					$preview.="$inartist|$intitle|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|<br>\n";
 				}
 			}
 		}
@@ -876,8 +884,8 @@ sub media {
 
 		if ($dotype eq 'books'){
 			$writenew="#DATE#|$today|#|#|#|\n";
-			$preview="#DATE#|$today|#|#|#|<br>\n";
 			$new="$newtitle|$newauthor|$newupc|$newisbn|$newtype|\n";
+			$preview="#DATE#|$today|#|#|#|<br>\n";
 			$previewnew="$newtitle|$newauthor|$newupc|$newisbn|$newtype|<br>\n";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
@@ -897,8 +905,8 @@ sub media {
 			}
 		} elsif ($dotype eq 'games'){
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
-			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
 			$new="$newtitle|$newepic|$newsteam|$newbattlenet|$neworigin|$newuplay|$newnes|$newwii|$newps2|$newxboxone|$newxbox360|$newupc|\n";
+			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
 			$previewnew="$newtitle|$newepic|$newsteam|$newbattlenet|$neworigin|$newuplay|$newnes|$newwii|$newps2|$newxboxone|$newxbox360|$newupc|<br>\n";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
@@ -918,8 +926,8 @@ sub media {
 			}
 		} elsif ($dotype eq 'videos'){
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|\n";
-			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|<br>\n";
 			$new="$newtitle|$newtype|$newbluray|$newdvd|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$newupc|$newisbn|\n";
+			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|<br>\n";
 			$previewnew="$newtitle|$newtype|$newbluray|$newdvd|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$newupc|$newisbn|<br>\n";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
@@ -939,23 +947,23 @@ sub media {
 			}
 		} elsif ($dotype eq 'music'){
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
+			$new="$newartist|$newtitle|$newupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
-			$new="$newtitle|$newartist|$newupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|\n";
-			$previewnew="$newtitle|$newartist|$newupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|<br>\n";
+			$previewnew="$newartist|$newtitle|$newupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|<br>\n";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				#print "$line\n";
-				($intitle,$inartist,$inupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody) = split(/\|/,$line);
-				if ($intitle eq "#DATE#") {
+				($inartist,$intitle,$inupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody) = split(/\|/,$line);
+				if ($inartist eq "#DATE#") {
 					#skip
-				} elsif ($intitle eq $oldtitle) {
+				} elsif (($intitle eq $oldtitle) && ($inartist eq $oldartist)) {
 					$writenew.=$new;
 					$preview.=$previewnew;
 					$changed=1;
-					print "$newtitle updated<br><br>\n";
+					print "$newartist, $newtitle updated<br><br>\n";
 				} else {
-					$new.="$intitle|$inartist|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n";
-					$previewnew.="$intitle|$inartist|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|<br>\n";
+					$new.="$inartist|$intitle|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n";
+					$preview.="$inartist|$intitle|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|<br>\n";
 				}
 			}
 		}
@@ -1159,6 +1167,7 @@ sub getqueries {
 		$value =~ tr/+/ /;
 		$value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
 		$value =~ s/<!--(.|\n)*-->//g;
+		$value =~ s/\"/\'\'/g;;
 		$FORM{$name} = $value;
 		$delay.=" || $name = $value";
 	}
