@@ -962,7 +962,7 @@ sub media {
 					$changed=1;
 					print "$newartist, $newtitle updated<br><br>\n";
 				} else {
-					$new.="$inartist|$intitle|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n";
+					$writenew.="$inartist|$intitle|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n";
 					$preview.="$inartist|$intitle|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|<br>\n";
 				}
 			}
@@ -971,7 +971,7 @@ sub media {
 		if ($changed != 1) {
 			$writenew.=$new;
 			$preview.=$previewnew;
-			print "$newtitle added<br><br>\n";
+			print "$newartist, $newtitle added<br><br>\n";
 		}
 
 		if ($debugwrite eq "1") {
@@ -981,7 +981,7 @@ sub media {
 		}
 
 		if ($debugpreviewhide eq "1") {
-			print "$writenew";
+			print "<!--\n$writenew\n-->\n";
 		}
 
 		if ($debugpreviewshow eq "1") {
@@ -1007,9 +1007,9 @@ sub media {
 			if ($debugwrite eq 0) {$dashwrite="off";} else {$dashwrite="on";}
 			if ($debugpreviewhide eq 0) {$dashpreviewhide="off";} else {$dashpreviewhide="on";}
 			if ($debugpreviewshow eq 0) {$dashpreviewshow="off";} else {$dashpreviewshow="on";}
-			print "    <tr class=\"grid\">\n     <td>$dashwrite</td><td>$dashpreviewhide</td>\n     <td>$dashpreviewshow</td>\n    </tr>\n";
+			print "    <tr class=\"grid\">\n     <td>$dashwrite</td>\n     <td>$dashpreviewhide</td>\n     <td>$dashpreviewshow</td>\n    </tr>\n";
 		}
-		print "    <tr><td align=center colspan=$columns><a href=\"$thispage?dowhat=debugedit&dotype=$dotype\">Change Debug</a></td></tr>\n";
+		print "    <tr><td align=center colspan=$columns><a href=\"$thispage?dowhat=debugedit&dotype=$dotype&fromtype=$fromtype\">Change Debug</a></td></tr>\n";
 		print "    </tbody>\n   </table>\n";
 	}
 
@@ -1074,7 +1074,7 @@ sub media {
 		}
 
 		print "     <tr>\n      <td colspan=3 align=center>\n       <input type=button value=\"Cancel\" onClick=\"history.back()\">\n       <input type=submit value=\"Submit\">\n      </td>\n     </tr>\n";
-		print "     <input type=hidden name=dowhat value=debugwrite>\n     <input type=hidden name=dotype value=$dotype>\n";
+		print "     <input type=hidden name=dowhat value=debugwrite>\n     <input type=hidden name=dotype value=$dotype>\n     <input type=hidden name=fromtype value=$fromtype>\n";
 		print "    </tbody>\n   </table>\n";
 	}
 
@@ -1083,8 +1083,8 @@ sub media {
 		open (WRITEINFO,">$basedir/$mediaitem") || &error("error: mediaitem /$mediaitem");
 		print (WRITEINFO $writenew);
 		close (WRITEINFO);
-		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"4;URL=$thispage?dotype=$dotype&dowhat=debugview\">\n";
-		print "     <p><a href=\"$thispage?gopage=media&dotype=$dotype&dowhat=debugview\">main screen</a>";
+		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"4;URL=$thispage?dotype=$fromtype\">\n";
+		print "     <p><a href=\"$thispage?gopage=media&dotype=$fromtype\">main screen</a>";
 		&footer;
 	}
 }
@@ -1103,7 +1103,7 @@ sub header {
 	} else {
 		print "     <td align=center class=header width=50%>Media Admin: write $write</td>\n";
 	}
-	print "     <td align=center class=header width=50%>{ <a href=\"$thispage?dotype=debug&dowhat=debugview\">debugview</a> | <a href=\"$thispage?dotype=books\">books</a> | <a href=\"$thispage?dotype=games\">games</a> | <a href=\"$thispage?dotype=music\">music</a> | <a href=\"$thispage?dotype=videos\">videos</a> }</td>\n";
+	print "     <td align=center class=header width=50%>{ <a href=\"$thispage?dotype=debug&dowhat=debugview&fromtype=$dotype\">debugview</a> | <a href=\"$thispage?dotype=books\">books</a> | <a href=\"$thispage?dotype=games\">games</a> | <a href=\"$thispage?dotype=music\">music</a> | <a href=\"$thispage?dotype=videos\">videos</a> }</td>\n";
 	print "    </tr>\n   </table>\n  </td>\n </tr>\n\n <tr>\n <form method=get action=$thispage>\n  <td align=center>";
 }
 
@@ -1247,4 +1247,5 @@ sub getqueries {
 	$editdebugwrite=$FORM{'debugwrite'};
 	$editdebugpreviewhide=$FORM{'debugpreviewhide'};
 	$editdebugpreviewshow=$FORM{'debugpreviewshow'};
+	$fromtype=$FORM{'fromtype'};
 }
