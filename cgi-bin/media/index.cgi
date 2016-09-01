@@ -6,7 +6,7 @@ $year=$year+1900;
 
 $dateupdated="2016.09.01";
 $basedir="";
-$mediaitem="$basedir/cgi-bin/mediademo/media_";
+$mediaitem="$basedir/cgi-bin/media/media_";
 $thispage="index.cgi";
 $empty="0";
 
