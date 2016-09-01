@@ -103,7 +103,7 @@ if ($pagetitle ne "book") {
       ($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$upc) = split(/\|/,$_);
       if ($title eq "#DATE#") {
 	    $dataupdated=$epic;
-	  } elsif ($title ne "#Video Games#") {
+	  } else {
         $table.= "  <tr class=\"grid\">\n   <td>$title</td><td>$epic</td><td>$steam</td><td>$battlenet</td><td>$origin</td><td>$uplay</td><td>$nes</td><td>$wii</td><td>$ps2</td><td>$xboxone</td><td>$xbox360</td><td>$upc</td>\n  </tr>\n";
       }
     }
@@ -117,7 +117,7 @@ if ($pagetitle ne "book") {
       ($title,$type,$bluray,$dvd,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn) = split(/\|/,$_);
       if ($title eq "#DATE#") {
 	    $dataupdated=$type;
-	  } elsif ($title ne "#Movie#") {
+	  } else {
         $table.= "  <tr class=\"grid\">\n   <td class=\"title\">$title</td><td>$type</td><td>$bluray</td><td>$dvd</td><td>$amazon</td><td>$disneyanywhere</td><td>$googleplay</td><td>$itunes</td><td>$uvvu</td><td>$upc</td><td>$isbn</td>\n  </tr>\n";
       }
     }
@@ -131,22 +131,22 @@ if ($pagetitle ne "book") {
       ($title,$author,$upc,$isbn,$type) = split(/\|/,$_);
       if ($title eq "#DATE#") {
 	    $dataupdated=$author;
-	  } elsif ($title ne "#Books#") {
+	  } else {
         $table.= "  <tr class=\"grid\">\n   <td>$title</td><td>$author</td><td>$upc</td><td>$isbn</td><td>$type</td>\n  </tr>\n";
       }
     }
     $table.= " </tbody>\n";
   }  elsif ($pagetitle eq "music") {
-    ##Title#|#Artist#|#UPC#|#CD#|#Amazon#|#DJBooth#|#Google#|#iTunes#|#ReverbNation#|#TopSpin#|#Rhapsody#|
+    ##Artist#|#Title#|#UPC#|#CD#|#Amazon#|#DJBooth#|#Google#|#iTunes#|#ReverbNation#|#TopSpin#|#Rhapsody#|
     $table.= " <thead>\n  <tr>\n   <th>Artist &ndash; Album</th>\n   <th>UPC</th>\n   <th>CD</th>\n   <th>Amazon</th>\n   <th>DJ Booth</th>\n  <th>Google Play</th>\n  <th>Groove</th>\n  <th>iTunes</th>\n  <th>ReverbNation</th>\n  <th>TopSpin</th>\n  <th>Rhapsody</th>\n  </tr>\n </thead>\n";
 
     $table.= " <tbody>\n";
     foreach (@in) {
-      ($title,$artist,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$_);
-      if ($title eq "#DATE#") {
-	    $dataupdated=$artist;
-	  } elsif ($title ne "#Music#") {
-        $table.= "  <tr class=\"grid\">\n   <td>$artist  $title</td><td>$upc</td><td>$cd</td><td>$amazon</td><td>$djbooth</td><td>$googleplay</td><td>$groove</td><td>$itunes</td><td>$reverbnation</td><td>$topspin</td><td>$rhapsody</td>\n  </tr>\n";
+      ($artist,$title,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$_);
+      if ($artist eq "#DATE#") {
+	    $dataupdated=$title;
+	  } else {
+        $table.= "  <tr class=\"grid\">\n   <td>$artist &ndash; $title</td><td>$upc</td><td>$cd</td><td>$amazon</td><td>$djbooth</td><td>$googleplay</td><td>$groove</td><td>$itunes</td><td>$reverbnation</td><td>$topspin</td><td>$rhapsody</td>\n  </tr>\n";
       }
     }
     $table.= " </tbody>\n";
@@ -158,7 +158,7 @@ print "<div align=left>";
 if ($empty != "1") {
  print "data updated: $dataupdated | ";
 }
-print "<a href=\"javascript:SizedPop('mediademo','media.pl','$query',1325,625);\">admin</a> | ";
+print "<a href=\"javascript:SizedPop('help','media.pl','$query',1325,625);\">admin</a> | ";
 print "<a href=\"$thispage?books\">books</a> | ";
 print "<a href=\"$thispage?games\">games</a> | ";
 print "<a href=\"$thispage?music\">music</a> | ";
