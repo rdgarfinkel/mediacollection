@@ -25,6 +25,7 @@ for this script to run, you'll need to have a web server capable of running Perl
 /javascripts/jquery-1.5.1.min.js, http://jquery.com/, http://sizzlejs.com/: required for use of freezeheader below<br>
 /javascripts/jquery.freezeheader.js, http://brentmuir.com/projects/freezeheader: freezes table header at the top of the screen when scrolling down
 
-# may do/fix?
-automatic item fill in with UPC code<br>
-when items are added, they'll be added to the bottom of the list, disregarding any type of sort. currently, the only way to organize the list is to go into an item to edit, do not make any changes, then submit the edit.
+# still to do and fix
+when using the ampersand (&) symbol in text fields, the editing feature doesn't work. seems that the 'query string' parsing splits this like it is a separate entry.<br>
+automatic item fill in with UPC code.<br>
+when items are added, they'll be added to the bottom of the list. currently, the only way to organize the list is to go into an item to edit, then submit the edit with or without changes.
