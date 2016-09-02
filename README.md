@@ -31,7 +31,7 @@ The scripts below are only implemented on the non-adminsitrative page:
 
 # items of note
 While testing, when using the <b>&</b> ampersand symbol in text fields, the editing feature didn't work. It seems that the 'query string' parsing splits this like it is a separate entry. Text replacement will occur server side, swapping the <b>&</b> symbol for <b>and</b> text.<br>
-While testing, when using double quotation <b>"</b> symbol in text fields, the editing feature didn't work. When clicking an entry to edit, the browser would interpret the quotations as the end of an <b>A HREF</a> HTML tag. Text replacement will occur server side, swapping the <b>"</b> symbol for <b>''</b> two single quotation symbols.
+While testing, when using double quotation <b>"</b> symbol in text fields, the editing feature didn't work. When clicking an entry to edit, the browser would interpret the quotations as the end of an <b>A HREF</b> HTML tag. Text replacement will occur server side, swapping the <b>"</b> symbol for <b>''</b> two single quotation symbols.
 When items are added, they'll be added to the bottom of the list. That entry can be sorted upon editing another entry and submitting.
 
 # things to add
