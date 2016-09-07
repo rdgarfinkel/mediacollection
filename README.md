@@ -35,4 +35,11 @@ While testing, when using double quotation <b>"</b> symbol in text fields, the e
 When items are added, they'll be added to the bottom of the list. That entry can be sorted upon editing another entry and submitting.
 
 # things to add
-Automatic item fill in with UPC code.
+Automatic item fill in with UPC code (maybe)?
+
+# change log
+2016.09.07<br>
+forced width of title column on non-admin and admin pages<br>
+changed color of row highlight to a darker color<br>
+put UPC/ISBN closer to the left side, where appropriate on the different media types. some were on the left, others on the right<br>
+turned off "fixed header" on the non-admin page; sometimes the header stayed fixed, other times not, and would sometimes not be scaled with the columns below<br>
