@@ -26,8 +26,8 @@ For this script to run, you'll need to have a web server capable of running Perl
 # what is included
 The scripts below are only implemented on the non-adminsitrative page:
 /javascripts/gs_sortable.js, http://www.allmyscripts.com/Table_Sort/index.html: allows for the dynamic sorting of table headers (only accessible when page has not been scrolled down)<br>
-/javascripts/jquery-1.5.1.min.js, http://jquery.com/, http://sizzlejs.com/: required for use of freezeheader below<br>
-/javascripts/jquery.freezeheader.js, http://brentmuir.com/projects/freezeheader: freezes table header at the top of the screen when scrolling down
+/javascripts/jquery-1.5.1.min.js, http://jquery.com/, http://sizzlejs.com/: disabled, but required for use of freezeheader below<br>
+/javascripts/jquery.freezeheader.js, http://brentmuir.com/projects/freezeheader: disabled because it's unreliable in operation, freezes table header at the top of the screen when scrolling down
 
 # items of note
 While testing, when using the <b>&</b> ampersand symbol in text fields, the editing feature didn't work. It seems that the 'query string' parsing splits this like it is a separate entry. Text replacement will occur server side, swapping the <b>&</b> symbol for <b>and</b> text.<br>
@@ -38,6 +38,8 @@ When items are added, they'll be added to the bottom of the list. That entry can
 Automatic item fill in with UPC code (maybe)?
 
 # change log
+2016.09.08<br>
+video section, BluRay and DVD columns are now combined into one, which will allow adding more media types in the future, if needed (ie. VHS, LaserDisc, HD-DVD, etc. if it is requested). there is a "transfer" script that is in the cgi-bin/media folder that will combine the BluRay and DVD entries into one entry.<br>
 2016.09.07<br>
 forced width of title column on non-admin and admin pages<br>
 changed color of row highlight to a darker color<br>
