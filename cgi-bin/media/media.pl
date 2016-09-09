@@ -5,13 +5,16 @@ print "Content-type: text/html\nPragma: no-cache\n\n";
 ### "global" settings and script settings
 ###    base directory and static locations for certain parts of the site
 $basedir="";
+
+#  media
+$directory="media";
+$mediaitem="cgi-bin/$directory/media_";
+$mediacheck="cgi-bin";
 $thispage="media.pl";
-###  media
-$mediaitem="cgi-bin/media/media_";
 $debug=$mediaitem."debug.txt";
 
 #  headers for the admin pages
-$dateupdated="2016.09.07";
+$dateupdated="2016.09.08";
 
 &getqueries;
 
@@ -41,8 +44,11 @@ sub media {
 	}
 
 	if ($dowhat eq "mediaedit") {&mediaedit;}
-	elsif ($dowhat eq "mediawrite") {&mediawrite;}
 	elsif ($dowhat eq "mediaadd") {&mediaedit;}
+	elsif ($dowhat eq "mediabarcode") {&mediaaddid;}
+	elsif ($dowhat eq "mediaisbn") {&mediaaddid;}
+	elsif ($dowhat eq "mediacheck") {&mediacheck;}
+	elsif ($dowhat eq "mediawrite") {&mediawrite;}
 	elsif ($dowhat eq "mediadelete") {&mediadelete;}
 	elsif ($dowhat eq "debugview") {&debugview;}
 	elsif ($dowhat eq "debugedit") {&debugedit;}
@@ -62,7 +68,7 @@ sub media {
 		if ($dotype eq 'books'){
 			$count_ebook=0;
 			$count_book=0;
-			print "    <thead>\n     <th>#</th>\n     <th>Title</th>\n     <th>Author(s)</th>\n     <th>UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n    <tbody>\n";
+			print "    <thead>\n     <th>#</th>\n     <th>Title</th>\n     <th>Author(s)</th>\n     <th>EAC/UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n    <tbody>\n";
 
 			foreach $line(@in) {
 				$line =~ s/\n//g;
@@ -70,7 +76,7 @@ sub media {
 				$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
 				$line =~ s/<!--(.|\n)*-->//g;
 				$line =~ s/\"/\'\'/g;
-				($title,$author,$upc,$isbn,$type) = split(/\|/,$line);  
+				($title,$author,$eacupc,$isbn,$type) = split(/\|/,$line);  
 				if ($title ne "#DATE#") {
 					if ($type eq "ebook") {
 						$count_ebook=$count_ebook+1;
@@ -81,7 +87,7 @@ sub media {
 					$titledisplay =~ s/\'\'/\"/g;
 					$authordisplay=$author;
 					$authordisplay =~ s/\'\'/\"/g;
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?gopage=media&dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td><div>$authordisplay</div></td>\n     <td>$upc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td><a href=\"$thispage?gopage=media&dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td><div>$authordisplay</div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
 					$count_title=$count_title+1;
 				} else {
 					$update=$author;
@@ -103,7 +109,7 @@ sub media {
 			$count_xboxonedl=0;
 			$count_xbox360dk=0;
 			$count_xbox360dl=0;
-			print "    <thead>\n     <th>#</th>\n     <th>Title</th>\n     <th>UPC</th>\n     <th>Battle.net</th>\n     <th>Epic</th>\n     <th>NES</th>\n     <th>Origin</th>\n     <th>PS2</th>\n     <th>Steam</th>\n     <th>Uplay</th>\n     <th>XBox 360</th>\n     <th>XBox One</th>\n     <th>Wii</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n    <tbody>\n";
+			print "    <thead>\n     <th>#</th>\n     <th>Title</th>\n     <th>EAC/UPC</th>\n     <th>Battle.net</th>\n     <th>Epic</th>\n     <th>NES</th>\n     <th>Origin</th>\n     <th>PS2</th>\n     <th>Steam</th>\n     <th>Uplay</th>\n     <th>XBox 360</th>\n     <th>XBox One</th>\n     <th>Wii</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n    <tbody>\n";
 
 			foreach $line(@in) {
 				$line =~ s/\n//g;
@@ -111,7 +117,7 @@ sub media {
 				$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
 				$line =~ s/<!--(.|\n)*-->//g;
 				$line =~ s/\"/\'\'/g;
-				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$upc) = split(/\|/,$line);  
+				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc) = split(/\|/,$line);  
 				if ($title ne "#DATE#") {
 					if ($epic eq "X") {
 						$count_epic=$count_epic+1;
@@ -139,31 +145,34 @@ sub media {
 					}
 					if ($xboxone eq "X, BC") {
 						$count_xboxonebc=$count_xboxonebc+1;
+						$xboxonetotal=$xboxonetotal+1;
 					}
 					if ($xboxone eq "X, DK") {
 						$count_xboxonedk=$count_xboxonedk+1;
+						$xboxonetotal=$xboxonetotal+1;
 					}
 					if ($xboxone eq "X, DL") {
 						$count_xboxonedl=$count_xboxonedl+1;
+						$xboxonetotal=$xboxonetotal+1;
 					}
 					if ($xbox360 eq "X, DK") {
 						$count_xbox360dk=$count_xbox360dk+1;
+						$xbox360total=$xbox360total+1;
 					}
 					if ($xbox360 eq "X, DL") {
 						$count_xbox360dl=$count_xbox360dl+1;
+						$xbox360total=$xbox360total+1;
 					}
 					$titledisplay=$title;
 					$titledisplay =~ s/\'\'/\"/g;
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?gopage=media&dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td>$upc</td>\n     <td>$battlenet</td>\n     <td>$epic</td>\n     <td>$nes</td>\n     <td>$origin</td>\n     <td>$ps2</td>\n     <td>$steam</td>\n     <td>$uplay</td>\n     <td>$xbox360</td>\n     <td>$xboxone</td>\n     <td>$wii</td>\n     <td><a href=\"$thispage?gopage=media&dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$battlenet</td>\n     <td>$epic</td>\n     <td>$nes</td>\n     <td>$origin</td>\n     <td>$ps2</td>\n     <td>$steam</td>\n     <td>$uplay</td>\n     <td>$xbox360</td>\n     <td>$xboxone</td>\n     <td>$wii</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
 					$count_title=$count_title+1;
 				} else {
 					$update=$epic;
 				}
 			}
-			$xbox360total=$count_xbox360dk+$count_xbox360dl;
-			$xboxonetotal=$count_xboxonebc+$count_xboxonedk+$count_xboxonedl;
 			$count_title=$count_title-1;
-			print "    <tr><td align=center colspan=$columns><b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>Epic $count_epic || Steam $count_steam || Battle.net $count_battlenet || Origin $count_origin || uPlay $count_uplay || NES $count_nes || Wii $count_wii || PS2 $count_ps2 || XBox 360 $xbox360total || XBox One $xboxonetotal<br>XBox One backwards compatible $count_xboxonebc || XBox One disk $count_xboxonedk ||  XBox One download $count_xboxonedl || XBox 360 disk $count_xbox360dk || XBox 360 download $count_xbox360dl</td></tr>\n";
+			print "    <tr><td align=center colspan=$columns><b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>Battle.net $count_battlenet || Epic $count_epic || NES $count_nes || Origin $count_origin || PS2 $count_ps2 || Steam $count_steam || uPlay $count_uplay || Wii $count_wii || XBox 360 $xbox360total || XBox One $xboxonetotal<br>XBox One backwards compatible $count_xboxonebc || XBox One disk $count_xboxonedk ||  XBox One download $count_xboxonedl || XBox 360 disk $count_xbox360dk || XBox 360 download $count_xbox360dl</td></tr>\n";
 		} elsif ($dotype eq 'videos'){
 			$count_tv=0;
 			$count_movie=0;
@@ -174,7 +183,7 @@ sub media {
 			$count_googleplay=0;
 			$count_itunes=0;
 			$count_uvvu=0;
-			print "    <thead>\n     <th>#</th>\n     <th>Title</th>\n     <th>UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>BluRay</th>\n     <th>DVD</th>\n     <th>Amazon</th>\n     <th>Disney<br>Anywhere</th>\n     <th>Google Play</th>\n     <th>iTunes</th>\n     <th>UVVU</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n    <tbody>\n";
+			print "    <thead>\n     <th>#</th>\n     <th>Title</th>\n     <th>EAC/UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Physical<br>Media</th>\n     <th>Amazon</th>\n     <th>Disney<br>Anywhere</th>\n     <th>Google<br>Play</th>\n     <th>iTunes</th>\n     <th>UVVU</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n    <tbody>\n";
 
 			foreach $line(@in) {
 				$line =~ s/\n//g;
@@ -182,18 +191,24 @@ sub media {
 				$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
 				$line =~ s/<!--(.|\n)*-->//g;
 				$line =~ s/\"/\'\'/g;
-				($title,$type,$bluray,$dvd,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn) = split(/\|/,$line);  
+				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn) = split(/\|/,$line);  
 				if ($title ne "#DATE#") {
+					$mediadisplay="";
 					if ($type eq "TV") {
 						$count_tv=$count_tv+1;
 					} else {
 						$count_movie=$count_movie+1;
 					}
-					if ($bluray eq "X") {
+					if ($media eq "bluray") {
 						$count_bluray=$count_bluray+1;
-					} 
-					if ($dvd eq "X") {
+						$mediadisplay="BluRay";
+					} elsif ($media eq "dvd") {
 						$count_dvd=$count_dvd+1;
+						$mediadisplay="DVD";
+					} elsif ($media eq "diskcombo") {
+						$count_bluray=$count_bluray+1;
+						$count_dvd=$count_dvd+1;
+						$mediadisplay="BluRay/DVD";
 					}
 					if ($amazon eq "X") {
 						$count_amazon=$count_amazon+1;
@@ -212,14 +227,14 @@ sub media {
 					}
 					$titledisplay=$title;
 					$titledisplay =~ s/\'\'/\"/g;
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?gopage=media&dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td>$upc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td>$bluray</td>\n     <td>$dvd</td>\n     <td>$amazon</td>\n     <td>$disneyanywhere</td>\n     <td>$googleplay</td>\n     <td>$itunes</td>\n     <td>$uvvu</td>\n     <td><a href=\"$thispage?gopage=media&dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td>$mediadisplay</td>\n     <td>$amazon</td>\n     <td>$disneyanywhere</td>\n     <td>$googleplay</td>\n     <td>$itunes</td>\n     <td>$uvvu</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
 					$count_title=$count_title+1;
 				} else {
 					$update=$type;
 				}
 			}
 			$count_title=$count_title-1;
-			print "    <tr><td align=center colspan=$columns><b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>Movies $count_movie || TV $count_tv || BluRay $count_bluray || DVDs $count_dvd || Amazon Video $count_amazon || Google Play $count_googleplay || itunes $count_itunes || UVVU $count_uvvu</td></tr>\n";
+			print "    <tr><td align=center colspan=$columns><b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>Movies $count_movie || TV $count_tv || BluRay $count_bluray || DVDs $count_dvd || Amazon Video $count_amazon || Disney Anywhere $count_disneyanywhere || Google Play $count_googleplay || iTunes $count_itunes || UVVU $count_uvvu</td></tr>\n";
 		} elsif ($dotype eq 'music'){
 			$count_cd=0;
 			$count_amazon=0;
@@ -230,7 +245,7 @@ sub media {
 			$count_reverbnation=0;
 			$count_topspin=0;
 			$count_rhapsody=0;
-			print "    <thead>\n     <th>#</th>\n     <th>Artist &ndash; Title</th>\n     <th>UPC</th>\n     <th>CD</th>\n     <th>Amazon</th>\n     <th>DJ Booth</th>\n     <th>Google Play</th>\n     <th>Groove</th>\n     <th>iTunes</th>\n     <th>ReverbNation</th>\n     <th>Rhapsody</th>\n     <th>TopSpin</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n    <tbody>\n";
+			print "    <thead>\n     <th>#</th>\n     <th>Artist &ndash; Title</th>\n     <th>EAC/UPC</th>\n     <th>CD</th>\n     <th>Amazon</th>\n     <th>DJ Booth</th>\n     <th>Google<br>Play</th>\n     <th>Groove</th>\n     <th>iTunes</th>\n     <th>ReverbNation</th>\n     <th>Rhapsody</th>\n     <th>TopSpin</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n    <tbody>\n";
 
 			foreach $line(@in) {
 				$line =~ s/\n//g;
@@ -238,7 +253,7 @@ sub media {
 				$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
 				$line =~ s/<!--(.|\n)*-->//g;
 				$line =~ s/\"/\'\'/g;
-				($artist,$title,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$line);
+				($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$line);
 				if ($artist ne "#DATE#") {
 					if ($cd eq "X") {
 						$count_cd=$count_cd+1;
@@ -271,7 +286,7 @@ sub media {
 					$titledisplay =~ s/\'\'/\"/g;
 					$artistdisplay=$artist;
 					$artistdisplay =~ s/\'\'/\"/g;
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?gopage=media&dotype=$dotype&dowhat=mediaedit&showline=$line\">$artistdisplay &ndash; $titledisplay</a></div></td>\n     <td>$upc</td>\n     <td>$cd</td>\n     <td>$amazon</td>\n     <td>$djbooth</td>\n     <td>$googleplay</td>\n     <td>$groove</td>\n     <td>$itunes</td>\n     <td>$reverbnation</td>\n     <td>$rhapsody</td>\n     <td>$topspin</td>\n     <td><a href=\"$thispage?gopage=media&dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$artistdisplay &ndash; $titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$cd</td>\n     <td>$amazon</td>\n     <td>$djbooth</td>\n     <td>$googleplay</td>\n     <td>$groove</td>\n     <td>$itunes</td>\n     <td>$reverbnation</td>\n     <td>$rhapsody</td>\n     <td>$topspin</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
 					$count_title=$count_title+1;
 				} else {
 					$update=$title;
@@ -282,7 +297,7 @@ sub media {
 		}
 
 		if ($dotype ne "debug") {
-			print "    <tr><td align=center colspan=$columns><a href=\"$thispage?gopage=media&dowhat=mediaadd&dotype=$dotype\">Add Item</a></td></tr>\n";
+			print "    <tr><td align=center colspan=$columns><a href=\"$thispage?dowhat=mediaadd&dotype=$dotype\">Add Item</a></td></tr>\n";
 		}
 		print "    </tbody>\n";
 		print "   </table>";
@@ -300,14 +315,22 @@ sub media {
 		}
 
 		if ($dotype eq 'books'){
-			($title,$author,$upc,$isbn,$type)=split(/\|/,$showline);
+			if ($dowhat eq "mediaadd") {
+				$author=$newauthor;
+				$title=$newtitle;
+				$eacupc=$neweacupc;
+				$isbn=$newisbn;
+				$type=$newtype;
+			} else {
+				($title,$author,$eacupc,$isbn,$type)=split(/\|/,$showline);
+			}
 
-			print "     <tr>\n      <th align=right width=30%>title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>author:</th>\n      <td><input type=text name=newauthor value=\"$author\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>upc:</th>\n      <td>\n       <input type=text name=newupc value=\"$upc\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>isbn:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>Author:</th>\n      <td><input type=text name=newauthor value=\"$author\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td>\n       <input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>ISBN:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>type:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>Type:</th>\n      <td>\n";
 			print "       <select name=newtype>\n";
 			if ($type eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -327,12 +350,18 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 		} elsif ($dotype eq 'games'){
-			($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$upc)=split(/\|/,$showline);
+			if ($dowhat eq "mediaadd") {
+				$title=$newtitle;
+				$eacupc=$neweacupc;
+				$isbn=$newisbn;
+			} else {
+				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc)=split(/\|/,$showline);
+			}
 
-			print "     <tr>\n      <th align=right width=30%>title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>upc:</th>\n      <td>\n       <input type=text name=newupc value=\"$upc\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td>\n       <input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>epic:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>Epic:</th>\n      <td>\n";
 			print "       <select name=newepic>\n";
 			if ($epic eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -347,7 +376,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>steam:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>Steam:</th>\n      <td>\n";
 			print "       <select name=newsteam>\n";
 			if ($steam eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -362,7 +391,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>battlenet:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>Battlenet:</th>\n      <td>\n";
 			print "       <select name=newbattlenet>\n";
 			if ($battlenet eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -377,7 +406,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>origin:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>Origin:</th>\n      <td>\n";
 			print "       <select name=neworigin>\n";
 			if ($origin eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -392,7 +421,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>uplay:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>uPlay:</th>\n      <td>\n";
 			print "       <select name=newuplay>\n";
 			if ($uplay eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -407,7 +436,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>nes:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>NES:</th>\n      <td>\n";
 			print "       <select name=newnes>\n";
 			if ($nes eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -422,7 +451,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>wii:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>Wii:</th>\n      <td>\n";
 			print "       <select name=newwii>\n";
 			if ($wii eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -437,7 +466,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>ps2:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>PS2:</th>\n      <td>\n";
 			print "       <select name=newps2>\n";
 			if ($ps2 eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -452,7 +481,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>xboxone:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>XBoxOne:</th>\n      <td>\n";
 			print "       <select name=newxboxone>\n";
 			if ($xboxone eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -477,7 +506,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>xbox360:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>XBox360:</th>\n      <td>\n";
 			print "       <select name=newxbox360>\n";
 			if ($xbox360 eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -496,13 +525,19 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 		} elsif ($dotype eq 'videos'){
-			($title,$type,$bluray,$dvd,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn)=split(/\|/,$showline);
+			if ($dowhat eq "mediaadd") {
+				$title=$newtitle;
+				$eacupc=$neweacupc;
+				$isbn=$newisbn;
+				$type=$newtype;
+			} else {
+				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn)=split(/\|/,$showline);
+			}
 
-			print "     <tr>\n      <th align=right width=30%>title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>upc:</th>\n      <td><input type=text name=newupc value=\"$upc\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>isbn:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td><input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>type:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>Type:</th>\n      <td>\n";
 			print "       <select name=newtype>\n";
 			if ($type eq 'Movie'){
 				print "        <option value=\"Movie\" selected>Movie</option>\n";
@@ -517,37 +552,32 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>bluray:</th>\n      <td>\n";
-			print "       <select name=newbluray>\n";
-			if ($bluray eq ''){
+			print "     <tr>\n      <th align=right>Media:</th>\n      <td>\n";
+			print "       <select name=newmedia>\n";
+			if ($media eq ''){
 				print "        <option value=\"\" selected></option>\n";
 			} else {
 				print "        <option value=\"\"></option>\n";
 			}
-			if ($bluray eq 'X'){
-				print "        <option value=\"X\" selected>X</option>\n";
+			if ($media eq 'dvd'){
+				print "        <option value=\"dvd\" selected>DVD</option>\n";
 			} else {
-				print "        <option value=\"X\">X</option>\n";
+				print "        <option value=\"dvd\">DVD</option>\n";
+			}
+			if ($media eq 'bluray'){
+				print "        <option value=\"bluray\" selected>BluRay</option>\n";
+			} else {
+				print "        <option value=\"bluray\">BluRay</option>\n";
+			}
+			if ($media eq 'diskcombo'){
+				print "        <option value=\"diskcombo\" selected>BluRay/DVD</option>\n";
+			} else {
+				print "        <option value=\"diskcombo\">BluRay/DVD</option>\n";
 			}
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>dvd:</th>\n      <td>\n";
-			print "       <select name=newdvd>\n";
-			if ($dvd eq ''){
-				print "        <option value=\"\" selected></option>\n";
-			} else {
-				print "        <option value=\"\"></option>\n";
-			}
-			if ($dvd eq 'X'){
-				print "        <option value=\"X\" selected>X</option>\n";
-			} else {
-				print "        <option value=\"X\">X</option>\n";
-			}
-			print "       </select>\n";
-			print "      </td>\n     </tr>\n";
-
-			print "     <tr>\n      <th align=right>amazon:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>Amazon:</th>\n      <td>\n";
 			print "       <select name=newamazon>\n";
 			if ($amazon eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -562,7 +592,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>disneyanywhere:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>DisneyAnywhere:</th>\n      <td>\n";
 			print "       <select name=newdisneyanywhere>\n";
 			if ($disneyanywhere eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -577,7 +607,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>googleplay:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>GooglePlay:</th>\n      <td>\n";
 			print "       <select name=newgoogleplay>\n";
 			if ($googleplay eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -592,7 +622,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>itunes:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>iTunes:</th>\n      <td>\n";
 			print "       <select name=newitunes>\n";
 			if ($itunes eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -607,7 +637,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>uvvu:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>UVVU:</th>\n      <td>\n";
 			print "       <select name=newuvvu>\n";
 			if ($uvvu eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -622,13 +652,20 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 		} elsif ($dotype eq 'music'){
-			($artist,$title,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody)=split(/\|/,$showline);
+			if ($dowhat eq "mediaadd") {
+				$artist=$newauthor;
+				$title=$newtitle;
+				$eacupc=$neweacupc;
+				$isbn=$newisbn;
+			} else {
+				($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody)=split(/\|/,$showline);
+			}
 
-			print "     <tr>\n      <th align=right width=30%>artist:</th>\n      <td><input type=text name=newartist value=\"$artist\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>upc:</th>\n      <td><input type=text name=newupc value=\"$upc\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>Artist:</th>\n      <td><input type=text name=newartist value=\"$artist\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td><input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>cd:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>CD:</th>\n      <td>\n";
 			print "       <select name=newcd>\n";
 			if ($cd eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -643,7 +680,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>amazon:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>Amazon:</th>\n      <td>\n";
 			print "       <select name=newamazon>\n";
 			if ($amazon eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -658,7 +695,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>djbooth:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>DJBooth:</th>\n      <td>\n";
 			print "       <select name=newdjbooth>\n";
 			if ($djbooth eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -673,7 +710,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>googleplay:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>GooglePlay:</th>\n      <td>\n";
 			print "       <select name=newgoogleplay>\n";
 			if ($googleplay eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -688,7 +725,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>groove:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>Groove:</th>\n      <td>\n";
 			print "       <select name=newgroove>\n";
 			if ($groove eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -703,7 +740,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>itunes:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>iTunes:</th>\n      <td>\n";
 			print "       <select name=newitunes>\n";
 			if ($itunes eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -718,7 +755,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>reverbnation:</th>\n      <td>\n";
+			print "     <tr>\n      <th align=right>ReverbNation:</th>\n      <td>\n";
 			print "       <select name=newreverbnation>\n";
 			if ($reverbnation eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -732,23 +769,8 @@ sub media {
 			}
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
-
-			print "     <tr>\n      <th align=right>topspin:</th>\n      <td>\n";
-			print "       <select name=newtopspin>\n";
-			if ($topspin eq ''){
-				print "        <option value=\"\" selected></option>\n";
-			} else {
-				print "        <option value=\"\"></option>\n";
-			}
-			if ($topspin eq 'X'){
-				print "        <option value=\"X\" selected>X</option>\n";
-			} else {
-				print "        <option value=\"X\">X</option>\n";
-			}
-			print "       </select>\n";
-			print "      </td>\n     </tr>\n";
-
-			print "     <tr>\n      <th align=right>rhapsody:</th>\n      <td>\n";
+			
+			print "     <tr>\n      <th align=right>Rhapsody:</th>\n      <td>\n";
 			print "       <select name=newrhapsody>\n";
 			if ($rhapsody eq ''){
 				print "        <option value=\"\" selected></option>\n";
@@ -756,6 +778,21 @@ sub media {
 				print "        <option value=\"\"></option>\n";
 			}
 			if ($rhapsody eq 'X'){
+				print "        <option value=\"X\" selected>X</option>\n";
+			} else {
+				print "        <option value=\"X\">X</option>\n";
+			}
+			print "       </select>\n";
+			print "      </td>\n     </tr>\n";
+
+			print "     <tr>\n      <th align=right>TopSpin:</th>\n      <td>\n";
+			print "       <select name=newtopspin>\n";
+			if ($topspin eq ''){
+				print "        <option value=\"\" selected></option>\n";
+			} else {
+				print "        <option value=\"\"></option>\n";
+			}
+			if ($topspin eq 'X'){
 				print "        <option value=\"X\" selected>X</option>\n";
 			} else {
 				print "        <option value=\"X\">X</option>\n";
@@ -801,82 +838,82 @@ sub media {
 		}
 
 		if ($dotype eq 'books'){
-			($thistitle,$thisauthor,$thisupc,$thisisbn)=split(/\|/,$showline);
+			($thistitle,$thisauthor,$thiseacupc,$thisisbn)=split(/\|/,$showline);
 			$writenew="#DATE#|$today|#|#|#|\n";
 			$preview="#DATE#|$today|#|#|#|<br>\n";
-			$new="$thistitle|$thisauthor|$thisupc|$thisisbn|<br>\n";
+			$new="$thistitle|$thisauthor|$thiseacupc|$thisisbn|<br>\n";
 
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				#print "$line\n";
-				($intitle,$inauthor,$inupc,$inisbn,$intype) = split(/\|/,$line);
+				($intitle,$inauthor,$ineacupc,$inisbn,$intype) = split(/\|/,$line);
 				if ($intitle eq "#DATE#") {
 					#skip
 				} elsif ($intitle eq $thistitle) {
 					$changed=1;
 					print "$thistitle removed<br><br>\n";
 				} else {
-					$writenew.="$intitle|$inauthor|$inupc|$inisbn|$intype|\n";
-					$preview.="$intitle|$inauthor|$inupc|$inisbn|$intype|<br>\n";
+					$writenew.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|\n";
+					$preview.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|<br>\n";
 				}
 			}
 		} elsif ($dotype eq 'games'){
-			($thistitle,$thisepic,$thissteam,$thisbattlenet,$thisorigin,$thisuplay,$thisnes,$thiswii,$thisps2,$thisxboxone,$thisxbox360,$thisupc)=split(/\|/,$showline);
+			($thistitle,$thisepic,$thissteam,$thisbattlenet,$thisorigin,$thisuplay,$thisnes,$thiswii,$thisps2,$thisxboxone,$thisxbox360,$thiseacupc)=split(/\|/,$showline);
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
-			$new="$thistitle|$thisepic|$thissteam|$thisbattlenet|$thisorigin|$thisuplay|$thisnes|$thiswii|$thisps2|$thisxboxone|$thisxbox360|$thisupc|<br>\n";
+			$new="$thistitle|$thisepic|$thissteam|$thisbattlenet|$thisorigin|$thisuplay|$thisnes|$thiswii|$thisps2|$thisxboxone|$thisxbox360|$thiseacupc|<br>\n";
 
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				#print "$line\n";
-				($intitle,$inepic,$insteam,$inbattlenet,$inorigin,$inuplay,$innes,$inwii,$inps2,$inxboxone,$inxbox360,$inupc) = split(/\|/,$line);
+				($intitle,$inepic,$insteam,$inbattlenet,$inorigin,$inuplay,$innes,$inwii,$inps2,$inxboxone,$inxbox360,$ineacupc) = split(/\|/,$line);
 				if ($intitle eq "#DATE#") {
 					#skip
 				} elsif ($intitle eq $thistitle) {
 					$changed=1;
 					print "$thistitle removed<br><br>\n";
 				} else {
-					$writenew.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$inupc|\n";
-					$preview.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$inupc|<br>\n";
+					$writenew.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|\n";
+					$preview.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|<br>\n";
 				}
 			}
 		} elsif ($dotype eq 'videos'){
-			($thistitle,$thistype,$thisbluray,$thisdvd,$thisamazon,$thisdisneyanywhere,$thisgoogleplay,$thisitunes,$thisuvvu,$thisupc,$thisisbn)=split(/\|/,$showline);
+			($thistitle,$thistype,$thismedia,$thisamazon,$thisdisneyanywhere,$thisgoogleplay,$thisitunes,$thisuvvu,$thiseacupc,$thisisbn)=split(/\|/,$showline);
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|<br>\n";
-			$new="$thistitle|$thistype|$thisbluray|$thisdvd|$thisamazon|$thisdisneyanywhere|$thisgoogleplay|$thisitunes|$thisuvvu|$thisupc|$thisisbn|\n";
+			$new="$thistitle|$thistype|$thismedia|$thisamazon|$thisdisneyanywhere|$thisgoogleplay|$thisitunes|$thisuvvu|$thiseacupc|$thisisbn|\n";
 
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				#print "$line\n";
-				($intitle,$intype,$inbluray,$indvd,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$inupc,$inisbn) = split(/\|/,$line);
+				($intitle,$intype,$inmedia,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn) = split(/\|/,$line);
 				if ($intitle eq "#DATE#") {
 					#skip
 				} elsif ($intitle eq $thistitle) {
 					$changed=1;
 					print "$thistitle removed<br><br>\n";
 				} else {
-					$writenew.="$intitle|$intype|$inbluray|$indvd|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$inupc|$inisbn|\n";
-					$preview.="$intitle|$intype|$inbluray|$indvd|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$inupc|$inisbn|<br>\n";
+					$writenew.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|\n";
+					$preview.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|<br>\n";
 				}
 			}
 		} elsif ($dotype eq 'music'){
-			($thisartist,$thistitle,$thisupc,$thiscd,$thisamazon,$thisdjbooth,$thisgoogleplay,$thisgroove,$thisitunes,$thisreverbnation,$thistopspin,$thisrhapsody)=split(/\|/,$showline);
+			($thisartist,$thistitle,$thiseacupc,$thiscd,$thisamazon,$thisdjbooth,$thisgoogleplay,$thisgroove,$thisitunes,$thisreverbnation,$thistopspin,$thisrhapsody)=split(/\|/,$showline);
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
-			$new="$thisartist|$thistitle|$thisupc|$thiscd|$thisamazon|$thisdjbooth|$thisgoogleplay|$thisgroove|$thisitunes|$thisreverbnation|$thistopspin|$thisrhapsody|\n";
+			$new="$thisartist|$thistitle|$thiseacupc|$thiscd|$thisamazon|$thisdjbooth|$thisgoogleplay|$thisgroove|$thisitunes|$thisreverbnation|$thistopspin|$thisrhapsody|\n";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				#print "$line\n";
-				($inartist,$intitle,$inupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody) = split(/\|/,$line);
+				($inartist,$intitle,$ineacupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody) = split(/\|/,$line);
 				if ($inartist eq "#DATE#") {
 					#skip
 				} elsif ($intitle eq $thistitle) {
 					$changed=1;
 					print "$thisartist, $thistitle removed<br><br>\n";
 				} else {
-					$writenew.="$inartist|$intitle|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n";
-					$preview.="$inartist|$intitle|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|<br>\n";
+					$writenew.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n";
+					$preview.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|<br>\n";
 				}
 			}
 		}
@@ -895,8 +932,8 @@ sub media {
 			print "$preview";
 		}
 
-		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL=$thispage?gopage=media&dotype=$dotype\">\n";
-		print "     <p><a href=\"$thispage?gopage=media&dotype=$dotype\">main screen</a>";
+		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL=$thispage?dotype=$dotype\">\n";
+		print "     <p><a href=\"$thispage?dotype=$dotype\">main screen</a>";
 		&footer;
 	}
 
@@ -910,13 +947,14 @@ sub media {
 
 		if ($dotype eq 'books'){
 			$writenew="#DATE#|$today|#|#|#|\n";
-			$new="$newtitle|$newauthor|$newupc|$newisbn|$newtype|\n";
+			$new="$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|\n";
 			$preview="#DATE#|$today|#|#|#|<br>\n";
-			$previewnew="$newtitle|$newauthor|$newupc|$newisbn|$newtype|<br>\n";
+			$previewnew="$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|<br>\n";
+			$mediawrite="$dotype|$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				#print "$line\n";
-				($intitle,$inauthor,$inupc,$inisbn,$intype) = split(/\|/,$line);
+				($intitle,$inauthor,$ineacupc,$inisbn,$intype) = split(/\|/,$line);
 				if ($intitle eq "#DATE#") {
 					#skip
 				} elsif ($intitle eq $oldtitle) {
@@ -925,19 +963,20 @@ sub media {
 					$changed=1;
 					print "$newtitle updated<br><br>\n";
 				} else {
-					$writenew.="$intitle|$inauthor|$inupc|$inisbn|$intype|\n";
-					$preview.="$intitle|$inauthor|$inupc|$inisbn|$intype|<br>\n";
+					$writenew.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|\n";
+					$preview.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|<br>\n";
 				}
 			}
 		} elsif ($dotype eq 'games'){
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
-			$new="$newtitle|$newepic|$newsteam|$newbattlenet|$neworigin|$newuplay|$newnes|$newwii|$newps2|$newxboxone|$newxbox360|$newupc|\n";
+			$new="$newtitle|$newepic|$newsteam|$newbattlenet|$neworigin|$newuplay|$newnes|$newwii|$newps2|$newxboxone|$newxbox360|$neweacupc|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
-			$previewnew="$newtitle|$newepic|$newsteam|$newbattlenet|$neworigin|$newuplay|$newnes|$newwii|$newps2|$newxboxone|$newxbox360|$newupc|<br>\n";
+			$previewnew="$newtitle|$newepic|$newsteam|$newbattlenet|$neworigin|$newuplay|$newnes|$newwii|$newps2|$newxboxone|$newxbox360|$neweacupc|<br>\n";
+			$mediawrite="$dotype|$newtitle||$neweacupc|$newisbn||";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				#print "$line\n";
-				($intitle,$inepic,$insteam,$inbattlenet,$inorigin,$inuplay,$innes,$inwii,$inps2,$inxboxone,$inxbox360,$inupc) = split(/\|/,$line);
+				($intitle,$inepic,$insteam,$inbattlenet,$inorigin,$inuplay,$innes,$inwii,$inps2,$inxboxone,$inxbox360,$ineacupc) = split(/\|/,$line);
 				if ($intitle eq "#DATE#") {
 					#skip
 				} elsif ($intitle eq $oldtitle) {
@@ -946,19 +985,20 @@ sub media {
 					$changed=1;
 					print "$newtitle updated<br><br>\n";
 				} else {
-					$writenew.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$inupc|\n";
-					$preview.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$inupc|<br>\n";
+					$writenew.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|\n";
+					$preview.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|<br>\n";
 				}
 			}
 		} elsif ($dotype eq 'videos'){
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|\n";
-			$new="$newtitle|$newtype|$newbluray|$newdvd|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$newupc|$newisbn|\n";
+			$new="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|<br>\n";
-			$previewnew="$newtitle|$newtype|$newbluray|$newdvd|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$newupc|$newisbn|<br>\n";
+			$previewnew="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|<br>\n";
+			$mediawrite="$dotype|$newtitle||$neweacupc|$newisbn|$newtype|";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				#print "$line\n";
-				($intitle,$intype,$inbluray,$indvd,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$inupc,$inisbn) = split(/\|/,$line);
+				($intitle,$intype,$inmedia,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn) = split(/\|/,$line);
 				if ($intitle eq "#DATE#") {
 					#skip
 				} elsif ($intitle eq $oldtitle) {
@@ -967,19 +1007,20 @@ sub media {
 					$changed=1;
 					print "$newtitle updated<br><br>\n";
 				} else {
-					$writenew.="$intitle|$intype|$inbluray|$indvd|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$inupc|$inisbn|\n";
-					$preview.="$intitle|$intype|$inbluray|$indvd|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$inupc|$inisbn|<br>\n";
+					$writenew.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|\n";
+					$preview.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|<br>\n";
 				}
 			}
 		} elsif ($dotype eq 'music'){
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
-			$new="$newartist|$newtitle|$newupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|\n";
+			$new="$newartist|$newtitle|$neweacupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
-			$previewnew="$newartist|$newtitle|$newupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|<br>\n";
+			$previewnew="$newartist|$newtitle|$neweacupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|<br>\n";
+			$mediawrite="$dotype|$newtitle|$newartist|$neweacupc|$newisbn|$newtype|";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				#print "$line\n";
-				($inartist,$intitle,$inupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody) = split(/\|/,$line);
+				($inartist,$intitle,$ineacupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody) = split(/\|/,$line);
 				if ($inartist eq "#DATE#") {
 					#skip
 				} elsif (($intitle eq $oldtitle) && ($inartist eq $oldartist)) {
@@ -988,8 +1029,8 @@ sub media {
 					$changed=1;
 					print "$newartist, $newtitle updated<br><br>\n";
 				} else {
-					$writenew.="$inartist|$intitle|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n";
-					$preview.="$inartist|$intitle|$inupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|<br>\n";
+					$writenew.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n";
+					$preview.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|<br>\n";
 				}
 			}
 		}
@@ -997,28 +1038,107 @@ sub media {
 		if ($changed != 1) {
 			$writenew.=$new;
 			$preview.=$previewnew;
-			print "$newartist, $newtitle added<br><br>\n";
+			if ($newartist) {
+				print "$newartist, ";
+			}
+			print "$newtitle added<br><br>\n";
 		}
 
 		if ($debugwrite eq "1") {
-			open (WRITEINFO,">$basedir/$mediaitem") || &error("error: mediaitem /$mediaitem");
+			open (WRITEINFO,">$basedir/$mediaitem") || &error("error: mediaitem $mediaitem<br>");
 			print (WRITEINFO $writenew);
 			close (WRITEINFO);
+
+			if ($neweacupc) {
+				$mediaeacupc="eacupc/$neweacupc";
+				#print "$neweacupc";
+				#print "$basedir/$mediacheck/$mediaeacupc<br>\n";
+				open (WRITEINFO,"+>$basedir/$mediacheck/$mediaeacupc") || &error("error: mediaeacupc $mediaeacupc<br>");
+				print (WRITEINFO $mediawrite);
+				close (WRITEINFO);
+			}
+
+			if ($newisbn) {
+				$mediaisbn="isbn/$newisbn";
+				#print "$newisbn";
+				#print "$basedir/$mediacheck/$mediaisbn<br>\n";
+				open (WRITEINFO,"+>$basedir/$mediacheck/$mediaisbn") || &error("error: mediaisbn $mediaisbn<br>");
+				print (WRITEINFO $mediawrite);
+				close (WRITEINFO);
+			}
 		}
 
 		if ($debugpreviewhide eq "1") {
 			print "<!--\n$writenew\n-->\n";
+			print "<!--\n$mediawrite\n-->\n";
 		}
 
 		if ($debugpreviewshow eq "1") {
-			print "$preview";
+			print "<p>$preview</p>";
+			print "<p>mediawrite: $mediawrite</p>";
 		}
 
 		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL=$thispage?dotype=$dotype\">\n";
-		print "     <p><a href=\"$thispage?gopage=media&dotype=$dotype\">main screen</a>";
+		print "     <p><a href=\"$thispage?dotype=$dotype\">main screen</a>";
+
 		&footer;
 	}
 	
+	sub mediaaddid{
+		print "\n   <table cellspacing=2 cellpadding=2>\n";
+
+		if ($addtype eq "eacupc"){
+			print "     <tr>\n      <th align=right width=30%>EAC/UPC:</th>\n      <td><input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
+		} elsif ($addtype eq "isbn"){
+			print "     <tr>\n      <th align=right width=30%>ISBN:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
+		}
+		
+		print "     <tr>\n      <td colspan=2 align=center>\n       <input type=button value=\"Cancel\" onClick=\"history.back()\">\n       <input type=submit value=\"Submit\">\n      </td>\n     </tr>\n";
+		print "     <input type=hidden name=dowhat value=mediacheck>\n     <input type=hidden name=dotype value=$dotype>\n     <input type=hidden name=addtype value=$addtype>\n";
+
+		print "    </table>";
+
+		&footer;
+	}
+
+	sub mediacheck{
+		print "\n   <table cellspacing=2 cellpadding=2>\n";
+
+		$textcheck="";
+		if ($neweacupc) {
+			$mediacheck.="/eacupc/$neweacupc";
+			$textcheck.="EAC/UPC code $neweacupc";
+		}
+		if ($newisbn) {
+			$mediacheck.="/isbn/$newisbn";
+			$textcheck.="ISBN code $newisbn";
+		}
+		print "checking for an existing entry for $textcheck<br>\n";
+		#print "$mediacheck<br>\n";
+
+		$foundentry=1;
+		open (media,"$basedir/$mediacheck") || &error("did not find an entry for $textcheck<br>forwarding to create an entry<br>");
+		@in = <media>;
+		close (media);
+
+		if ($foundentry eq 1) {
+			print "found that entry!<br>forwarding to edit the entry<br>";
+			for $line(@in) {
+				($dotype,$title,$author,$eacupc,$isbn,$type) = split(/\|/,$line);
+				#print "$dotype,$title,$author,$eacupc,$isbn,$type<br>\n";
+			}
+			print "<p><META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL='$thispage?dowhat=mediaadd&dotype=$dotype&neweacupc=$eacupc&newisbn=$isbn&newtitle=$title&newauthor=$author&newtype=$type'\">\n";
+			print "<a href=\"$thispage?dowhat=mediaadd&dotype=$dotype&neweacupc=$eacupc&newisbn=$isbn&newtitle=$title&newauthor=$author&newtype=$type\">continue</a></p>";
+		} else {
+			print "<p><META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL='$thispage?dowhat=mediaadd&dotype=$dotype&neweacupc=$neweacupc&newisbn=$newisbn'\">\n";
+			print "<a href=\"$thispage?dowhat=mediaadd&dotype=$dotype&neweacupc=$neweacupc&newisbn=$newisbn\">continue</a></p>";
+		}
+
+		print "    </table>";
+
+		&footer;
+	}
+
 	sub debugview {
 		open (media,"$basedir/$mediaitem") || &error("error: mediaitem /$mediaitem");
 		@in = <media>;
@@ -1110,7 +1230,7 @@ sub media {
 		print (WRITEINFO $writenew);
 		close (WRITEINFO);
 		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"4;URL=$thispage?dotype=$fromtype\">\n";
-		print "     <p><a href=\"$thispage?gopage=media&dotype=$fromtype\">main screen</a>";
+		print "     <p><a href=\"$thispage?dotype=$fromtype\">main screen</a>";
 		&footer;
 	}
 }
@@ -1119,18 +1239,25 @@ sub header {
 	local($e) = @_;
 	print "$delay\n<html>\n<head>\n <title>EZ Editor: Media Admin</title>\n";
 	print " <LINK HREF=\"/styles/adminstyle.css\" REL=\"stylesheet\" TYPE=\"text/css\" />\n";
-	print "</head>\n<body topmargin=0 bottommargin=0 leftmargin=0 rightmargin=0>\n";
+	print "</head>\n<body topmargin=0 bottommargin=0 leftmargin=0 rightmargin=0 OnLoad=\"document.myform.";
+	if ($dowhat eq "mediabarcode") {print "neweacupc";} elsif ($dowhat eq "mediaisbn") {print "newisbn";} else {print "newtitle";}
+	print ".focus();\">\n";
 	print "<table width=100% height=100% border=1 align=center valign=center>\n";
 	print " <tr>\n  <td height=20 colspan=3 valign=top align=center class=header>\n";
 	print "   <table width=100% cellspacing=0 cellpadding=0 border=0>\n";
 	print "    <tr>\n";
 	if ($preview or $showhide) {
-		print "     <td align=center class=header width=50%>Media Admin: write $write | preview $preview and $showhide</td>\n";
+		print "     <td align=center class=header width=30%>Media Admin: write $write | preview $preview, $showhide</td>\n";
 	} else {
-		print "     <td align=center class=header width=50%>Media Admin: write $write</td>\n";
+		print "     <td align=center class=header width=35%>Media Admin: write $write</td>\n";
 	}
-	print "     <td align=center class=header width=50%>{ <a href=\"$thispage?dotype=debug&dowhat=debugview&fromtype=$dotype\">debugview</a> | <a href=\"$thispage?dotype=books\">books</a> | <a href=\"$thispage?dotype=games\">games</a> | <a href=\"$thispage?dotype=music\">music</a> | <a href=\"$thispage?dotype=videos\">videos</a> }</td>\n";
-	print "    </tr>\n   </table>\n  </td>\n </tr>\n\n <tr>\n <form method=get action=$thispage>\n  <td align=center>";
+	print "     <td align=center class=header width=35%>";
+	if ($dotype ne "debug") {
+		print "{ <a href=\"$thispage?dowhat=mediaadd&dotype=$dotype\">Add Item Manually</a> | <a href=\"$thispage?dowhat=mediabarcode&dotype=$dotype&addtype=eacupc\">Add Item by Barcode</a> | <a href=\"$thispage?dowhat=mediaisbn&dotype=$dotype&addtype=isbn\">Add Item by ISBN</a> }";
+	}
+	print "</td>\n";
+	print "     <td align=center class=header width=33%>{ <a href=\"$thispage?dotype=debug&dowhat=debugview&fromtype=$dotype\">debug</a> | <a href=\"$thispage?dotype=books\">books</a> | <a href=\"$thispage?dotype=games\">games</a> | <a href=\"$thispage?dotype=music\">music</a> | <a href=\"$thispage?dotype=videos\">videos</a> }</td>\n";
+	print "    </tr>\n   </table>\n  </td>\n </tr>\n\n <tr>\n <form method=get action=$thispage name=\"myform\">\n  <td align=center>";
 }
 
 sub footer {
@@ -1141,6 +1268,7 @@ sub footer {
 sub error {
 	local($e) = @_;
 	print "$e\n";
+	$foundentry=0;
 }
 
 sub errorfatal {
@@ -1158,7 +1286,7 @@ sub getqueries {
 	if(length($mon) eq '1') {$mon="0$mon";}
 	if(length($day) eq '1') {$day="0$day";}
 	$year=$year+1900;
-	$today="$mon.$day.$year";
+	$today="$year.$mon.$day";
 
 	## enable or disable update functions
 	open (debug,"$basedir/$debug") || &error("error: mediaitem /$debug");
@@ -1204,17 +1332,17 @@ sub getqueries {
 
 	###### global
 	$action=$FORM{'action'};
-	#### media
 	$dotype=$FORM{'dotype'};
 	$dowhat=$FORM{'dowhat'};
 	$showline=$FORM{'showline'};
 	$continue=$FORM{'continue'};
-	## global
+	$addtype=$FORM{'addtype'};
+	## multi-use
 	$newtitle=$FORM{'newtitle'};
 	$oldtitle=$FORM{'oldtitle'};
-	$newupc=$FORM{'newupc'};
+	$neweacupc=$FORM{'neweacupc'};
+	$oldeacupc=$FORM{'oldeacupc'};
 	$newisbn=$FORM{'newisbn'};
-	$oldupc=$FORM{'oldupc'};
 	$oldisbn=$FORM{'oldisbn'};
 	$newtype=$FORM{'newtype'};
 	$oldtype=$FORM{'oldtype'};
@@ -1249,10 +1377,8 @@ sub getqueries {
 	$newxbox360=$FORM{'newxbox360'};
 	$oldxbox360=$FORM{'oldxbox360'};
 	## videos
-	$newbluray=$FORM{'newbluray'};
-	$oldbluray=$FORM{'oldbluray'};
-	$newdvd=$FORM{'newdvd'};
-	$olddvd=$FORM{'olddvd'};
+	$newmedia=$FORM{'newmedia'};
+	$oldmedia=$FORM{'oldmedia'};
 	$newdisneyanywhere=$FORM{'newdisneyanywhere'};
 	$olddisneyanywhere=$FORM{'olddisneyanywhere'};
 	$newuvvu=$FORM{'newuvvu'};
