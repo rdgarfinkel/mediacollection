@@ -35,9 +35,12 @@ While testing, when using double quotation <b>"</b> symbol in text fields, the e
 When items are added, they'll be added to the bottom of the list. That entry can be sorted upon editing another entry and submitting.
 
 # things to add
-Automatic item fill in with UPC code (maybe)?
+ability to hide/show columns, ie if you have columns not in use
 
 # change log
+2016.09.09<br>
+Added the ability to add items based on ISBN codes or EAC/UPC barcodes! I haven't found a "universal" barcode service that can provide DVD/BluRay/CD/Movie/TV/Books barcodes, so I built one into the script. At the center of the top of the administration pages, there's now the option to add items based on ISBN and EAC/UPC barcodes. The only text input available there are either the ISBN or EAC/UPC barcode textbox. If the code is not found, you'll be directed to add it manually. Upon submitting the manual entry, the entry is created within the 'upc' or 'eacupc' folders that contains the items' EAC/UPC code, ISBN code, title, artist(s)/author(s), database type, and physical media type. I've started these folders with my collections of ISBN/UPC/EAC codes, hopefully more people can contribute theirs as well.<br>
+When adding entries, the first text box in the editing screen receives focus so you can start typing right away, rather than clicking first then typing.<br>
 2016.09.08<br>
 video section, BluRay and DVD columns are now combined into one, which will allow adding more media types in the future, if needed (ie. VHS, LaserDisc, HD-DVD, etc. if it is requested). there is a "transfer" script that is in the cgi-bin/media folder that will combine the BluRay and DVD entries into one entry.<br>
 2016.09.07<br>
