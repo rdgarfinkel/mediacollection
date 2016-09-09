@@ -1,16 +1,14 @@
 #!/usr/bin/perl
 
-# - date/time
-my($sec,$min,$hours,$day,$mon,$year)=localtime(time);
-$year=$year+1900;
-
 $basedir="";
-$mediaitem="$basedir/cgi-bin/media/media_";
+$directory="media";
+$admindirectory="media";
+$mediaitem="$basedir/cgi-bin/$directory/media_";
 $thispage="index.cgi";
 $empty="0";
 
 #  headers for the admin pages
-$dateupdated="2016.09.06";
+$dateupdated="2016.09.08";
 
 print "Content-TYPE: text/html\npragma: no-cache\n\n";
 print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n";
@@ -77,7 +75,7 @@ if ($empty != "1") {
 
   #print "<!--@in-->";
   
-  $table= "<table cellspacing=2 cellpadding=2 id=\"mytable\" class=\"data-table\">\n";
+  $table= "<table cellspacing=10 cellpadding=10 id=\"mytable\" class=\"data-table\">\n";
   $table.= " <colgroup>\n";
   $table.= "  <col style=\"background-color: #ddd\">\n";
   
@@ -100,23 +98,31 @@ if ($empty != "1") {
       if ($title eq "#DATE#") {
         $dataupdated=$epic;
       } else {
-        $table.= "  <tr class=\"grid\">\n   <td>$titledisplay</td><td>$upc</td><td>$battlenet</td><td>$epic</td><td>$nes</td><td>$origin</td><td>$ps2</td><td>$steam</td><td>$uplay</td><td>$xbox360</td><td>$xboxone</td><td>$wii</td>\n  </tr>\n";
+        $table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td><td>$upc</td><td>$battlenet</td><td>$epic</td><td>$nes</td><td>$origin</td><td>$ps2</td><td>$steam</td><td>$uplay</td><td>$xbox360</td><td>$xboxone</td><td>$wii</td>\n  </tr>\n";
       }
     }
     $table.= " </tbody>\n";
   } elsif ($pagetitle eq "video") {
-    ##Movie#|#Movie/TV#|#BluRay#|#DVD#|#Amazon#|#Disney Anywhere#|#Google Play#|#iTunes#|#UVVU#|#UPC#|#ISBN#||
-    $table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Movie/TV</th>\n   <th>Blu-Ray</th>\n   <th>DVD</th>\n   <th>Amazon</th>\n   <th>Disney Anywhere</th>\n   <th>Google Play</th>\n   <th>iTunes</th>\n   <th>UVVU</th>\n  </tr>\n </thead>\n";
+    ##Movie#|#Movie/TV#|#Media#|#Amazon#|#Disney Anywhere#|#Google Play#|#iTunes#|#UVVU#|#UPC#|#ISBN#||
+    $table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Movie/TV</th>\n   <th>Physical<br>Media</th>\n   <th>Amazon</th>\n   <th>Disney Anywhere</th>\n   <th>Google Play</th>\n   <th>iTunes</th>\n   <th>UVVU</th>\n  </tr>\n </thead>\n";
 
     $table.= " <tbody>\n";
     foreach (@in) {
-      ($title,$type,$bluray,$dvd,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn) = split(/\|/,$_);
+      ($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn) = split(/\|/,$_);
+	  $mediadisplay="";
+	  if ($media eq "bluray") {
+	    $mediadisplay="BluRay";
+	  } elsif ($media eq "dvd") {
+	    $mediadisplay="DVD";
+	  } elsif ($media eq "diskcombo") {
+	    $mediadisplay="BluRay/DVD";
+	  }
       $titledisplay=$title;
       $titledisplay =~ s/\'\'/\"/g;
       if ($title eq "#DATE#") {
         $dataupdated=$type;
       } else {
-        $table.= "  <tr class=\"grid\">\n   <td class=\"title\">$titledisplay</td><td>$upc</td><td>$isbn</td><td>$type</td><td>$bluray</td><td>$dvd</td><td>$amazon</td><td>$disneyanywhere</td><td>$googleplay</td><td>$itunes</td><td>$uvvu</td>\n  </tr>\n";
+        $table.= "  <tr class=\"grid\">\n   <td class=\"title\"><div>$titledisplay</div></td><td>$upc</td><td>$isbn</td><td>$type</td><td>$mediadisplay</td><td>$amazon</td><td>$disneyanywhere</td><td>$googleplay</td><td>$itunes</td><td>$uvvu</td>\n  </tr>\n";
       }
     }
     $table.= " </tbody>\n";
@@ -134,7 +140,7 @@ if ($empty != "1") {
       if ($title eq "#DATE#") {
         $dataupdated=$author;
       } else {
-        $table.= "  <tr class=\"grid\">\n   <td>$titledisplay</td><td>$authordisplay</td><td>$upc</td><td>$isbn</td><td>$type</td>\n  </tr>\n";
+        $table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td><td><div>$authordisplay</div></td><td>$upc</td><td>$isbn</td><td>$type</td>\n  </tr>\n";
       }
     }
     $table.= " </tbody>\n";
@@ -152,7 +158,7 @@ if ($empty != "1") {
       if ($artist eq "#DATE#") {
 	    $dataupdated=$title;
 	  } else {
-        $table.= "  <tr class=\"grid\">\n   <td>$artistdisplay &ndash; $titledisplay</td><td>$upc</td><td>$cd</td><td>$amazon</td><td>$djbooth</td><td>$googleplay</td><td>$groove</td><td>$itunes</td><td>$reverbnation</td><td>$rhapsody</td><td>$topspin</td>\n  </tr>\n";
+        $table.= "  <tr class=\"grid\">\n   <td><div>$artistdisplay &ndash; $titledisplay</div></td><td>$upc</td><td>$cd</td><td>$amazon</td><td>$djbooth</td><td>$googleplay</td><td>$groove</td><td>$itunes</td><td>$reverbnation</td><td>$rhapsody</td><td>$topspin</td>\n  </tr>\n";
       }
     }
     $table.= " </tbody>\n";
@@ -164,7 +170,7 @@ print "<div align=left>";
 if ($empty != "1") {
  print "data updated: $dataupdated | ";
 }
-print "<a href=\"javascript:SizedPop('help','media.pl','$query',1325,625);\">admin</a> | ";
+print "<a href=\"javascript:SizedPop('$admindirectory','media.pl','$query',1325,625);\">admin</a> | ";
 print "<a href=\"$thispage?books\">books</a> | ";
 print "<a href=\"$thispage?games\">games</a> | ";
 print "<a href=\"$thispage?music\">music</a> | ";
