@@ -6,19 +6,19 @@ In the non-administrative pages, at the top left, you'll see the date that the t
 <br>
 In the adminstrative pages, you'll see the date the text database was last updated at the bottom of the page, as well as an overall count of the media currently displayed, and as a breakdown of each individual category. here, you can also add, edit, and delete media items.<br>
 <br>
-Also in the administrative pages, there's an additional option of "debugview," which can be used to be able to preview changes to the text database. After changing the options, you'll be redirected back to the media section that you were on previously. Here, you'll be able to:<br>
+Also in the administrative pages, there's an additional option of "debug," which can be used to be able to preview changes to the text database. After changing the options, you'll be redirected back to the media section that you were on previously. Here, you'll be able to:<br>
 - enable write: enable/disable actual changes to your database<br>
 - preview hidden: enable/disable a preview of the changes to the database in only the HTML code<br>
 - preview shown: enable/disable a preview of the changes to the database within the adminstrative window
 
 # first things first
-If you will be using this on a public server, put the /cgi-bin/media/media.pl file within a separate directory that is password protected so that only you can add/amend/delete your database entries. <br>
+If you will be using this on a public server, put the /cgi-bin/media/media.pl file within a separate directory that is password protected so that only you can add/amend/delete your database entries.<br>
 Things should work "directly out of the box." You'll probably need to edit the $basedir variable in the index.cgi and media.pl scripts, and maybe the "#!/usr/bin/perl" line at the top of each script
 
 # demonstration
 A demonstration of the script and it's abilities is online and available, with editing abilities enabled, and no password is required for the admin side. Test it out as you wish:
 http://rgarfinkel.heliohost.org/cgi-bin/mediademo/index.cgi
-Please note that the "modification" date in the hidden HTML code for each script on the demonstrations may be newer than the one present here on Github. I do the coding offline, post it to the demo site to verify it still works on those live sites, then I'll post it here.
+Please note that the "modification" date in the hidden HTML code for each script on the demonstrations may be newer than the one present here on Github. I do the coding offline, post it to the test site to verify it still works on those live sites, then I'll post it here.
 
 # requirements
 For this script to run, you'll need to have a web server capable of running Perl scripts; can be a public server or just a local server.
@@ -30,21 +30,30 @@ The scripts below are only implemented on the non-adminsitrative page:
 /javascripts/jquery.freezeheader.js, http://brentmuir.com/projects/freezeheader: disabled because it's unreliable in operation, freezes table header at the top of the screen when scrolling down
 
 # items of note
--While testing, when using the <b>&</b> ampersand symbol in text fields, the editing feature didn't work. It seems that the 'query string' parsing splits this like it is a separate entry. Text replacement will occur server side, swapping the <b>&</b> symbol for <b>and</b> text.<br>
--While testing, when using the <b>"</b> double quotation mark in text fields, the editing feature didn't work. When clicking an entry to edit, the browser would interpret the quotations as the end of an <b>A HREF</b> HTML tag. Text replacement will occur server side, swapping the <b>"</b> double quotation mark for <b>''</b> two single quotation symbols for storing the entries, and <b>''</b> two single quotation symbols will be swapped for the <b>"</b> double quotation mark for display in the user facing tables.<br>
--When items are added, they'll be added to the bottom of the list. That entry can be sorted upon editing another entry and submitting.
+- While testing, when using the <b>&</b> ampersand symbol in text fields, the editing feature didn't work. It seems that the 'query string' parsing splits this like it is a separate entry. Text replacement will occur server side, swapping the <b>&</b> symbol for <b>and</b> text.<br>
+- While testing, when using the <b>"</b> double quotation mark in text fields, the editing feature didn't work. When clicking an entry to edit, the browser would interpret the quotations as the end of an <b>A HREF</b> HTML tag. Text replacement will occur server side, swapping the <b>"</b> double quotation mark for <b>''</b> two single quotation symbols for storing the entries, and <b>''</b> two single quotation symbols will be swapped for the <b>"</b> double quotation mark for display in the user facing tables.<br>
+- When items are added, they'll be added to the bottom of the list. That entry can be sorted upon editing another entry and submitting.
 
 # things to add
--ability to hide/show columns, ie if you have columns not in use
+- ability to hide/show columns, ie if you have columns not in use
+- make code comments on sections and processes for helping others' understand what is doing what
 
 # change log
-2016.09.09<br>
--Added the ability to add items based on ISBN codes or EAC/UPC barcodes! I haven't found a "universal" barcode service that can provide DVD/BluRay/CD/Movie/TV/Books barcodes, so I built one into the script. At the center of the top of the administration pages, there's now the option to add items based on ISBN and EAC/UPC barcodes. The only text input available there are either the ISBN or EAC/UPC barcode textbox. If the code is not found, you'll be directed to add it manually. Upon submitting the manual entry, the entry is created within the 'upc' or 'eacupc' folders that contains the items' EAC/UPC code, ISBN code, title, artist(s)/author(s), database type, and physical media type. I've started these folders with my collections of ISBN/UPC/EAC codes, hopefully more people can contribute theirs as well.<br>
--When adding entries, the first text box in the editing screen receives focus so you can start typing right away, rather than clicking first then typing.<br>
-2016.09.08<br>
--video section, BluRay and DVD columns are now combined into one, which will allow adding more media types in the future, if needed (ie. VHS, LaserDisc, HD-DVD, etc. if it is requested). there is a "transfer" script that is in the cgi-bin/media folder that will combine the BluRay and DVD entries into one entry.<br>
-2016.09.07<br>
--forced width of title column on non-admin and admin pages
--changed color of row highlight to a darker color
--put UPC/ISBN closer to the left side, where appropriate on the different media types. some were on the left, others on the right<br>
--turned off "fixed header" on the non-admin page; sometimes the header stayed fixed, other times not, and would sometimes not be scaled with the columns below
+- 2016.09.16<br>
+  - Some code cleanup.
+  - Added the ability to sort the table columns in the administration pages.
+  - In the 'debug' menu, there's now an option for sorting titles with "The" at the beginning, and this effects both the non-administration and administration side. Using *The Sandlot* as an example, when 'sort by' is on, the title will appear as, *Sandlot, The*. Otherwise, it will appear as *The Sandlot*. For adding/changing *The Sandlot*, you can enter *Sandlot, The* or *The Sandlot*, and it will be entered into the database as *Sandlot, The* server side.
+  - Added descriptions for the functions of each option in the 'debug' menu.
+  - If I add more options on the 'debug' menu, I may switch the name to be 'options' instead.
+  - While testing the sorting in the administration side, the media collection totals would sometimes also be included in the sort. To prevent this from happening now, those totals now appear separate of the sortable table.
+  - When you first visited the non-administration page, there would be no 'dotype' variable passed to the administration page, if you clicked on the admin link. This would result in the administration page displaying only the text, "missing 'dotype'." This is now fixed, and shows the headers as well.
+- 2016.09.09
+  - Added the ability to add items based on ISBN codes or EAC/UPC barcodes! I haven't found a "universal" barcode service that can provide DVD/BluRay/CD/Movie/TV/Books barcodes, so I built one into the script. At the center of the top of the administration pages, there's now the option to add items based on ISBN and EAC/UPC barcodes. The only text input available there are either the ISBN or EAC/UPC barcode textbox. If the code is not found, you'll be directed to add it manually. Upon submitting the manual entry, the entry is created within the 'upc' or 'eacupc' folders that contains the items' EAC/UPC code, ISBN code, title, artist(s)/author(s), database type, and physical media type. I've started these folders with my collections of ISBN/UPC/EAC codes, hopefully more people can contribute theirs as well.
+  - When adding entries, the first text box in the editing screen receives focus so you can start typing right away, rather than clicking first then typing.
+- 2016.09.08
+  - In the video section, BluRay and DVD columns are now combined into one, which will allow for adding more media types in the future, if needed (ie. VHS, LaserDisc, HD-DVD, etc. if it is requested). There is a "transfer" script that is in the cgi-bin/media folder that will combine the BluRay and DVD entries into one entry, run it only once.
+- 2016.09.07
+  - Forced width of title column on non-admin and admin pages
+  - Changed color of row highlight to a darker color
+  - Put UPC/ISBN closer to the left side, where appropriate on the different media types. some were on the left, others on the right
+  - Turned off "fixed header" on the non-admin page; sometimes the header stayed fixed, other times not, and would sometimes not be scaled with the columns below
