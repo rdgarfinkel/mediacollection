@@ -8,7 +8,14 @@ $thispage="index.cgi";
 $empty="0";
 
 #  headers for the admin pages
-$dateupdated="2016.09.08";
+$dateupdated="2016.09.15";
+
+open (debug,"$basedir/$debugitem") || &error("error: mediaitem $debugitem");
+@in = <debug>;
+close (debug);
+for $line(@in) {
+	($debugwrite,$debugpreviewhide,$debugpreviewshow,$debugthesort) = split(/\|/,$line);
+}
 
 print "Content-TYPE: text/html\npragma: no-cache\n\n";
 print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n";
@@ -19,40 +26,45 @@ print " <script type=\"text/javascript\" src=\"/javascripts/gs_sortable.js\"></s
 #print " <script type=\"text/javascript\" src=\"/javascripts/jquery-1.5.1.min.js\"></script>\n";
 #print " <script type=\"text/javascript\" src=\"/javascripts/jquery.freezeheader.js\"></script>\n";
 print " <script type=\"text/javascript\">\n  <!--\n";
-print "  function SizedPop(dir,page,type,width,height) {\n    window.open('/cgi-bin/' + dir + '/' + page + '?dotype=' + type, dir, \n";
+print "   function SizedPop(dir,page,type,width,height) {\n    window.open('/cgi-bin/' + dir + '/' + page + '?dotype=' + type, dir, \n";
 print "    'toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=no,resizable=no,width=' + width + ',height=' + height);\n";
 print "   }\n   self.name = \"main\";\n";
 
 $query=$ENV{"QUERY_STRING"};
 if ($query eq "games") {
-        $mediaitem.="games.txt";
-        $pagetitle="game";
-        $columns=11;
-        print "  var TSort_Data = new Array ('mytable', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's');\n";
+	$mediaitem.="games.txt";
+	$pagetitle="game";
+	$columns=12;
 } elsif ($query eq "videos") {
-        $mediaitem.="videos.txt";
-        $pagetitle="video";
-        $columns=11;
-        print "  var TSort_Data = new Array ('mytable', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's');\n";
+	$mediaitem.="videos.txt";
+	$pagetitle="video";
+	$columns=11;
 } elsif ($query eq "music") {
-        $mediaitem.="music.txt";
-        $pagetitle="music";
-        $columns=11;
-        print "  var TSort_Data = new Array ('mytable', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's');\n";
+	$mediaitem.="music.txt";
+	$pagetitle="music";
+	$columns=11;
 } elsif ($query eq "books") {
-        $mediaitem.="books.txt";
-        $pagetitle="book";
-        $columns=5;
-        print "  var TSort_Data = new Array ('mytable', 's', 's', 's', 's', 's');\n";
+	$mediaitem.="books.txt";
+	$pagetitle="book";
+	$columns=5;
 } else {
 	$empty="1";
 	$pagetitle="media";
 }
-print "  tsRegister();\n";
-print "  \$(document).ready(function(){\n";
+
+print "   var TSort_Data = new Array ('mytable'";
+$sortcolumns=0;
+while($sortcolumns < $columns){
+	print ",'s'";
+	$sortcolumns = $sortcolumns + 1;
+}
+print ");\n";
+
+print "   tsRegister();\n";
+print "   \$(document).ready(function(){\n";
 print "    \$(\"table\").freezeHeader({ top: true, left: true });\n";
-print "  });\n";
-print "  //  -->\n";
+print "   });\n";
+print "  -->\n";
 print " </script>\n";
 
 print " <TITLE>my $pagetitle collection</TITLE>\n";
@@ -69,101 +81,125 @@ print "</HEAD>\n";
 print "<BODY BGCOLOR=#ffffff>\n";
 
 if ($empty != "1") {
-  open (media,"$basedir/$mediaitem") || print "error: $mediaitem";
-  @in = <media>;
-  close (media);
+	open (media,"$basedir/$mediaitem") || print "error: $mediaitem";
+	@in = <media>;
+	close (media);
 
-  #print "<!--@in-->";
+	#print "<!--@in-->";
+
+	$table= "<table cellspacing=10 cellpadding=10 id=\"mytable\" class=\"data-table\">\n";
+	$table.= " <colgroup>\n";
+	$table.= "  <col style=\"background-color: #ddd\">\n";
   
-  $table= "<table cellspacing=10 cellpadding=10 id=\"mytable\" class=\"data-table\">\n";
-  $table.= " <colgroup>\n";
-  $table.= "  <col style=\"background-color: #ddd\">\n";
-  
-  $mediacolumns=1;
-  while($mediacolumns < $columns){
-   $mediacolumns = $mediacolumns + 1;
-   $table.= "  <col>\n";
-  }
-  $table.= " </colgroup>\n";
+	$mediacolumns=1;
+	while($mediacolumns < $columns){
+		$mediacolumns = $mediacolumns + 1;
+		$table.= "  <col>\n";
+	}
+	$table.= " </colgroup>\n";
 
-  if ($pagetitle eq "game") {
-    ##Video Games#|#Epic#|#Steam#|#Battle.net#|#Origin#|#uplay#|#NES#|#Wii#|#PS2#|#Xbox One#|#Xbox 360#|#UPC#|||||||||||
-    $table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>UPC</th>\n   <th>Battle.net</th>\n   <th>Epic</th>\n   <th>NES</th>\n   <th>Origin</th>\n   <th>PS2</th>\n   <th>Steam</th>\n   <th>Uplay</th>\n   <th>XBox 360</th>\n   <th>XBox One</th>\n   <th>Wii</th>\n  </tr>\n </thead>\n";
+	if ($pagetitle eq "game") {
+		##Video Games#|#Epic#|#Steam#|#Battle.net#|#Origin#|#uplay#|#NES#|#Wii#|#PS2#|#Xbox One#|#Xbox 360#|#UPC#|||||||||||
+		$table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>UPC</th>\n   <th>Battle.net</th>\n   <th>Epic</th>\n   <th>NES</th>\n   <th>Origin</th>\n   <th>PS2</th>\n   <th>Steam</th>\n   <th>Uplay</th>\n   <th>XBox 360</th>\n   <th>XBox One</th>\n   <th>Wii</th>\n  </tr>\n </thead>\n";
 
-    $table.= " <tbody>\n";
-    foreach (@in) {
-      ($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$upc) = split(/\|/,$_);
-      $titledisplay=$title;
-      $titledisplay =~ s/\'\'/\"/g;
-      if ($title eq "#DATE#") {
-        $dataupdated=$epic;
-      } else {
-        $table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td><td>$upc</td><td>$battlenet</td><td>$epic</td><td>$nes</td><td>$origin</td><td>$ps2</td><td>$steam</td><td>$uplay</td><td>$xbox360</td><td>$xboxone</td><td>$wii</td>\n  </tr>\n";
-      }
-    }
-    $table.= " </tbody>\n";
-  } elsif ($pagetitle eq "video") {
-    ##Movie#|#Movie/TV#|#Media#|#Amazon#|#Disney Anywhere#|#Google Play#|#iTunes#|#UVVU#|#UPC#|#ISBN#||
-    $table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Movie/TV</th>\n   <th>Physical<br>Media</th>\n   <th>Amazon</th>\n   <th>Disney Anywhere</th>\n   <th>Google Play</th>\n   <th>iTunes</th>\n   <th>UVVU</th>\n  </tr>\n </thead>\n";
+		$table.= " <tbody>\n";
+		foreach (@in) {
+			($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$upc) = split(/\|/,$_);
+			if ($debugthesort == "1" && substr($title,0,4) eq "The ") {
+				$title=substr($title,4,length($title)).", The";
+			}
+			if ($debugthesort == "0" && substr($title,length($title)-5,5) eq ", The") {
+				$title="The ".substr($title,0,length($title)-5);
+			}
+			$titledisplay=$title;
+			$titledisplay =~ s/\'\'/\"/g;
+			if ($title eq "#DATE#") {
+				$dataupdated=$epic;
+			} else {
+				$table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td><td>$upc</td><td>$battlenet</td><td>$epic</td><td>$nes</td><td>$origin</td><td>$ps2</td><td>$steam</td><td>$uplay</td><td>$xbox360</td><td>$xboxone</td><td>$wii</td>\n  </tr>\n";
+			}
+		}
+		$table.= " </tbody>\n";
+	} elsif ($pagetitle eq "video") {
+		##Movie#|#Movie/TV#|#Media#|#Amazon#|#Disney Anywhere#|#Google Play#|#iTunes#|#UVVU#|#UPC#|#ISBN#|#Microsoft#|
+		$table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Movie/TV</th>\n   <th>Physical<br>Media</th>\n   <th>Amazon</th>\n   <th>Disney Anywhere</th>\n   <th>Google Play</th>\n   <th>iTunes</th>\n   <th>Microsoft</th>\n<th>UVVU</th>\n  </tr>\n </thead>\n";
 
-    $table.= " <tbody>\n";
-    foreach (@in) {
-      ($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn) = split(/\|/,$_);
-	  $mediadisplay="";
-	  if ($media eq "bluray") {
-	    $mediadisplay="BluRay";
-	  } elsif ($media eq "dvd") {
-	    $mediadisplay="DVD";
-	  } elsif ($media eq "diskcombo") {
-	    $mediadisplay="BluRay/DVD";
-	  }
-      $titledisplay=$title;
-      $titledisplay =~ s/\'\'/\"/g;
-      if ($title eq "#DATE#") {
-        $dataupdated=$type;
-      } else {
-        $table.= "  <tr class=\"grid\">\n   <td class=\"title\"><div>$titledisplay</div></td><td>$upc</td><td>$isbn</td><td>$type</td><td>$mediadisplay</td><td>$amazon</td><td>$disneyanywhere</td><td>$googleplay</td><td>$itunes</td><td>$uvvu</td>\n  </tr>\n";
-      }
-    }
-    $table.= " </tbody>\n";
-  }  elsif ($pagetitle eq "book") {
-    ##Books#|#Authors#|#UPC#|#ISBN#|#Type#|
-    $table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>Authors</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Type</th>\n  </tr>\n </thead>\n";
+		$table.= " <tbody>\n";
+		foreach (@in) {
+			($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn,$microsoft) = split(/\|/,$_);
+			$mediadisplay="";
+			if ($media eq "bluray") {
+				$mediadisplay="BluRay";
+			} elsif ($media eq "dvd") {
+				$mediadisplay="DVD";
+			} elsif ($media eq "diskcombo") {
+				$mediadisplay="BluRay/DVD";
+			}
+			if (substr($title,0,4) eq "The ") {
+				$titletest1=substr($title,4,length($title)).", The";
+			}
+			if (substr($title,length($title)-5,5) eq ", The") {
+				$titletest2="The ".substr($title,0,length($title)-5);
+			}
+			$titledisplay=$title;
+			$titledisplay =~ s/\'\'/\"/g;
+			if ($title eq "#DATE#") {
+				$dataupdated=$type;
+			} else {
+				$table.= "  <tr class=\"grid\">\n   <td class=\"title\"><div>$titledisplay</div></td><td>$upc</td><td>$isbn</td><td>$type</td><td>$mediadisplay</td><td>$amazon</td><td>$disneyanywhere</td><td>$googleplay</td><td>$itunes</td><td>$microsoft</td><td>$uvvu</td>\n  </tr>\n";
+			}
+		}
+		$table.= " </tbody>\n";
+	}  elsif ($pagetitle eq "book") {
+		##Books#|#Authors#|#UPC#|#ISBN#|#Type#|
+		$table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>Authors</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Type</th>\n  </tr>\n </thead>\n";
 
-    $table.= " <tbody>\n";
-    foreach (@in) {
-      ($title,$author,$upc,$isbn,$type) = split(/\|/,$_);
-      $titledisplay=$title;
-      $titledisplay =~ s/\'\'/\"/g;
-      $authordisplay=$author;
-      $authordisplay =~ s/\'\'/\"/g;
-      if ($title eq "#DATE#") {
-        $dataupdated=$author;
-      } else {
-        $table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td><td><div>$authordisplay</div></td><td>$upc</td><td>$isbn</td><td>$type</td>\n  </tr>\n";
-      }
-    }
-    $table.= " </tbody>\n";
-  }  elsif ($pagetitle eq "music") {
-    ##Artist#|#Title#|#UPC#|#CD#|#Amazon#|#DJBooth#|#Google#|#iTunes#|#ReverbNation#|#TopSpin#|#Rhapsody#|
-    $table.= " <thead>\n  <tr>\n   <th>Artist &ndash; Album</th>\n   <th>UPC</th>\n   <th>CD</th>\n   <th>Amazon</th>\n   <th>DJ Booth</th>\n   <th>Google Play</th>\n   <th>Groove</th>\n   <th>iTunes</th>\n   <th>ReverbNation</th>\n   <th>Rhapsody</th>\n   <th>TopSpin</th>\n  </tr>\n </thead>\n";
+		$table.= " <tbody>\n";
+		foreach (@in) {
+			($title,$author,$upc,$isbn,$type) = split(/\|/,$_);
+			if (substr($title,0,4) eq "The ") {
+				$title=substr($title,4,length($title)).", The";
+			}
+			if (substr($title,length($title)-5,5) eq ", The") {
+				$title="The ".substr($title,0,length($title)-5);
+			}
+			$titledisplay=$title;
+			$titledisplay =~ s/\'\'/\"/g;
+			$authordisplay=$author;
+			$authordisplay =~ s/\'\'/\"/g;
+			if ($title eq "#DATE#") {
+				$dataupdated=$author;
+			} else {
+				$table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td><td><div>$authordisplay</div></td><td>$upc</td><td>$isbn</td><td>$type</td>\n  </tr>\n";
+			}
+		}
+		$table.= " </tbody>\n";
+	}  elsif ($pagetitle eq "music") {
+		##Artist#|#Title#|#UPC#|#CD#|#Amazon#|#DJBooth#|#Google#|#Groove#|#iTunes#|#ReverbNation#|#TopSpin#|#Rhapsody#|
+		$table.= " <thead>\n  <tr>\n   <th>Artist &ndash; Album</th>\n   <th>UPC</th>\n   <th>CD</th>\n   <th>Amazon</th>\n   <th>DJ Booth</th>\n   <th>Google Play</th>\n   <th>Groove</th>\n   <th>iTunes</th>\n   <th>ReverbNation</th>\n   <th>Rhapsody</th>\n   <th>TopSpin</th>\n  </tr>\n </thead>\n";
 
-    $table.= " <tbody>\n";
-    foreach (@in) {
-      ($artist,$title,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$_);
-      $titledisplay=$title;
-      $titledisplay =~ s/\'\'/\"/g;
-      $artistdisplay=$artist;
-      $artistdisplay =~ s/\'\'/\"/g;
-      if ($artist eq "#DATE#") {
-	    $dataupdated=$title;
-	  } else {
-        $table.= "  <tr class=\"grid\">\n   <td><div>$artistdisplay &ndash; $titledisplay</div></td><td>$upc</td><td>$cd</td><td>$amazon</td><td>$djbooth</td><td>$googleplay</td><td>$groove</td><td>$itunes</td><td>$reverbnation</td><td>$rhapsody</td><td>$topspin</td>\n  </tr>\n";
-      }
-    }
-    $table.= " </tbody>\n";
-  }
-  $table.= "</table>\n";
+		$table.= " <tbody>\n";
+		foreach (@in) {
+			($artist,$title,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$_);
+			if (substr($title,0,4) eq "The ") {
+				$titletest1=substr($title,4,length($title)).", The";
+			}
+			if (substr($title,length($title)-5,5) eq ", The") {
+				$titletest2="The ".substr($title,0,length($title)-5);
+			}
+			$titledisplay=$title;
+			$titledisplay =~ s/\'\'/\"/g;
+			$artistdisplay=$artist;
+			$artistdisplay =~ s/\'\'/\"/g;
+			if ($artist eq "#DATE#") {
+				$dataupdated=$title;
+			} else {
+				$table.= "  <tr class=\"grid\">\n   <td><div>$artistdisplay &ndash; $titledisplay</div></td><td>$upc</td><td>$cd</td><td>$amazon</td><td>$djbooth</td><td>$googleplay</td><td>$groove</td><td>$itunes</td><td>$reverbnation</td><td>$rhapsody</td><td>$topspin</td>\n  </tr>\n";
+			}
+		}
+		$table.= " </tbody>\n";
+	}
+	$table.= "</table>\n";
 }
 
 print "<div align=left>";
