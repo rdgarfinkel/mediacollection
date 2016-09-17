@@ -14,7 +14,7 @@ $thispage="media.pl";
 $debug=$mediaitem."debug.txt";
 
 #  headers for the admin pages
-$dateupdated="2016.09.08";
+$dateupdated="2016.09.15";
 
 &getqueries;
 
@@ -24,25 +24,6 @@ else {&header;&errorfatal("missing or invalid administration page<br>select a li
 # end
 
 sub media {
-	if ($dotype eq "books") {
-		$mediaitem.="books.txt";
-		$columns=7;
-	} elsif ($dotype eq "games") {
-		$mediaitem.="games.txt";
-		$columns=14;
-	} elsif ($dotype eq "music") {
-		$mediaitem.="music.txt";
-		$columns=13;
-	} elsif ($dotype eq "videos") {
-		$mediaitem.="videos.txt";
-		$columns=13;
-	} elsif ($dotype eq "debug") {
-		$mediaitem.="debug.txt";
-		$columns=3;
-	} else {
-		&errorfatal("missing \'dotype\'");
-	}
-
 	if ($dowhat eq "mediaedit") {&mediaedit;}
 	elsif ($dowhat eq "mediaadd") {&mediaedit;}
 	elsif ($dowhat eq "mediabarcode") {&mediaaddid;}
@@ -85,6 +66,12 @@ sub media {
 					}
 					$titledisplay=$title;
 					$titledisplay =~ s/\'\'/\"/g;
+					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+						$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
+					}
+					if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+						$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
+					}
 					$authordisplay=$author;
 					$authordisplay =~ s/\'\'/\"/g;
 					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td><div>$authordisplay</div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
@@ -93,8 +80,9 @@ sub media {
 					$update=$author;
 				}
 			}
+			print "    </tbody>\n";
 			$count_title=$count_title-1;
-			print "    <tr><td align=center colspan=$columns><b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>books $count_book || ebooks $count_ebook</td></tr>\n";
+			$tablestats=" <tr><td align=center colspan=3><b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>books $count_book || ebooks $count_ebook";
 		} elsif ($dotype eq 'games'){
 			$count_epic=0;
 			$count_steam=0;
@@ -165,14 +153,21 @@ sub media {
 					}
 					$titledisplay=$title;
 					$titledisplay =~ s/\'\'/\"/g;
+					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+						$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
+					}
+					if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+						$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
+					}
 					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$battlenet</td>\n     <td>$epic</td>\n     <td>$nes</td>\n     <td>$origin</td>\n     <td>$ps2</td>\n     <td>$steam</td>\n     <td>$uplay</td>\n     <td>$xbox360</td>\n     <td>$xboxone</td>\n     <td>$wii</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
 					$count_title=$count_title+1;
 				} else {
 					$update=$epic;
 				}
 			}
+			print "    </tbody>\n";
 			$count_title=$count_title-1;
-			print "    <tr><td align=center colspan=$columns><b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>Battle.net $count_battlenet || Epic $count_epic || NES $count_nes || Origin $count_origin || PS2 $count_ps2 || Steam $count_steam || uPlay $count_uplay || Wii $count_wii || XBox 360 $xbox360total || XBox One $xboxonetotal<br>XBox One backwards compatible $count_xboxonebc || XBox One disk $count_xboxonedk ||  XBox One download $count_xboxonedl || XBox 360 disk $count_xbox360dk || XBox 360 download $count_xbox360dl</td></tr>\n";
+			$tablestats=" <tr><td align=center colspan=3><b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>Battle.net $count_battlenet || Epic $count_epic || NES $count_nes || Origin $count_origin || PS2 $count_ps2 || Steam $count_steam || uPlay $count_uplay || Wii $count_wii || XBox 360 $xbox360total || XBox One $xboxonetotal<br>XBox One backwards compatible $count_xboxonebc || XBox One disk $count_xboxonedk ||  XBox One download $count_xboxonedl || XBox 360 disk $count_xbox360dk || XBox 360 download $count_xbox360dl";
 		} elsif ($dotype eq 'videos'){
 			$count_tv=0;
 			$count_movie=0;
@@ -180,10 +175,11 @@ sub media {
 			$count_dvd=0;
 			$count_amazon=0;
 			$count_disneyanywhere=0;
+			$count_microsoft=0;
 			$count_googleplay=0;
 			$count_itunes=0;
 			$count_uvvu=0;
-			print "    <thead>\n     <th>#</th>\n     <th>Title</th>\n     <th>EAC/UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Physical<br>Media</th>\n     <th>Amazon</th>\n     <th>Disney<br>Anywhere</th>\n     <th>Google<br>Play</th>\n     <th>iTunes</th>\n     <th>UVVU</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n    <tbody>\n";
+			print "    <thead>\n     <th>#</th>\n     <th>Title</th>\n     <th>EAC/UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Physical<br>Media</th>\n     <th>Amazon</th>\n     <th>Disney<br>Anywhere</th>\n     <th>Google<br>Play</th>\n     <th>iTunes</th>\n     <th>Microsoft</th>\n     <th>UVVU</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n    <tbody>\n";
 
 			foreach $line(@in) {
 				$line =~ s/\n//g;
@@ -191,7 +187,7 @@ sub media {
 				$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
 				$line =~ s/<!--(.|\n)*-->//g;
 				$line =~ s/\"/\'\'/g;
-				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn) = split(/\|/,$line);  
+				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft) = split(/\|/,$line);  
 				if ($title ne "#DATE#") {
 					$mediadisplay="";
 					if ($type eq "TV") {
@@ -222,19 +218,29 @@ sub media {
 					if ($itunes eq "X") {
 						$count_itunes=$count_itunes+1;
 					}
+					if ($microsoft eq "X") {
+						$count_microsoft=$count_microsoft+1;
+					}
 					if ($uvvu eq "X") {
 						$count_uvvu=$count_uvvu+1;
 					}
 					$titledisplay=$title;
 					$titledisplay =~ s/\'\'/\"/g;
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td>$mediadisplay</td>\n     <td>$amazon</td>\n     <td>$disneyanywhere</td>\n     <td>$googleplay</td>\n     <td>$itunes</td>\n     <td>$uvvu</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
+					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+						$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
+					}
+					if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+						$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
+					}
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td>$mediadisplay</td>\n     <td>$amazon</td>\n     <td>$disneyanywhere</td>\n     <td>$googleplay</td>\n     <td>$itunes</td>\n     <td>$microsoft</td>\n     <td>$uvvu</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
 					$count_title=$count_title+1;
 				} else {
 					$update=$type;
 				}
 			}
+			print "    </tbody>\n";
 			$count_title=$count_title-1;
-			print "    <tr><td align=center colspan=$columns><b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>Movies $count_movie || TV $count_tv || BluRay $count_bluray || DVDs $count_dvd || Amazon Video $count_amazon || Disney Anywhere $count_disneyanywhere || Google Play $count_googleplay || iTunes $count_itunes || UVVU $count_uvvu</td></tr>\n";
+			$tablestats=" <tr><td align=center colspan=3><b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>Movies $count_movie || TV $count_tv || BluRay $count_bluray || DVDs $count_dvd || Amazon Video $count_amazon || Disney Anywhere $count_disneyanywhere || Google Play $count_googleplay || iTunes $count_itunes || Microsoft $count_microsoft || UVVU $count_uvvu";
 		} elsif ($dotype eq 'music'){
 			$count_cd=0;
 			$count_amazon=0;
@@ -284,6 +290,12 @@ sub media {
 					}
 					$titledisplay=$title;
 					$titledisplay =~ s/\'\'/\"/g;
+					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+						$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
+					}
+					if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+						$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
+					}
 					$artistdisplay=$artist;
 					$artistdisplay =~ s/\'\'/\"/g;
 					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$artistdisplay &ndash; $titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$cd</td>\n     <td>$amazon</td>\n     <td>$djbooth</td>\n     <td>$googleplay</td>\n     <td>$groove</td>\n     <td>$itunes</td>\n     <td>$reverbnation</td>\n     <td>$rhapsody</td>\n     <td>$topspin</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
@@ -292,14 +304,15 @@ sub media {
 					$update=$title;
 				}
 			}
+			print "    </tbody>\n";
 			$count_title=$count_title-1;
-			print "    <tr><td align=center colspan=$columns><b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>CD $count_cd || Amazon $count_amazon || DJ Booth $count_djbooth || Google Play $count_googleplay || Groove $count_groove || iTunes $count_itunes || ReverbNation $count_reverbnation || TopSpin $count_topspin || Rhapsody $count_rhapsody</td></tr>\n";
+			$tablestats=" <tr>\  <td align=center colspan=3>   <b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>\n   CD $count_cd || Amazon $count_amazon || DJ Booth $count_djbooth || Google Play $count_googleplay || Groove $count_groove || iTunes $count_itunes || ReverbNation $count_reverbnation || TopSpin $count_topspin || Rhapsody $count_rhapsody";
 		}
 
 		if ($dotype ne "debug") {
-			print "    <tr><td align=center colspan=$columns><a href=\"$thispage?dowhat=mediaadd&dotype=$dotype\">Add Item</a></td></tr>\n";
+			$tablestats.="<br>\n   <a href=\"$thispage?dowhat=mediaadd&dotype=$dotype\">Add Item Manually</a> | <a href=\"$thispage?dowhat=mediabarcode&dotype=$dotype&addtype=eacupc\">Add Item by Barcode</a> | <a href=\"$thispage?dowhat=mediaisbn&dotype=$dotype&addtype=isbn\">Add Item by ISBN</a>\n  </td>\n </tr>";
 		}
-		print "    </tbody>\n";
+
 		print "   </table>";
 
 		&footer;
@@ -531,7 +544,7 @@ sub media {
 				$isbn=$newisbn;
 				$type=$newtype;
 			} else {
-				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn)=split(/\|/,$showline);
+				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft)=split(/\|/,$showline);
 			}
 
 			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
@@ -630,6 +643,21 @@ sub media {
 				print "        <option value=\"\"></option>\n";
 			}
 			if ($itunes eq 'X'){
+				print "        <option value=\"X\" selected>X</option>\n";
+			} else {
+				print "        <option value=\"X\">X</option>\n";
+			}
+			print "       </select>\n";
+			print "      </td>\n     </tr>\n";
+
+			print "     <tr>\n      <th align=right>Microsoft:</th>\n      <td>\n";
+			print "       <select name=newmicrosoft>\n";
+			if ($microsoft eq ''){
+				print "        <option value=\"\" selected></option>\n";
+			} else {
+				print "        <option value=\"\"></option>\n";
+			}
+			if ($microsoft eq 'X'){
 				print "        <option value=\"X\" selected>X</option>\n";
 			} else {
 				print "        <option value=\"X\">X</option>\n";
@@ -878,10 +906,10 @@ sub media {
 				}
 			}
 		} elsif ($dotype eq 'videos'){
-			($thistitle,$thistype,$thismedia,$thisamazon,$thisdisneyanywhere,$thisgoogleplay,$thisitunes,$thisuvvu,$thiseacupc,$thisisbn)=split(/\|/,$showline);
+			($thistitle,$thistype,$thismedia,$thisamazon,$thisdisneyanywhere,$thisgoogleplay,$thisitunes,$thisuvvu,$thiseacupc,$thisisbn,$thismicrosoft)=split(/\|/,$showline);
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|<br>\n";
-			$new="$thistitle|$thistype|$thismedia|$thisamazon|$thisdisneyanywhere|$thisgoogleplay|$thisitunes|$thisuvvu|$thiseacupc|$thisisbn|\n";
+			$new="$thistitle|$thistype|$thismedia|$thisamazon|$thisdisneyanywhere|$thisgoogleplay|$thisitunes|$thisuvvu|$thiseacupc|$thisisbn|$thismicrosoft|\n";
 
 			foreach $line(@infile) {
 				$line=~s/\n//g;
@@ -893,8 +921,8 @@ sub media {
 					$changed=1;
 					print "$thistitle removed<br><br>\n";
 				} else {
-					$writenew.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|\n";
-					$preview.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|<br>\n";
+					$writenew.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|\n";
+					$preview.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|<br>\n";
 				}
 			}
 		} elsif ($dotype eq 'music'){
@@ -945,6 +973,10 @@ sub media {
 
 		$changed=0;
 
+		if (substr($newtitle,0,4) eq "The ") {
+			$newtitle=substr($newtitle,4,length($newtitle)).", The";
+		}
+
 		if ($dotype eq 'books'){
 			$writenew="#DATE#|$today|#|#|#|\n";
 			$new="$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|\n";
@@ -955,6 +987,10 @@ sub media {
 				$line=~s/\n//g;
 				#print "$line\n";
 				($intitle,$inauthor,$ineacupc,$inisbn,$intype) = split(/\|/,$line);
+				if (substr($intitle,0,4) eq "The ") {
+					$intitle=substr($intitle,4,length($intitle)).", The";
+				}
+
 				if ($intitle eq "#DATE#") {
 					#skip
 				} elsif ($intitle eq $oldtitle) {
@@ -977,6 +1013,9 @@ sub media {
 				$line=~s/\n//g;
 				#print "$line\n";
 				($intitle,$inepic,$insteam,$inbattlenet,$inorigin,$inuplay,$innes,$inwii,$inps2,$inxboxone,$inxbox360,$ineacupc) = split(/\|/,$line);
+				if (substr($intitle,0,4) eq "The ") {
+					$intitle=substr($intitle,4,length($intitle)).", The";
+				}
 				if ($intitle eq "#DATE#") {
 					#skip
 				} elsif ($intitle eq $oldtitle) {
@@ -991,14 +1030,17 @@ sub media {
 			}
 		} elsif ($dotype eq 'videos'){
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|\n";
-			$new="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|\n";
+			$new="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|$newmicrosoft|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|<br>\n";
-			$previewnew="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|<br>\n";
+			$previewnew="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|$newmicrosoft|<br>\n";
 			$mediawrite="$dotype|$newtitle||$neweacupc|$newisbn|$newtype|";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				#print "$line\n";
-				($intitle,$intype,$inmedia,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn) = split(/\|/,$line);
+				($intitle,$intype,$inmedia,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn,$inmicrosoft) = split(/\|/,$line);
+				if (substr($intitle,0,4) eq "The ") {
+					$intitle=substr($intitle,4,length($intitle)).", The";
+				}
 				if ($intitle eq "#DATE#") {
 					#skip
 				} elsif ($intitle eq $oldtitle) {
@@ -1007,8 +1049,8 @@ sub media {
 					$changed=1;
 					print "$newtitle updated<br><br>\n";
 				} else {
-					$writenew.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|\n";
-					$preview.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|<br>\n";
+					$writenew.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|\n";
+					$preview.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|<br>\n";
 				}
 			}
 		} elsif ($dotype eq 'music'){
@@ -1021,6 +1063,9 @@ sub media {
 				$line=~s/\n//g;
 				#print "$line\n";
 				($inartist,$intitle,$ineacupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody) = split(/\|/,$line);
+				if (substr($intitle,0,4) eq "The ") {
+					$intitle=substr($intitle,4,length($intitle)).", The";
+				}
 				if ($inartist eq "#DATE#") {
 					#skip
 				} elsif (($intitle eq $oldtitle) && ($inartist eq $oldartist)) {
@@ -1144,18 +1189,30 @@ sub media {
 		@in = <media>;
 		close (media);
 
-		print "\n   <table cellspacing=2 cellpadding=2 id=\"mytable\">\n";
-		print "    <thead>\n     <th>enable write</th>\n     <th>preview hidden</th>\n     <th>preview shown</th>\n    </tr>\n    </thead>\n    <tbody>\n";
+		print "\n   <table cellspacing=10 cellpadding=10 id=\"mytable\">\n";
+		print "    <thead>\n     <th>enable write</th>\n     <th>preview hidden</th>\n     <th>preview shown</th>\n     <th>sort by</th>\n    </tr>\n    </thead>\n    <tbody>\n";
 
 		foreach $line(@in) {
 			$line=~s/\n//g;
-			($debugwrite,$debugpreviewhide,$debugpreviewshow) = split(/\|/,$line);
+			($debugwrite,$debugpreviewhide,$debugpreviewshow,$debugthesort) = split(/\|/,$line);
 			if ($debugwrite eq 0) {$dashwrite="off";} else {$dashwrite="on";}
 			if ($debugpreviewhide eq 0) {$dashpreviewhide="off";} else {$dashpreviewhide="on";}
 			if ($debugpreviewshow eq 0) {$dashpreviewshow="off";} else {$dashpreviewshow="on";}
-			print "    <tr class=\"grid\">\n     <td>$dashwrite</td>\n     <td>$dashpreviewhide</td>\n     <td>$dashpreviewshow</td>\n    </tr>\n";
+			if ($debugthesort eq 0) {$dashthesort="off";} else {$dashthesort="on";}
+			print "    <tr class=\"grid\">\n     <td>$dashwrite</td>\n     <td>$dashpreviewhide</td>\n     <td>$dashpreviewshow</td>\n     <td>$dashthesort</td>\n    </tr>\n";
 		}
+
 		print "    <tr><td align=center colspan=$columns><a href=\"$thispage?dowhat=debugedit&dotype=$dotype&fromtype=$fromtype\">Change Debug</a></td></tr>\n";
+		print "    <tr>\n";
+		print "     <td style=\"text-align:left\" colspan=$columns>\n";
+		print "      <b>enable write</b>: enables content write when on, disabled when off<br>\n";
+		print "      <b>preview hidden</b>: enables content preview within HTML comments when on, disabled when off<br>\n";
+		print "      <b>preview shown</b>: enables content preview in this window when on, disabled when off<br>\n";
+		print "      <b>sort by</b>: titles beginning with 'The' will instead appear with '<i>, The</i>' at the end when on, disabled when off<br>\n";
+		print "      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this applies to both the administrative and non-administrative pages, but not to the database,<br>\n";
+		print "      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;primarily for sorting purposes\n";
+		print "     </td>\n";
+		print "    </tr>\n";
 		print "    </tbody>\n   </table>\n";
 	}
 
@@ -1163,12 +1220,12 @@ sub media {
 		open (media,"$basedir/$mediaitem") || &error("error: mediaitem /$mediaitem");
 		@in = <media>;
 		close (media);
-		print "\n   <table cellspacing=2 cellpadding=2 id=\"mytable\">\n";
-		print "    <thead>\n     <th>enable write</th>\n     <th>preview hidden</th>\n     <th>preview shown</th>\n    </tr>\n    </thead>\n    <tbody>\n";
+		print "\n   <table cellspacing=10 cellpadding=10 id=\"mytable\">\n";
+		print "    <thead>\n     <th>enable write</th>\n     <th>preview hidden</th>\n     <th>preview shown</th>\n     <th>sort by</th>\n    </tr>\n    </thead>\n    <tbody>\n";
 
 		foreach $line(@in) {
 			$line=~s/\n//g;
-			($debugwrite,$debugpreviewhide,$debugpreviewshow) = split(/\|/,$line);
+			($debugwrite,$debugpreviewhide,$debugpreviewshow,$debugthesort) = split(/\|/,$line);
 			print "     <tr class=\"grid\">\n";
 
 			print "      <td>\n";
@@ -1213,19 +1270,42 @@ sub media {
 			} else {
 				print "        <option value=\"1\">on</option>\n";
 			}
+
+			print "      <td>\n";
+			print "       <select name=debugthesort>\n";
+			if ($debugthesort eq '0'){
+				print "        <option value=\"0\" selected>off</option>\n";
+			} else {
+				print "        <option value=\"0\">off</option>\n";
+			}
+			if ($debugthesort eq '1'){
+				print "        <option value=\"1\" selected>on</option>\n";
+			} else {
+				print "        <option value=\"1\">on</option>\n";
+			}
 			
 			print "       </select>\n";
 			print "      </td>\n";
 			print "     </tr>\n";
 		}
 
-		print "     <tr>\n      <td colspan=3 align=center>\n       <input type=button value=\"Cancel\" onClick=\"history.back()\">\n       <input type=submit value=\"Submit\">\n      </td>\n     </tr>\n";
+		print "     <tr>\n      <td colspan=$columns align=center>\n       <input type=button value=\"Cancel\" onClick=\"history.back()\">\n       <input type=submit value=\"Submit\">\n      </td>\n     </tr>\n";
+		print "     <tr>\n";
+		print "      <td style=\"text-align:left\" colspan=$columns>\n";
+		print "       <b>enable write</b>: enables content write when on, disabled when off<br>\n";
+		print "       <b>preview hidden</b>: enables content preview within HTML comments when on, disabled when off<br>\n";
+		print "       <b>preview shown</b>: enables content preview in this window when on, disabled when off<br>\n";
+		print "       <b>sort by</b>: titles beginning with 'The' will instead appear with '<i>, The</i>' at the end when on, disabled when off<br>\n";
+		print "       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this applies to both the administrative and non-administrative pages, but not to the database,<br>\n";
+		print "       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;primarily for sorting purposes\n";
+		print "      </td>\n";
+		print "     </tr>\n";
 		print "     <input type=hidden name=dowhat value=debugwrite>\n     <input type=hidden name=dotype value=$dotype>\n     <input type=hidden name=fromtype value=$fromtype>\n";
 		print "    </tbody>\n   </table>\n";
 	}
 
 	sub debugwrite {
-		$writenew="$editdebugwrite|$editdebugpreviewhide|$editdebugpreviewshow|";
+		$writenew="$editdebugwrite|$editdebugpreviewhide|$editdebugpreviewshow|$editdebugthesort|";
 		open (WRITEINFO,">$basedir/$mediaitem") || &error("error: mediaitem /$mediaitem");
 		print (WRITEINFO $writenew);
 		close (WRITEINFO);
@@ -1239,6 +1319,21 @@ sub header {
 	local($e) = @_;
 	print "$delay\n<html>\n<head>\n <title>EZ Editor: Media Admin</title>\n";
 	print " <LINK HREF=\"/styles/adminstyle.css\" REL=\"stylesheet\" TYPE=\"text/css\" />\n";
+	if ($dotype ne "debug") {
+		print " <script type=\"text/javascript\" src=\"/javascripts/gs_sortable.js\"></script>\n";
+		print " <script type=\"text/javascript\">\n  <!--\n";
+
+		print "   var TSort_Data = new Array ('mytable'";
+		$sortcolumns=1;
+		while($sortcolumns < $columns){
+			print ",'s'";
+			$sortcolumns = $sortcolumns + 1;
+		}
+		print ");\n";
+		print "  -->\n";
+		print " </script>\n";
+	}
+
 	print "</head>\n<body topmargin=0 bottommargin=0 leftmargin=0 rightmargin=0 OnLoad=\"document.myform.";
 	if ($dowhat eq "mediabarcode") {print "neweacupc";} elsif ($dowhat eq "mediaisbn") {print "newisbn";} else {print "newtitle";}
 	print ".focus();\">\n";
@@ -1261,7 +1356,7 @@ sub header {
 }
 
 sub footer {
-	print "\n  </td>\n </tr>\n </form>\n</table>\n</body>\n</html>";
+	print "\n  </td>\n </tr>\n$tablestats\n </form>\n</table>\n</body>\n</html>";
 	exit;
 }
 
@@ -1293,7 +1388,7 @@ sub getqueries {
 	@in = <debug>;
 	close (debug);
 	for $line(@in) {
-		($debugwrite,$debugpreviewhide,$debugpreviewshow) = split(/\|/,$line);
+		($debugwrite,$debugpreviewhide,$debugpreviewshow,$debugthesort) = split(/\|/,$line);
 	}
 
 	# delay write information display
@@ -1383,6 +1478,8 @@ sub getqueries {
 	$olddisneyanywhere=$FORM{'olddisneyanywhere'};
 	$newuvvu=$FORM{'newuvvu'};
 	$olduvvu=$FORM{'olduvvu'};
+	$newmicrosoft=$FORM{'newmicrosoft'};
+	$oldmicrosoft=$FORM{'oldmicrosoft'};
 	## music
 	$newartist=$FORM{'newartist'};
 	$oldartist=$FORM{'oldartist'};
@@ -1402,5 +1499,27 @@ sub getqueries {
 	$editdebugwrite=$FORM{'debugwrite'};
 	$editdebugpreviewhide=$FORM{'debugpreviewhide'};
 	$editdebugpreviewshow=$FORM{'debugpreviewshow'};
+	$editdebugthesort=$FORM{'debugthesort'};
 	$fromtype=$FORM{'fromtype'};
+
+	if ($dotype eq "books") {
+		$mediaitem.="books.txt";
+		$columns=7;
+	} elsif ($dotype eq "games") {
+		$mediaitem.="games.txt";
+		$columns=14;
+	} elsif ($dotype eq "music") {
+		$mediaitem.="music.txt";
+		$columns=13;
+	} elsif ($dotype eq "videos") {
+		$mediaitem.="videos.txt";
+		$columns=13;
+	} elsif ($dotype eq "debug") {
+		if ($dowhat eq "") {$dowhat="debugview";}
+		$mediaitem.="debug.txt";
+		$columns=4;
+	} else {
+		&header;
+		&errorfatal("missing \'dotype\'");
+	}
 }
