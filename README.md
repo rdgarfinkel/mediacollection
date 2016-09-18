@@ -29,12 +29,15 @@ The public server I use for the demonstration (as well as my other sites there) 
 # things to add
 - Make code comments on files and processes for helping others' understand what is doing what.
 - Work on the wiki for this project.
+- EAC/UPC/ISBN approval script to verify that entries are at a good quality, and not spam.
 - Ability to hide/show columns, ie if there are media types not in use. This will require a slight rewrite of some code, but will make additions of media types easier in the future. Currently columns numbers are adjusted manually by myself, so when a column is added, I have to increment a variable number by one. The method I've come up with will essentially automate this, and I'll no longer need to manually adjust that variable. This will not require adjustments to the database files, either.
 - Researching other options for having a fixed header upon scrolling. The one that was in place is not 100% reliable.
 - TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, and musicbrainz.org integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
 
 # change log
-- 2016.09.16<br>
+- Next update
+  - Up until now, when EAC/UPC/ISBN codes were found, the entry was overwritten upon each edit. Now entries are only created and not updated. *This isn't implemented yet, but will be on the next update.*
+- 2016.09.16
   - Some code cleanup/rearranging.
   - Added the ability to sort the table columns in the administration pages.
   - In the 'debug' menu, there's now an option for sorting titles with "The" at the beginning, and this effects both the non-administration and administration side. Using *The Sandlot* as an example, when 'sort by' is on, the title will appear as, *Sandlot, The*. Otherwise, it will appear as *The Sandlot*. For adding/changing *The Sandlot*, you can enter *Sandlot, The* or *The Sandlot*, and it will be entered into the database as *Sandlot, The* server side.
