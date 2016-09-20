@@ -23,20 +23,21 @@ The public server I use for the demonstration (as well as my other sites there) 
 - While testing, when using the <b>&</b> ampersand symbol in text fields, the editing feature didn't work. It seems that the 'query string' parsing splits this like it is a separate entry. Text replacement will occur server side, swapping the <b>&</b> symbol for <b>and</b> text.
 - While testing, when using the <b>"</b> double quotation mark in text fields, the editing feature didn't work. When clicking an entry to edit, the browser would interpret the quotations as the end of an <b>A HREF</b> HTML tag. Text replacement will occur server side, swapping the <b>"</b> double quotation mark for <b>''</b> two single quotation symbols for storing the entries, and <b>''</b> two single quotation symbols will be swapped for the <b>"</b> double quotation mark for display in the user facing tables.
 - When items are added, they'll be added to the bottom of the list. That entry can be sorted upon editing another entry and submitting, unless I can find a way to do this upon adding entries.
-- When movies are redone and the titles are the same, you'll get unwanted results when trying to edit one of the two entries. For example, the 1967 movie, *The Jungle Book* and the 2016 movie, *The Jungle Book*. When both exist in the database, both entries would be edited when editing one of the entries. To work around this, use the movie's year in the title as well, for example, *The Jungle Book (1967)* or *The Jungle Book (2016).*
-- The columns within each media section are the media types that I have access to. So, I didn't add Sony Playstation 1, 3, or 4 columns in the games section, as an example. If you need these, file an issue here on Github, and I'll add whatever you need.
+- When movies are redone and the titles are the same, you'll get unwanted results when trying to edit one of the two entries. For example, the 1967 movie, *The Jungle Book* and the 2016 movie, *The Jungle Book*. When both exist in the database, both entries would be edited when editing one of the entries. To work around this, there is now a year input box within the media editor for videos.
+- The columns within each media section are the media types that I have access to. As an example, I don't have any Sony Playstation 1, 3, or 4 columns in the games section, as an example. If you need these, file an issue here on Github, and I'll add whatever you need.
 
 # things to add
-- Make code comments on files and processes for helping others' understand what is doing what.
+- Make code comments on files and processes for helping others' understand what is doing what. (media.pl is close to finished, index.cgi will be next)
 - Work on the wiki for this project.
-- EAC/UPC/ISBN approval script to verify that entries are at a good quality, and not spam.
+- EAC/UPC/ISBN approval script to verify that entries are at a good quality.
 - Ability to hide/show columns, ie if there are media types not in use. This will require a slight rewrite of some code, but will make additions of media types easier in the future. Currently columns numbers are adjusted manually by myself, so when a column is added, I have to increment a variable number by one. The method I've come up with will essentially automate this, and I'll no longer need to manually adjust that variable. This will not require adjustments to the database files, either.
 - Researching other options for having a fixed header upon scrolling. The one that was in place is not 100% reliable.
-- TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, and musicbrainz.org integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
+- TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
 
 # change log
-- Next update
-  - Up until now, when EAC/UPC/ISBN codes were found, the entry was overwritten upon each edit. Now entries are only created and not updated. *This isn't implemented yet, but will be on the next update.*
+- 206.09.19
+  - Up until now, when EAC/UPC/ISBN codes were found, the entry was overwritten upon each edit. Now entries are only created and not updated/overwritten.
+  - Added a year input option to videos on the administration side, and also added the display of the year on the non-administrative side. I now have two movies that were named the same, and editing one would edit the other. This is now fixed, as long as one or both of the movies have a year attached to it.
 - 2016.09.16
   - Some code cleanup/rearranging.
   - Added the ability to sort the table columns in the administration pages.
