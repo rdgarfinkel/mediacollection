@@ -3,12 +3,13 @@
 $basedir="";
 $directory="media";
 $admindirectory="media";
-$mediaitem="$basedir/cgi-bin/$directory/media_";
+$mediaitem="cgi-bin/$directory/media_";
+$debugitem="cgi-bin/$directory/media_debug.txt";
 $thispage="index.cgi";
 $empty="0";
 
 #  headers for the admin pages
-$dateupdated="2016.09.15";
+$dateupdated="2016.09.19";
 
 open (debug,"$basedir/$debugitem") || &error("error: mediaitem $debugitem");
 @in = <debug>;
@@ -122,11 +123,11 @@ if ($empty != "1") {
 		$table.= " </tbody>\n";
 	} elsif ($pagetitle eq "video") {
 		##Movie#|#Movie/TV#|#Media#|#Amazon#|#Disney Anywhere#|#Google Play#|#iTunes#|#UVVU#|#UPC#|#ISBN#|#Microsoft#|
-		$table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Movie/TV</th>\n   <th>Physical<br>Media</th>\n   <th>Amazon</th>\n   <th>Disney Anywhere</th>\n   <th>Google Play</th>\n   <th>iTunes</th>\n   <th>Microsoft</th>\n<th>UVVU</th>\n  </tr>\n </thead>\n";
+		$table.= " <thead>\n  <tr>\n   <th>Title (Year)</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Movie/TV</th>\n   <th>Physical<br>Media</th>\n   <th>Amazon</th>\n   <th>Disney<br>Anywhere</th>\n   <th>Google Play</th>\n   <th>iTunes</th>\n   <th>Microsoft</th>\n<th>UVVU</th>\n  </tr>\n </thead>\n";
 
 		$table.= " <tbody>\n";
 		foreach (@in) {
-			($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn,$microsoft) = split(/\|/,$_);
+			($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn,$microsoft,$year) = split(/\|/,$_);
 			$mediadisplay="";
 			if ($media eq "bluray") {
 				$mediadisplay="BluRay";
@@ -143,6 +144,9 @@ if ($empty != "1") {
 			}
 			$titledisplay=$title;
 			$titledisplay =~ s/\'\'/\"/g;
+			if ($year) {
+				$titledisplay.=" ($year)";
+			}
 			if ($title eq "#DATE#") {
 				$dataupdated=$type;
 			} else {
