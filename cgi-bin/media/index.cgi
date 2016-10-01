@@ -88,7 +88,7 @@ if ($empty != "1") {
 
 	#print "<!--@in-->";
 
-	$table= "<table cellspacing=10 cellpadding=10 id=\"mytable\" class=\"data-table\">\n";
+	$table= "<div align=center>\n<table cellspacing=10 cellpadding=10 id=\"mytable\" class=\"data-table\">\n";
 	$table.= " <colgroup>\n";
 	$table.= "  <col style=\"background-color: #ddd\">\n";
   
@@ -123,7 +123,7 @@ if ($empty != "1") {
 		$table.= " </tbody>\n";
 	} elsif ($pagetitle eq "video") {
 		##Movie#|#Movie/TV#|#Media#|#Amazon#|#Disney Anywhere#|#Google Play#|#iTunes#|#UVVU#|#UPC#|#ISBN#|#Microsoft#|
-		$table.= " <thead>\n  <tr>\n   <th>Title (Year)</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Movie/TV</th>\n   <th>Physical<br>Media</th>\n   <th>Amazon</th>\n   <th>Disney<br>Anywhere</th>\n   <th>Google Play</th>\n   <th>iTunes</th>\n   <th>Microsoft</th>\n<th>UVVU</th>\n  </tr>\n </thead>\n";
+		$table.= " <thead>\n  <tr>\n   <th>Title (Year)</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Movie/TV</th>\n   <th>Physical<br>Media</th>\n   <th>Amazon</th>\n   <th>Disney<br>Anywhere</th>\n   <th>Google<br>Play</th>\n   <th>iTunes</th>\n   <th>Microsoft</th>\n<th>UVVU</th>\n  </tr>\n </thead>\n";
 
 		$table.= " <tbody>\n";
 		foreach (@in) {
@@ -203,10 +203,10 @@ if ($empty != "1") {
 		}
 		$table.= " </tbody>\n";
 	}
-	$table.= "</table>\n";
+	$table.= "</table>\n</div>\n";
 }
 
-print "<div align=left>";
+print "<div align=center>";
 if ($empty != "1") {
  print "data updated: $dataupdated | ";
 }
@@ -220,6 +220,10 @@ print "</div>\n";
 print "<br>\n";
 
 print $table;
+
+print "<br>\n<div align=center>";
+print "<i>this script, <b>mediacollection</b>, is part of an open source Perl script available on <a href=\"https://github.com/rdgarfinkel/mediacollection\" target=\"_GitHub\">Github</a></i>";
+print "</div>\n";
 
 print "</body>\n";
 print "</html>";
