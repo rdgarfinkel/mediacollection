@@ -112,9 +112,11 @@ sub media {
 						$count_book=$count_book+1;
 					}
 
-					# The next four lines swap double single quotation marks to a single double quotation mark, but keeps $title/$author as is to not break the editing ability
+					# The next few lines swap double single quotation marks for a single double quotation mark, (plus) for a plus symbol, (pound) for the pound symbol, but keeps $title as is to not break the editing ability
 					$titledisplay=$title;
 					$titledisplay =~ s/\'\'/\"/g;
+					$titledisplay =~ s/\(plus\)/+/g;
+					$titledisplay =~ s/\(pound\)/#/g;
 					$authordisplay=$author;
 					$authordisplay =~ s/\'\'/\"/g;
 
@@ -223,9 +225,11 @@ sub media {
 						$xbox360total=$xbox360total+1;
 					}
 
-					# The next two lines swap double single quotation marks to a single double quotation mark, but keeps $title/$artist as is to not break the editing ability
+					# The next few lines swap double single quotation marks for a single double quotation mark, (plus) for a plus symbol, (pound) for the pound symbol, but keeps $title as is to not break the editing ability
 					$titledisplay=$title;
 					$titledisplay =~ s/\'\'/\"/g;
+					$titledisplay =~ s/\(plus\)/+/g;
+					$titledisplay =~ s/\(pound\)/#/g;
 
 					# If $debugthesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
 					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
@@ -329,9 +333,11 @@ sub media {
 						$count_uvvu=$count_uvvu+1;
 					}
 
-					# The next two lines swap double single quotation marks to a single double quotation mark, but keeps $title/$artist as is to not break the editing ability
+					# The next few lines swap double single quotation marks for a single double quotation mark, (plus) for a plus symbol, (pound) for the pound symbol, but keeps $title as is to not break the editing ability
 					$titledisplay=$title;
 					$titledisplay =~ s/\'\'/\"/g;
+					$titledisplay =~ s/\(plus\)/+/g;
+					$titledisplay =~ s/\(pound\)/#/g;
 
 					# If $debugthesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
 					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
@@ -424,6 +430,8 @@ sub media {
 					# The next four lines swap double single quotation marks to a single double quotation mark, but keeps $title/$artist as is to not break the editing ability
 					$titledisplay=$title;
 					$titledisplay =~ s/\'\'/\"/g;
+					$titledisplay =~ s/\(plus\)/+/g;
+					$titledisplay =~ s/\(pound\)/#/g;
 					$artistdisplay=$artist;
 					$artistdisplay =~ s/\'\'/\"/g;
 
@@ -1707,6 +1715,7 @@ sub getqueries {
 		$value =~ s/<!--(.|\n)*-->//g;
 		$value =~ s/\"/\'\'/g;
 		$value =~ s/\&/and/g;
+		$value =~ s/#/\(pound\)/g;
 		$FORM{$name} = $value;
 		$delay.=" || $name = $value";
 	}
