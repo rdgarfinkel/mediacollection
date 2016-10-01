@@ -1,18 +1,18 @@
 # mediacollection
-Physical and digital music, video (movies/tv), books, and games collection display and management
+Simple data display/management for physical and digital music, video (movies/tv), books, and games collections
 
 # first things first
 If you will be using this on a public server, put the /cgi-bin/media/media.pl file within a separate directory that is password protected so that only you can add/amend/delete your database entries.<br>
-Things *should* work "directly out of the box." You'll need to edit the $basedir variable in the index.cgi and media.pl scripts, and maybe the "#!/usr/bin/perl" line at the top of each script
+Aside from editing the $basedir variable in the index.cgi and media.pl scripts (and maybe the "#!/usr/bin/perl" line at the top of each script), things *should* work "directly out of the box." 
 
 # demonstration
-A demonstration of the script and it's abilities is online and available, with editing abilities enabled. No password is required for the admin side. Test it out as you wish, http://rgarfinkel.heliohost.org/cgi-bin/mediademo/index.cgi<br>
+A demonstration of the script and it's abilities is online and available, with editing abilities enabled. No password is required for the admin side. Test it out as you wish, http://rgarfinkel.heliohost.org/cgi-bin/mediademo/index.cgi.<br>
 Please note that the "modification" date in the shown/hidden HTML on the demonstration sites may be newer than the one present here on Github. I do the coding offline on a local server, post it to the public site to verify it still works on there, then I'll post it here.
 
 # requirements
 For this script to run, you'll need to have a web server and it needs to be capable of running Perl scripts. It can be a public server or just a local server.<br>
 I use Aprelium's Abyss Web Server for local server scripting/testing, free and available for Windows/Mac/Linux; http://aprelium.com/. Perl installation instructions are here: http://aprelium.com/abyssws/perl.html.<br>
-The public server I use for the demonstration (as well as my other sites there) is also free; http://heliohost.org. Highly suggest signing up with the Stevie server if you go with this option, the Johnny server isn't quite as good. You do need to remember to login to your account once a month to keep your account (your account and all files will be recovered if you forget).
+The public server I use for the demonstration (as well as my other sites there) is also free; http://heliohost.org. Highly suggest signing up with the Stevie server if you go with this option, the Johnny server isn't quite as good in terms of reliability. Stevie has daily signup limits, and the clock resets at midnight UTC (http://www.timeanddate.com/worldclock/timezone/utc). You do need to remember to login to your account once a month to keep your account active–I can say comfortably that your account and all files will be recovered if you do forget.
 
 # what is included
 - /javascripts/gs_sortable.js, http://www.allmyscripts.com/Table_Sort/index.html: allows for the dynamic sorting of table headers (only accessible when page has not been scrolled down)<br>
@@ -23,19 +23,25 @@ The public server I use for the demonstration (as well as my other sites there) 
 - While testing, when using the <b>&</b> ampersand symbol in text fields, the editing feature didn't work. It seems that the 'query string' parsing splits this like it is a separate entry. Text replacement will occur server side, swapping the <b>&</b> symbol for <b>and</b> text.
 - While testing, when using the <b>"</b> double quotation mark in text fields, the editing feature didn't work. When clicking an entry to edit, the browser would interpret the quotations as the end of an <b>A HREF</b> HTML tag. Text replacement will occur server side, swapping the <b>"</b> double quotation mark for <b>''</b> two single quotation symbols for storing the entries, and <b>''</b> two single quotation symbols will be swapped for the <b>"</b> double quotation mark for display in the user facing tables.
 - When items are added, they'll be added to the bottom of the list. That entry can be sorted upon editing another entry and submitting, unless I can find a way to do this upon adding entries.
-- When movies are redone and the titles are the same, you'll get unwanted results when trying to edit one of the two entries. For example, the 1967 movie, *The Jungle Book* and the 2016 movie, *The Jungle Book*. When both exist in the database, both entries would be edited when editing one of the entries. To work around this, there is now a year input box within the media editor for videos.
-- The columns within each media section are the media types that I have access to. As an example, I don't have a Sony Playstation 1, 3, or 4 system, so those columns don't exist yet in the games section. If you need these or other options, file an issue here on Github, and I'll add whatever you need.
+- When movies are redone and the titles are the same, you'll get unwanted results when trying to edit one of the two entries. For example, the 1967 movie, *The Jungle Book* and the 2016 movie, *The Jungle Book*. When both exist in the database, both entries would be edited when editing one of the entries. To work around this, there is now a year input box within the media editor for videos, and entries are now compared by title and year, when the year has a value.
+- The columns currently within each media section are the media types that I have. As an example, I don't have a Sony Playstation 1, 3, or 4 system/games, so those columns don't exist yet in the games section. If you need these or other options, file an issue here on Github, and I'll add whatever you need, or if anyone wants to contribute, that's okay too.
 
 # things to add
 - Make code comments on files and processes for helping others' understand what is doing what. (media.pl is close to finished, index.cgi will be next)
 - Work on the wiki for this project.
-- EAC/UPC/ISBN approval script to verify that entries are at a good quality.
-- Ability to hide/show columns, ie if there are media types not in use. This will require a slight rewrite of some code, but will make additions of media types easier in the future. Currently columns numbers are adjusted manually by myself, so when a column is added, I have to increment a variable number by one. The method I've come up with will essentially automate this, and I'll no longer need to manually adjust that variable. This will not require adjustments to the database files, either.
-- Researching other options for having a fixed header upon scrolling. The one that was in place is not 100% reliable.
+- EAC/UPC/ISBN approval script to verify that public entries are at a good quality.
+- Ability to hide/show columns, ie if there are media types that you don't personally have/use. This will require a slight revamp of code, but will make additions of media types easier in the future. Currently column numbers are adjusted manually by myself, so when a column is added, I have to manually increment a variable number by one. The method I've come up with will essentially automate that. This will not require adjustments to the database files, either.
+- Researching other options for having a fixed header upon scrolling. The one that was in place is not 100% reliable.<br>
+
+# things to add way down the road</b><br>
 - TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
+- Hosted website with these scripts put online, with member signup abilities.
 
 # change log
-- 206.09.19
+- 2016.10.01
+  - Found an error in the code on the admin side where the month was lost on date updated entry, now fixed.
+  - Table display on non-admin side is now centered, and also contains the github mention footer.
+- 2016.09.19
   - Up until now, when EAC/UPC/ISBN codes were found, the entry was overwritten upon each edit. Now entries are only created and not updated/overwritten.
   - Added a year input option to videos on the administration side, and also added the display of the year on the non-administrative side. I now have two movies that were named the same, and editing one would edit the other. This is now fixed, as long as one or both of the movies have a year attached to it.
 - 2016.09.16
