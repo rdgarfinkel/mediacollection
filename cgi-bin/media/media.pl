@@ -19,7 +19,7 @@ $debug=$mediaitem."debug.txt";
 
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2016.09.19";
+$dateupdated="2016.10.01";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -1658,7 +1658,7 @@ sub getqueries {
 	# Get the server's current date/time
 	my($sec,$min,$hrs,$day,$mon,$currentyear)=localtime(time);
 	$mon=$mon+1;
-	if(length($mon) eq '1') {$mnth="0$mon";}
+	if(length($mon) eq '1') {$mnth="0$mon";} else {$mnth=$mon;}
 	if(length($day) eq '1') {$day="0$day";}
 	if(length($hrs) eq '1') {$hrs="0$hrs";}
 	if(length($min) eq '1') {$min="0$min";}
