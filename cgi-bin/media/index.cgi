@@ -8,8 +8,8 @@ $debugitem="cgi-bin/$directory/media_debug.txt";
 $thispage="index.cgi";
 $empty="0";
 
-#  headers for the admin pages
-$dateupdated="2016.09.19";
+#  headers for the non-admin pages
+$dateupdated="2016.10.01";
 
 open (debug,"$basedir/$debugitem") || &error("error: mediaitem $debugitem");
 @in = <debug>;
@@ -114,6 +114,8 @@ if ($empty != "1") {
 			}
 			$titledisplay=$title;
 			$titledisplay =~ s/\'\'/\"/g;
+			$titledisplay =~ s/\(plus\)/+/g;
+			$titledisplay =~ s/\(pound\)/#/g;
 			if ($title eq "#DATE#") {
 				$dataupdated=$epic;
 			} else {
@@ -144,6 +146,8 @@ if ($empty != "1") {
 			}
 			$titledisplay=$title;
 			$titledisplay =~ s/\'\'/\"/g;
+			$titledisplay =~ s/\(plus\)/+/g;
+			$titledisplay =~ s/\(pound\)/#/g;
 			if ($year) {
 				$titledisplay.=" ($year)";
 			}
@@ -169,6 +173,8 @@ if ($empty != "1") {
 			}
 			$titledisplay=$title;
 			$titledisplay =~ s/\'\'/\"/g;
+			$titledisplay =~ s/\(plus\)/+/g;
+			$titledisplay =~ s/\(pound\)/#/g;
 			$authordisplay=$author;
 			$authordisplay =~ s/\'\'/\"/g;
 			if ($title eq "#DATE#") {
@@ -193,6 +199,8 @@ if ($empty != "1") {
 			}
 			$titledisplay=$title;
 			$titledisplay =~ s/\'\'/\"/g;
+			$titledisplay =~ s/\(plus\)/+/g;
+			$titledisplay =~ s/\(pound\)/#/g;
 			$artistdisplay=$artist;
 			$artistdisplay =~ s/\'\'/\"/g;
 			if ($artist eq "#DATE#") {
