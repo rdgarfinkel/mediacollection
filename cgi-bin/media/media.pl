@@ -19,7 +19,7 @@ $debug=$mediaitem."debug.txt";
 
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2016.10.01";
+$dateupdated="2016.10.05";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -174,7 +174,7 @@ sub media {
 				$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
 
 				# Split each variable by the | character
-				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc) = split(/\|/,$line);  
+				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc) = split(/\|/,$line);
 
 				# If $title doesn't equal "#DATE#"
 				if ($title ne "#DATE#") {
@@ -282,7 +282,7 @@ sub media {
 				$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
 
 				# Split each variable by the | character
-				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year) = split(/\|/,$line);  
+				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year) = split(/\|/,$line);
 
 				# If $title doesn't equal "#DATE#"
 				if ($title ne "#DATE#") {
@@ -507,8 +507,8 @@ sub media {
 			}
 
 			# Generate the necessary text input fields for adding/editing entries
-			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>Author:</th>\n      <td><input type=text name=newauthor value=\"$author\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onkeyup=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>Author:</th>\n      <td><input type=text name=newauthor value=\"$author\" onkeyup=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td>\n       <input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>ISBN:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
 
@@ -549,7 +549,7 @@ sub media {
 				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc)=split(/\|/,$showline);
 			}
 
-			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onkeyup=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td>\n       <input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 
 			print "     <tr>\n      <th align=right>Epic:</th>\n      <td>\n";
@@ -725,7 +725,7 @@ sub media {
 				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year)=split(/\|/,$showline);
 			}
 
-			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onkeyup=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>Year:</th>\n      <td><input type=text name=newyear value=\"$year\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td><input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>ISBN:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
@@ -869,8 +869,8 @@ sub media {
 				($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody)=split(/\|/,$showline);
 			}
 
-			print "     <tr>\n      <th align=right width=30%>Artist:</th>\n      <td><input type=text name=newartist value=\"$artist\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Artist:</th>\n      <td><input type=text name=newartist value=\"$artist\" onkeyup=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onkeyup=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td><input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 
 			print "     <tr>\n      <th align=right>CD:</th>\n      <td>\n";
@@ -1734,8 +1734,11 @@ sub getqueries {
 	$newtitle=$FORM{'newtitle'};
 	$oldtitle=$FORM{'oldtitle'};
 	$neweacupc=$FORM{'neweacupc'};
+	$neweacupc=~s/[^\d]//gi;                   # remove any character besides numbers for EAC/UPC
 	$oldeacupc=$FORM{'oldeacupc'};
 	$newisbn=$FORM{'newisbn'};
+	$newisbn=~s/[^\dxX]//gi;                   # remove any character besides numbers and X from ISBN
+	$newisbn=uc $newisbn;                      # force uppercase for ISBN
 	$oldisbn=$FORM{'oldisbn'};
 	$newtype=$FORM{'newtype'};
 	$oldtype=$FORM{'oldtype'};
