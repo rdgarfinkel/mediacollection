@@ -24,7 +24,6 @@ The public server I use for the demonstration (as well as my other sites there) 
 - When using the <b>"</b> double quotation symbol in text fields, the editing feature didn't work. When clicking an entry to edit, the browser would interpret the quotations as the end of an <b>A HREF</b> HTML tag. Text replacement will occur server side, swapping the <b>"</b> double quotation mark for <b>''</b> two single quotation symbols for storing the entries, and <b>''</b> two single quotation symbols will be swapped for the <b>"</b> double quotation mark for display in the user facing tables.
 - When using the <b>#</b> pound symbol in text fields, the editing feature didn't work. I think what happens is the script thinks that the entry is supposed to be hidden, like it is a comment in Perl. When a pound sign is needed in titles, use <b>(pound)</b>, and it will be entered into the database that way, and <b>(pound)</b> will be swapped for <b>#</b> pound symbol in the user facing tables.
 - When the <b>+</b> plus symbol is used, the editing feature works, but not as expected. The plus symbol is the indicator these scripts use for spaces, and would be interpreted as such. Now, assuming that Javascript is enabled client-side, when the <b>+</b> plus symbol is entered by the user, the field will automatically change the character to <b>(plus)</b>, otherwise it'll need to be entered manually. <b>(plus)</b> will be entered into the database, and <b>(plus)</b> will be swapped for <b>+</b> plus symbol in the user facing tables.
-- When items are added, they'll be added to the bottom of the list. That entry can be sorted upon editing another entry and submitting, unless I can find a way to do this upon adding entries.
 - When movies are redone and the titles are the same, you'll get unwanted results when trying to edit one of the two entries. For example, the 1967 movie, *The Jungle Book* and the 2016 movie, *The Jungle Book*. When both exist in the database, both entries would be edited when editing one of the entries. To work around this, there is now a year input box within the media editor for videos, and entries are now compared by title and year, when the year has a value.
 - The columns currently within each media section are the media types that I have. As an example, I don't have a Sony Playstation 1, 3, or 4 system/games, so those columns don't exist yet in the games section. If you need these or other options, file an issue here on Github, and I'll add whatever you need, or if anyone wants to contribute, that's okay too.
 
@@ -40,6 +39,8 @@ The public server I use for the demonstration (as well as my other sites there) 
 - Hosted website with these scripts put online, with member signup abilities.
 
 # change log
+- 2016.??.??
+  - As of the next update, when adding entries, it will be sorted into the database. :)
 - 2016.10.05
   - Added ability for new/editing titles to have the ability to swap the <b>+</b> plus symbol for <b>(plus)</b> automatically upon entry by the user.
   - EAC/UPC barcodes are strictly numbers. If anything else is entered, it is stripped server-side.
