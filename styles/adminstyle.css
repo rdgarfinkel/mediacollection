@@ -1,0 +1,58 @@
+BODY {BACKGROUND-COLOR: #FFFFFF;}
+BODY,A,A.out {FONT-FAMILY: UBUNTU, VERDANA; COLOR: #000000;}
+A,TH,TD,.section {FONT-SIZE: 11PT;}
+.link {FONT-SIZE: 20PT;}
+.out {FONT-SIZE: 16PT;}
+a {
+	font-family: UBUNTU, VERDANA;
+	font-size: 10pt;
+}
+TD,th {
+	font-family: UBUNTU, VERDANA;
+	font-size: 10pt;
+	background: #FFFFFF;
+}
+TD DIV {
+	width: 250px;
+}
+a.lowlinks, input, select {
+	color: #000000;
+	border: 1px dashed #000000;
+	background-color: #ffffff;
+	font-family: UBUNTU, VERDANA;
+	font-size: 10pt;
+	padding: 2px;
+}
+a.lowlinks,a.lowlinks:hover {
+	padding: 3px;
+	cursor: default;
+}
+.header {
+	background: #9bbad6;
+	font-size: 10pt;
+}
+.submit {
+	position: absolute;
+	visibility: hidden;
+}
+
+#mytable {
+    border-collapse: collapse;
+  }
+
+#mytable td, #my_table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align:center;
+}
+
+#mytable tr:nth-child(even){background-color: #f2f2f2;}
+
+#mytable tr:hover {background-color: #ccc;}
+
+#mytable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: #4CAF50;
+    color: white;
+}
