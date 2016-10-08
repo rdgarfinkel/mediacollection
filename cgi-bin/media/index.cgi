@@ -1,16 +1,26 @@
 #!/usr/bin/perl
 
-$basedir="";
+### "GLOBAL" SETTINGS AND SCRIPT SETTINGS
+#  base directory and static locations for certain parts of the site
+$basedir=$ENV{'DOCUMENT_ROOT'};
+
+##  MEDIACOLLECTION SETTINGS
+#  $directory should be where the media data is stored.
 $directory="media";
+#  $admindirectory should be the location where media.pl is stored, in case you have it in a separate password protected folder.
 $admindirectory="media";
+#  $mediaitem is the general location of the media data.
 $mediaitem="cgi-bin/$directory/media_";
+#  $debugitem is the debug file for the media data.
 $debugitem="cgi-bin/$directory/media_debug.txt";
 $thispage="index.cgi";
+#  $empty gets the value of 0 here, and will be tested a little later on to be sure that there is a media type.
 $empty="0";
 
 #  headers for the non-admin pages
-$dateupdated="2016.10.01";
+$dateupdated="2016.10.07";
 
+#  Open and process the "debug" file. On this page, the article sort is the only variable that matters.
 open (debug,"$basedir/$debugitem") || &error("error: mediaitem $debugitem");
 @in = <debug>;
 close (debug);
@@ -18,6 +28,7 @@ for $line(@in) {
 	($debugwrite,$debugpreviewhide,$debugpreviewshow,$debugthesort) = split(/\|/,$line);
 }
 
+#  Set content type of the page.
 print "Content-TYPE: text/html\npragma: no-cache\n\n";
 print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n";
 print "<!--my media collection v$dateupdated-->\n";
@@ -31,23 +42,30 @@ print "   function SizedPop(dir,page,type,width,height) {\n    window.open('/cgi
 print "    'toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=no,resizable=no,width=' + width + ',height=' + height);\n";
 print "   }\n   self.name = \"main\";\n";
 
+#  Get the query from the URI address
 $query=$ENV{"QUERY_STRING"};
+#  if $query equals games, set $mediaitem to look at the games.txt file, set the page title to "game," and set columns
 if ($query eq "games") {
 	$mediaitem.="games.txt";
 	$pagetitle="game";
 	$columns=12;
+#  if $query equals videos, set $mediaitem to look at the videos.txt file, set the page title to "video," and set columns
 } elsif ($query eq "videos") {
 	$mediaitem.="videos.txt";
 	$pagetitle="video";
 	$columns=11;
+#  if $query equals music, set $mediaitem to look at the music.txt file, set the page title to "music," and set columns
 } elsif ($query eq "music") {
 	$mediaitem.="music.txt";
 	$pagetitle="music";
 	$columns=11;
+#  if $query equals books, set $mediaitem to look at the books.txt file, set the page title to "book," and set columns
 } elsif ($query eq "books") {
 	$mediaitem.="books.txt";
 	$pagetitle="book";
 	$columns=5;
+#  if none of the above are true, then the $query is either incorrect or missing, so now $empty is set to 1, and page title
+#  is set to "media." this also prevents the data table from being created.
 } else {
 	$empty="1";
 	$pagetitle="media";
@@ -62,9 +80,6 @@ while($sortcolumns < $columns){
 print ");\n";
 
 print "   tsRegister();\n";
-print "   \$(document).ready(function(){\n";
-print "    \$(\"table\").freezeHeader({ top: true, left: true });\n";
-print "   });\n";
 print "  -->\n";
 print " </script>\n";
 
@@ -80,6 +95,7 @@ print " </style>\n";
 
 print "</HEAD>\n";
 print "<BODY BGCOLOR=#ffffff>\n";
+
 
 if ($empty != "1") {
 	open (media,"$basedir/$mediaitem") || print "error: $mediaitem";
@@ -106,16 +122,17 @@ if ($empty != "1") {
 		$table.= " <tbody>\n";
 		foreach (@in) {
 			($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$upc) = split(/\|/,$_);
-			if ($debugthesort == "1" && substr($title,0,4) eq "The ") {
-				$title=substr($title,4,length($title)).", The";
-			}
-			if ($debugthesort == "0" && substr($title,length($title)-5,5) eq ", The") {
-				$title="The ".substr($title,0,length($title)-5);
-			}
 			$titledisplay=$title;
+			if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+				$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
+			}
+			if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+				$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
+			}
 			$titledisplay =~ s/\'\'/\"/g;
 			$titledisplay =~ s/\(plus\)/+/g;
 			$titledisplay =~ s/\(pound\)/#/g;
+			$titledisplay =~ s/\(amp\)/\&/g;
 			if ($title eq "#DATE#") {
 				$dataupdated=$epic;
 			} else {
@@ -138,16 +155,17 @@ if ($empty != "1") {
 			} elsif ($media eq "diskcombo") {
 				$mediadisplay="BluRay/DVD";
 			}
-			if (substr($title,0,4) eq "The ") {
-				$titletest1=substr($title,4,length($title)).", The";
-			}
-			if (substr($title,length($title)-5,5) eq ", The") {
-				$titletest2="The ".substr($title,0,length($title)-5);
-			}
 			$titledisplay=$title;
+			if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+				$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
+			}
+			if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+				$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
+			}
 			$titledisplay =~ s/\'\'/\"/g;
 			$titledisplay =~ s/\(plus\)/+/g;
 			$titledisplay =~ s/\(pound\)/#/g;
+			$titledisplay =~ s/\(amp\)/\&/g;
 			if ($year) {
 				$titledisplay.=" ($year)";
 			}
@@ -165,18 +183,22 @@ if ($empty != "1") {
 		$table.= " <tbody>\n";
 		foreach (@in) {
 			($title,$author,$upc,$isbn,$type) = split(/\|/,$_);
-			if (substr($title,0,4) eq "The ") {
-				$title=substr($title,4,length($title)).", The";
-			}
-			if (substr($title,length($title)-5,5) eq ", The") {
-				$title="The ".substr($title,0,length($title)-5);
-			}
 			$titledisplay=$title;
+			if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+				$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
+			}
+			if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+				$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
+			}
 			$titledisplay =~ s/\'\'/\"/g;
 			$titledisplay =~ s/\(plus\)/+/g;
 			$titledisplay =~ s/\(pound\)/#/g;
+			$titledisplay =~ s/\(amp\)/\&/g;
 			$authordisplay=$author;
 			$authordisplay =~ s/\'\'/\"/g;
+			$authordisplay =~ s/\(plus\)/+/g;
+			$authordisplay =~ s/\(pound\)/#/g;
+			$authordisplay =~ s/\(amp\)/\&/g;
 			if ($title eq "#DATE#") {
 				$dataupdated=$author;
 			} else {
@@ -191,18 +213,22 @@ if ($empty != "1") {
 		$table.= " <tbody>\n";
 		foreach (@in) {
 			($artist,$title,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$_);
-			if (substr($title,0,4) eq "The ") {
-				$titletest1=substr($title,4,length($title)).", The";
-			}
-			if (substr($title,length($title)-5,5) eq ", The") {
-				$titletest2="The ".substr($title,0,length($title)-5);
-			}
 			$titledisplay=$title;
+			if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+				$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
+			}
+			if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+				$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
+			}
 			$titledisplay =~ s/\'\'/\"/g;
 			$titledisplay =~ s/\(plus\)/+/g;
 			$titledisplay =~ s/\(pound\)/#/g;
+			$titledisplay =~ s/\(amp\)/\&/g;
 			$artistdisplay=$artist;
 			$artistdisplay =~ s/\'\'/\"/g;
+			$artistdisplay =~ s/\(plus\)/+/g;
+			$artistdisplay =~ s/\(pound\)/#/g;
+			$artistdisplay =~ s/\(amp\)/\&/g;
 			if ($artist eq "#DATE#") {
 				$dataupdated=$title;
 			} else {
