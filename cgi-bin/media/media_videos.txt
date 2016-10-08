@@ -1,12 +1,1 @@
-#DATE#|08.18.2016|#|#|#|#|#|#|#|#|#|
-Adaptation|Movie|||||||X|||
-Airplane II The Sequel|Movie||X||||||97360148947||
-Airplane!|Movie||X||||||97360130546||
-Alien|Movie|||||||X|||
-Animusic 1|Movie||X||||||821143100194||
-Animusic 2|Movie||X||||||821143115297||
-August Rush|Movie|||X|||||||
-Austin Powers: Goldmember|Movie||X||||||794043607820||
-Austin Powers: International Man of Mystery|Movie||X|||||X|794043457722||
-Austin Powers: The Spy Who Shagged Me|Movie||X||||||794043489129|780628403|
-BASEketball|Movie||X||||||25192043024||
+#DATE#|#|#|#|#|#|#|#|#|#|#|
