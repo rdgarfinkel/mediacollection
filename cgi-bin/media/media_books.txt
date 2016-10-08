@@ -1,13 +1,1 @@
-#DATE#|08.20.2016|#|#|#|
-CG 101: A Computer Graphics Industry Reference|Terrence Masson||073570046X|book|
-DVCAM: A Practical Guide to the Professional System|ASC, Jon Fauer||240804805|book|
-Designing and Producing the Television Commercial|Larry Elin, Alan Lapides||205365388|book|
-Digital Lighting and Rendering|Jeremy Birn|752064059547|1562059548|book|
-Digital Texturing and Painting|Owen Demers|752064709183|735709181|book|
-Directing and Producing for Television: A Format Approach, Second Edition|Ivan Cury||024080452X|book|
-Exploring 3D Modeling with Maya 6|Patricia Beckmann, Scott Wells||1401843808|book|
-Special Effects (Exceptional Social Studies Titles for Upper Grades)|Ron Miller||761329188|book|
-The Art of 3D: Computer Animation and Imaging, 2nd Edition|Isaac Victor Kerlow||047136004X|book|
-Video Basics 3|Herbert Zettl||534526241|book|
-Word of Mouth: A Guide to Commercial Voice-Over Excellence|Susan Blu, Molly Ann Mullin||938817329|book|
-Writing for the Electronic Media|Peter E. Mayeux|9780072880991|72880996|book|
+#DATE#|#|#|#|#|
