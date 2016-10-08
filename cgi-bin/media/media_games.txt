@@ -1,16 +1,1 @@
-#DATE#|08.20.2016|#|#|#|#|#|#|#|#|#|#|
-Burnout 2: Point of Impact||||||||X||||
-Burnout 3: Takedown||||||||||X, DL||
-Burnout Crash!||||||||||X, DL||
-Burnout Paradise||||||||||X, DL||
-Call of Duty: Black Ops 1||||||||||X, DL||
-Call of Duty: Black Ops 2||||||||||X, DL||
-Call of Duty: Black Ops 3|||||||||X, DK|||
-Call of Duty: Ghosts||||||||||X, DK|47875846814|
-Call of Duty: Modern Warfare 3||||||||||X, DK|47875842069|
-Call of Duty: World at War||||||||||X, DL||
-Charlie Murder||||||||||X, DL||
-Child Of Light|||||||||X, DL|||
-Command and Conquer Red Alert 2||||X||||||||
-Crackdown||||||||||X, DL||
-Crysis 3||||||||||X, DL||
+#DATE#|#|#|#|#|#|#|#|#|#|#|#|
