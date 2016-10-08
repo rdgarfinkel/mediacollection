@@ -1,17 +1,13 @@
 #!/usr/bin/perl
 
-### "Global" and script settings
-## $basedir - Base directory and static locations for operations
-$basedir="";
-
-### MEDIA SETTINGS
-## $directory - should be the folder where media.pl resides
+### MEDIACOLLECTION SETTINGS
+## $directory - Directory where the media data resides.
 $directory="media";
-## $mediaitem - Directory where your data resides
+## $mediaitem - Directory where your data resides.
 $mediaitem="cgi-bin/$directory/media_";
 ## $mediacheck - Directory where the EAC/UPC/ISBN data. In my case, these are located in cgi-bin/eacupc and cgi-bin/isbn.
 $mediacheck="cgi-bin";
-## $thispage - "Global" link for accessing this page thru links. As of this writing, there's 33 instances of $thispage
+## $thispage - "Global" link for accessing this page thru links. As of this writing, there's 34 instances of $thispage
 ##             throughout the script, if the name of the script changes, I/you only have to change it once. You're welcome! ;)
 $thispage="media.pl";
 ## $debug - This is the location of the "debug" file, it sits right next to the other database files.
@@ -19,7 +15,7 @@ $debug=$mediaitem."debug.txt";
 
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2016.10.05";
+$dateupdated="2016.10.07";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -77,8 +73,8 @@ sub media {
 		# Begin table
 		print "\n   <table cellspacing=10 cellpadding=10 id=\"mytable\">\n";
 
-		# $count_title is a 'global' variable for each media type, so that we can get a total number count of individual media types.
-		# It's outside of the media type sections because it cuts down on repetition, since it would appear four times, once per type. :)
+		# $count_title is a 'global' variable for each media type, so that we can get a total number count of individual media types. It's
+		# outside of the media type sections because it cuts down on repetition, since it would appear four times, once per media type. :)
 		$count_title=0;
 
 		# If $dotype equals books...
@@ -117,8 +113,12 @@ sub media {
 					$titledisplay =~ s/\'\'/\"/g;
 					$titledisplay =~ s/\(plus\)/+/g;
 					$titledisplay =~ s/\(pound\)/#/g;
+					$titledisplay =~ s/\(amp\)/\&/g;
 					$authordisplay=$author;
 					$authordisplay =~ s/\'\'/\"/g;
+					$authordisplay =~ s/\(plus\)/+/g;
+					$authordisplay =~ s/\(pound\)/#/g;
+					$authordisplay =~ s/\(amp\)/\&/g;
 
 					# If $debugthesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
 					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
@@ -230,6 +230,7 @@ sub media {
 					$titledisplay =~ s/\'\'/\"/g;
 					$titledisplay =~ s/\(plus\)/+/g;
 					$titledisplay =~ s/\(pound\)/#/g;
+					$titledisplay =~ s/\(amp\)/\&/g;
 
 					# If $debugthesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
 					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
@@ -286,11 +287,12 @@ sub media {
 
 				# If $title doesn't equal "#DATE#"
 				if ($title ne "#DATE#") {
-					# $mediadisplay is set to empty text here because once it was set, it would keep that text until another change throwing off the media type count
+					# $mediadisplay is set to empty text here because once it was set, it would keep that text and because it would
+					# keep displaying it on the table until another media entry changed it, which threw off the media type count
 					$mediadisplay="";
 
-					# The code below is a breakout of physical media types.
-					#   If media is bluray, increment count for bluray by 1, and make display text say, "BluRay"
+					# The code below breaks out the count of physical media types.
+					#   If media is bluray, increment count for bluray by 1, and make $mediadisplay text say, "BluRay"
 					#   If media is dvd, increment count for dvd by 1, and make display text say, "DVD"
 					#   If media is diskcombo, increment count for bluray and dvd by 1, and make display text say, "BluRay/DVD"
 					if ($media eq "bluray") {
@@ -305,7 +307,7 @@ sub media {
 						$mediadisplay="BluRay/DVD";
 					}
 
-					# The code below is a breakout of TV and Movie media types.
+					# The code below breaks out the count of TV and Movie media types.
 					if ($type eq "TV") {
 						$count_tv=$count_tv+1;
 					} else {
@@ -338,6 +340,7 @@ sub media {
 					$titledisplay =~ s/\'\'/\"/g;
 					$titledisplay =~ s/\(plus\)/+/g;
 					$titledisplay =~ s/\(pound\)/#/g;
+					$titledisplay =~ s/\(amp\)/\&/g;
 
 					# If $debugthesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
 					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
@@ -432,8 +435,12 @@ sub media {
 					$titledisplay =~ s/\'\'/\"/g;
 					$titledisplay =~ s/\(plus\)/+/g;
 					$titledisplay =~ s/\(pound\)/#/g;
+					$titledisplay =~ s/\(amp\)/\&/g;
 					$artistdisplay=$artist;
 					$artistdisplay =~ s/\'\'/\"/g;
+					$artistdisplay =~ s/\(plus\)/+/g;
+					$artistdisplay =~ s/\(pound\)/#/g;
+					$artistdisplay =~ s/\(amp\)/\&/g;
 
 					# If $debugthesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
 					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
@@ -502,13 +509,13 @@ sub media {
 			}
 			# $dowhat doesn't equal "mediaadd", so the user has to be editing an already existing entry
 			else {
-				# Split each entry with the character '|'
+				# Split each entry of $showline by the character '|'
 				($title,$author,$eacupc,$isbn,$type)=split(/\|/,$showline);
 			}
 
 			# Generate the necessary text input fields for adding/editing entries
-			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onkeyup=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>Author:</th>\n      <td><input type=text name=newauthor value=\"$author\" onkeyup=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>Author:</th>\n      <td><input type=text name=newauthor value=\"$author\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td>\n       <input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>ISBN:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
 
@@ -549,7 +556,7 @@ sub media {
 				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc)=split(/\|/,$showline);
 			}
 
-			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onkeyup=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td>\n       <input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 
 			print "     <tr>\n      <th align=right>Epic:</th>\n      <td>\n";
@@ -725,7 +732,7 @@ sub media {
 				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year)=split(/\|/,$showline);
 			}
 
-			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onkeyup=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>Year:</th>\n      <td><input type=text name=newyear value=\"$year\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td><input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>ISBN:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
@@ -869,8 +876,8 @@ sub media {
 				($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody)=split(/\|/,$showline);
 			}
 
-			print "     <tr>\n      <th align=right width=30%>Artist:</th>\n      <td><input type=text name=newartist value=\"$artist\" onkeyup=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onkeyup=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Artist:</th>\n      <td><input type=text name=newartist value=\"$artist\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td><input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 
 			print "     <tr>\n      <th align=right>CD:</th>\n      <td>\n";
@@ -1017,7 +1024,11 @@ sub media {
 		# Hidden variables for passing onto the script for the next step to add/edit entries.
 		# dotype passes on the current media type to the 'mediawrite' subroutine, once the entry is submitted
 		# oldtitle is actually the current title, and is how 'mediawrite' finds an already existing entry for editing the entry
-		print "     <input type=hidden name=dowhat value=mediawrite>\n     <input type=hidden name=dotype value=$dotype>\n     <input type=hidden name=oldtitle value=\"$title\">\n";
+		print "     <input type=hidden name=dowhat value=mediawrite>\n";
+		if (($dotype eq 'music') || ($dotype eq 'books') || ($dotype eq 'videos') || ($dotype eq 'games')) {
+				print "     <input type=hidden name=dotype value=$dotype>\n";
+		}
+		print "     <input type=hidden name=oldtitle value=\"$title\">\n";
 
 		# If $continueeacupc equals "1", we'll keep continueeacupc set at 1. This will create the entry for the code once submitted.
 		if ($continueeacupc eq 1) {
@@ -1211,14 +1222,12 @@ sub media {
 		#### Like before, this is repeated three more times, so only one breakout description
 		# If $dotype equals 'books'...
 		if ($dotype eq 'books'){
-			# $writenew is the start of the text that will be written to the database.
-			$writenew="#DATE#|$today|#|#|#|\n";
-			# $new is the new entry that can be written to the database.
-			$new="$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|\n";
-			# $preview is the start of the text that will be written to the database.
-			$preview="#DATE#|$today|#|#|#|<br>\n";
-			# $previewnew is the new entry that can be written to the database.
-			$previewnew="$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|<br>\n";
+			# the next two lines begin the unsorted_updatedb and unsorted_previewdb arrays, and begins establishing the date last modified of the database.
+			push(@unsorted_updateddb,"#DATE#|$today|#|#|#|\n");
+			push(@unsorted_previewdb,"#DATE#|$today|#|#|#|\n");
+			# $update_entry is the new entry that can be written to the database, $previewentry creates the new entry for the preview.
+			$update_entry="$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|\n";
+			$previewentry=$update_entry;
 			# $mediawrite is the new EAC/UPC/ISBN entry that can be written to the database.
 			$mediawrite="$dotype|$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|";
 			foreach $line(@infile) {
@@ -1228,24 +1237,23 @@ sub media {
 				if (substr($intitle,0,4) eq "The ") {
 					$intitle=substr($intitle,4,length($intitle)).", The";
 				}
-
 				if ($intitle eq "#DATE#") {
 					# Skip
 				} elsif ($intitle eq $oldtitle) {
-					$writenew.=$new;
-					$preview.=$previewnew;
+					push(@unsorted_updateddb,$update_entry);
+					push(@unsorted_previewdb,$previewentry);
 					$changed=1;
 					print "$newauthor, $newtitle updated<br><br>\n";
 				} else {
-					$writenew.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|\n";
-					$preview.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|<br>\n";
+					push(@unsorted_updateddb,"$intitle|$inauthor|$ineacupc|$inisbn|$intype|\n");
+					push(@unsorted_previewdb,"$intitle|$inauthor|$ineacupc|$inisbn|$intype|\n");
 				}
 			}
 		} elsif ($dotype eq 'games'){
-			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
-			$new="$newtitle|$newepic|$newsteam|$newbattlenet|$neworigin|$newuplay|$newnes|$newwii|$newps2|$newxboxone|$newxbox360|$neweacupc|\n";
-			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
-			$previewnew="$newtitle|$newepic|$newsteam|$newbattlenet|$neworigin|$newuplay|$newnes|$newwii|$newps2|$newxboxone|$newxbox360|$neweacupc|<br>\n";
+			push(@unsorted_updateddb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n");
+			push(@unsorted_previewdb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n");
+			$update_entry="$newtitle|$newepic|$newsteam|$newbattlenet|$neworigin|$newuplay|$newnes|$newwii|$newps2|$newxboxone|$newxbox360|$neweacupc|\n";
+			$previewentry=$update_entry;
 			$mediawrite="$dotype|$newtitle||$neweacupc|$newisbn||";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
@@ -1257,20 +1265,20 @@ sub media {
 				if ($intitle eq "#DATE#") {
 					# Skip
 				} elsif ($intitle eq $oldtitle) {
-					$writenew.=$new;
-					$preview.=$previewnew;
+					push(@unsorted_updateddb,$update_entry);
+					push(@unsorted_previewdb,$previewentry);
 					$changed=1;
 					print "$newtitle updated<br><br>\n";
 				} else {
-					$writenew.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|\n";
-					$preview.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|<br>\n";
+					push(@unsorted_updateddb,"$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|\n");
+					push(@unsorted_previewdb,"$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|\n");
 				}
 			}
 		} elsif ($dotype eq 'videos'){
-			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|\n";
-			$new="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|$newmicrosoft|$newyear|\n";
-			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|<br>\n";
-			$previewnew="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|$newmicrosoft|$newyear|<br>\n";
+			push(@unsorted_updateddb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|\n");
+			push(@unsorted_previewdb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|\n");
+			$update_entry="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|$newmicrosoft|$newyear|\n";
+			$previewentry=$update_entry;
 			$mediawrite="$dotype|$newtitle||$neweacupc|$newisbn|$newtype|$newyear|";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
@@ -1282,23 +1290,23 @@ sub media {
 				if ($intitle eq "#DATE#") {
 					# Skip
 				} elsif (($intitle eq $oldtitle) && ($inyear eq $oldyear)) {
-					$writenew.=$new;
-					$preview.=$previewnew;
+					push(@unsorted_updateddb,$update_entry);
+					push(@unsorted_previewdb,$previewentry);
 					$changed=1;
 					if ($oldyear) {
 						$newtitle.=" ($newyear)";
 					}
 					print "$newtitle updated<br><br>\n";
 				} else {
-					$writenew.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|\n";
-					$preview.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|<br>\n";
+					push(@unsorted_updateddb,"$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|\n");
+					push(@unsorted_previewdb,"$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|\n");
 				}
 			}
 		} elsif ($dotype eq 'music'){
-			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
-			$new="$newartist|$newtitle|$neweacupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|\n";
-			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
-			$previewnew="$newartist|$newtitle|$neweacupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|<br>\n";
+			push(@unsorted_updateddb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n");
+			push(@unsorted_previewdb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n");
+			$update_entry="$newartist|$newtitle|$neweacupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|\n";
+			$previewentry=$update_entry;
 			$mediawrite="$dotype|$newtitle|$newartist|$neweacupc|$newisbn|$newtype|";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
@@ -1310,13 +1318,13 @@ sub media {
 				if ($inartist eq "#DATE#") {
 					# Skip
 				} elsif (($intitle eq $oldtitle) && ($inartist eq $oldartist)) {
-					$writenew.=$new;
-					$preview.=$previewnew;
+					push(@unsorted_updateddb,$update_entry);
+					push(@unsorted_previewdb,$previewentry);
 					$changed=1;
 					print "$newartist, $newtitle updated<br><br>\n";
 				} else {
-					$writenew.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n";
-					$preview.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|<br>\n";
+					push(@unsorted_updateddb,"$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n");
+					push(@unsorted_previewdb,"$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n");
 				}
 			}
 		}
@@ -1324,8 +1332,8 @@ sub media {
 		# If $changed does not equal 1, then it is assumed that what has been entered is a completely new entry, so we'll add
 		# $new to $writenew and $preview
 		if ($changed != 1) {
-			$writenew.=$new;
-			$preview.=$previewnew;
+			push(@unsorted_updateddb,$update_entry);
+			push(@unsorted_previewdb,$previewentry);
 			if ($newartist) {
 				print "$newartist, ";
 			}
@@ -1335,10 +1343,14 @@ sub media {
 			print "$newtitle added<br><br>\n";
 		}
 
+		# These next two sort the @unsorted_updateddb and @unsorted_previewdb arrays in alphabetical order.
+		@sorted_updateddb = sort @unsorted_updateddb;
+		@sorted_previewdb = sort @unsorted_previewdb;
+
 		# If $debugwrite is equal to "1", then writing is enabled
 		if ($debugwrite eq "1") {
 			open (WRITEINFO,">$basedir/$mediaitem") || &error("error: mediaitem $mediaitem<br>");
-			print (WRITEINFO $writenew);
+			print (WRITEINFO @sorted_updateddb);
 			close (WRITEINFO);
 
 			# If $neweacupc exists...
@@ -1368,14 +1380,36 @@ sub media {
 
 		# If $debugpreviewhide equals 1, display the results as a hidden HTML comment
 		if ($debugpreviewhide eq "1") {
-			print "<!--\n$writenew\n-->\n";
-			print "<!--\n$mediawrite\n-->\n";
+			print "<!--\n unsorted_updateddb: @unsorted_updateddb\n-->\n";
+			print "<!- \n sorted_updateddb: @sorted_updateddb\n-->\n";
+			print "<!--\n unsorted_previewdb: @unsorted_previewdb\n-->\n";
+			print "<!- \n sorted_previewdb: @sorted_previewdb\n-->\n";
+			print "<!--\n mediawrite: $mediawrite\n-->\n";
 		}
 
-		# If $debugpreviewshow equals 1, display the results as in the administration window
+		# If $debugpreviewshow equals 1, display the results in the administration window
 		if ($debugpreviewshow eq "1") {
-			print "<p>$preview</p>";
-			print "<p>mediawrite: $mediawrite</p>";
+			print "<p><b>unsorted_updateddb</b>: <div style=\"text-align:left;width:700px;\">";
+			foreach (@unsorted_updateddb) {
+ 				print "$_<br>\n";
+			}
+			print "</div></p>\n";
+			print "<p><b>sorted_updateddb </b>: <div style=\"text-align:left;width:700px;\">";
+			foreach (@sorted_updateddb) {
+ 				print "$_<br>\n";
+			}
+			print "</div></p>\n";
+			print "<p><b> unsorted_previewdb </b>: <div style=\"text-align:left;width:700px;\">";
+			foreach (@unsorted_previewdb) {
+ 				print "$_<br>\n";
+			}
+			print "</div></p>\n";
+			print "<p><b>sorted_previewdb </b>: <div style=\"text-align:left;width:700px;\">";
+			foreach (@sorted_previewdb) {
+ 				print "$_<br>\n";
+			}
+			print "</div></p>\n";
+			print "<p><b>mediawrite</b>: <div style=\"text-align:left;width:700px;\">$mediawrite</div></p>\n";
 		}
 
 		# Forward you back to the media database table
@@ -1606,17 +1640,21 @@ sub header {
 		print " </script>\n";
 	}
 
-	print "</head>\n<body topmargin=0 bottommargin=0 leftmargin=0 rightmargin=0 OnLoad=\"document.myform.";
-	if ($dowhat eq "mediabarcode") {
-		print "neweacupc";
-	} elsif ($dowhat eq "mediaisbn") {
-		print "newisbn";
-	} elsif ($dotype eq "music") {
-		print "newartist";
-	} else {
-		print "newtitle";
+	print "</head>\n<body topmargin=0 bottommargin=0 leftmargin=0 rightmargin=0";
+	if (($dowhat eq "mediabarcode") || ($dowhat eq "mediaisbn") || ($dowhat eq "mediaedit") || ($dowhat eq "mediaadd")) {
+		print " OnLoad=\"document.myform.";
+		if ($dowhat eq "mediabarcode") {
+			print "neweacupc";
+		} elsif ($dowhat eq "mediaisbn") {
+			print "newisbn";
+		} elsif ($dotype eq "music") {
+			print "newartist";
+		} else {
+			print "newtitle";
+		}
+		print ".focus();\"";
 	}
-	print ".focus();\">\n";
+	print ">\n";
 	print "<table width=100% height=100% border=1 align=center valign=center>\n";
 	print " <tr>\n  <td height=20 colspan=3 valign=top align=center class=header>\n";
 	print "   <table width=100% cellspacing=0 cellpadding=0 border=0>\n";
@@ -1662,6 +1700,9 @@ sub getqueries {
 	# Set the content-type of the page to be an HTML file, and Pragma tries to force the browser
 	# to always get a new version, and not cache the output
 	print "Content-type: text/html\nPragma: no-cache\n\n";
+
+	## $basedir - Base directory and static locations for operations
+	$basedir=$ENV{'DOCUMENT_ROOT'};
 
 	# Get the server's current date/time
 	my($sec,$min,$hrs,$day,$mon,$currentyear)=localtime(time);
@@ -1714,7 +1755,7 @@ sub getqueries {
 		$value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
 		$value =~ s/<!--(.|\n)*-->//g;
 		$value =~ s/\"/\'\'/g;
-		$value =~ s/\&/and/g;
+		$value =~ s/\&/\(amp\)/g;
 		$value =~ s/#/\(pound\)/g;
 		$FORM{$name} = $value;
 		$delay.=" || $name = $value";
@@ -1737,7 +1778,7 @@ sub getqueries {
 	$neweacupc=~s/[^\d]//gi;                   # remove any character besides numbers for EAC/UPC
 	$oldeacupc=$FORM{'oldeacupc'};
 	$newisbn=$FORM{'newisbn'};
-	$newisbn=~s/[^\dxX]//gi;                   # remove any character besides numbers and X from ISBN
+	$newisbn=~s/[^\dxX]//gi;                   # remove any character besides numbers and x/X from ISBN
 	$newisbn=uc $newisbn;                      # force uppercase for ISBN
 	$oldisbn=$FORM{'oldisbn'};
 	$newtype=$FORM{'newtype'};
