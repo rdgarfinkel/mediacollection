@@ -3,7 +3,7 @@ Simple data display/management for physical and digital music, video (movies/tv)
 
 # first things first
 If you will be using this on a public server, put the /cgi-bin/media/media.pl file within a separate directory that is password protected so that only you can add/amend/delete your database entries.<br>
-Aside from editing the $basedir variable in the index.cgi and media.pl scripts (and maybe the "#!/usr/bin/perl" line at the top of each script), things *should* work "directly out of the box." 
+Aside from editing the "#!/usr/bin/perl" line at the top of each script, things *should* work "directly out of the box." 
 
 # demonstration
 A demonstration of the script and it's abilities is online and available, with editing abilities enabled. No password is required for the admin side. Test it out as you wish, http://rgarfinkel.heliohost.org/cgi-bin/mediademo/index.cgi.<br>
@@ -20,7 +20,7 @@ The public server I use for the demonstration (as well as my other sites there) 
 - /javascripts/jquery.freezeheader.js, http://brentmuir.com/projects/freezeheader: disabled because it's unreliable in operation. freezes table header at the top of the screen when scrolling down
 
 # items of note
-- When using the <b>&</b> ampersand symbol in text fields, the editing feature didn't work. It seems that the 'query string' parsing splits this like it is a separate entry. Text replacement will occur server side, swapping the <b>&</b> symbol for <b>and</b> text.
+- When using the <b>&</b> ampersand symbol in text fields, the editing feature didn't work. It seems that the 'query string' parsing splits this like it is a separate entry. Text replacement will occur server side, swapping the <b>&</b> symbol for <b>(amp)</b> text.
 - When using the <b>"</b> double quotation symbol in text fields, the editing feature didn't work. When clicking an entry to edit, the browser would interpret the quotations as the end of an <b>A HREF</b> HTML tag. Text replacement will occur server side, swapping the <b>"</b> double quotation mark for <b>''</b> two single quotation symbols for storing the entries, and <b>''</b> two single quotation symbols will be swapped for the <b>"</b> double quotation mark for display in the user facing tables.
 - When using the <b>#</b> pound symbol in text fields, the editing feature didn't work. I think what happens is the script thinks that the entry is supposed to be hidden, like it is a comment in Perl. When a pound sign is needed in titles, use <b>(pound)</b>, and it will be entered into the database that way, and <b>(pound)</b> will be swapped for <b>#</b> pound symbol in the user facing tables.
 - When the <b>+</b> plus symbol is used, the editing feature works, but not as expected. The plus symbol is the indicator these scripts use for spaces, and would be interpreted as such. Now, assuming that Javascript is enabled client-side, when the <b>+</b> plus symbol is entered by the user, the field will automatically change the character to <b>(plus)</b>, otherwise it'll need to be entered manually. <b>(plus)</b> will be entered into the database, and <b>(plus)</b> will be swapped for <b>+</b> plus symbol in the user facing tables.
@@ -39,8 +39,11 @@ The public server I use for the demonstration (as well as my other sites there) 
 - Hosted website with these scripts put online, with member signup abilities.
 
 # change log
-- 2016.??.??
-  - As of the next update, when adding entries, it will be sorted into the database. :)
+- 2016.10.07
+  - As of the next update, when adding entries, it will be sorted into the database.
+  - $basedir is now automatically discovered by the scripts.
+  - (amp) can now be used so that the ampersand symbol appears in the user facing tables.
+  - Some code cleanup and optimizing.
 - 2016.10.05
   - Added ability for new/editing titles to have the ability to swap the <b>+</b> plus symbol for <b>(plus)</b> automatically upon entry by the user.
   - EAC/UPC barcodes are strictly numbers. If anything else is entered, it is stripped server-side.
