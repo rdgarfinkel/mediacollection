@@ -39,8 +39,12 @@ The public server I use for the demonstration (as well as my other sites there) 
 - Hosted website with these scripts put online, with member signup abilities.
 
 # change log
+- 2016.10.??
+  - As of the next update, several new features, including a EAC/UPC/ISBN entry verification/editing option.
+  - Made naming adjustments to the subroutines and links, ie 'debug' is now 'config'
+  - Switched media edits now 'POST' data to the script, so now edits are generally unlimited in length
 - 2016.10.07
-  - As of the next update, when adding entries, it will be sorted into the database.
+  - When adding entries, it will be sorted into the database.
   - $basedir is now automatically discovered by the scripts.
   - (amp) can now be used so that the ampersand symbol appears in the user facing tables.
   - Some code cleanup and optimizing.
