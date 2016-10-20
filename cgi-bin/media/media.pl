@@ -1,21 +1,26 @@
 #!/usr/bin/perl
 
 ### MEDIACOLLECTION SETTINGS
-## $directory - Directory where the media data resides.
-$directory="media";
-## $mediaitem - Directory where your data resides.
-$mediaitem="cgi-bin/$directory/media_";
-## $mediacheck - Directory where the EAC/UPC/ISBN data. In my case, these are located in cgi-bin/eacupc and cgi-bin/isbn.
-$mediacheck="cgi-bin";
-## $thispage - "Global" link for accessing this page thru links. As of this writing, there's 34 instances of $thispage
-##             throughout the script, if the name of the script changes, I/you only have to change it once. You're welcome! ;)
-$thispage="media.pl";
-## $debug - This is the location of the "debug" file, it sits right next to the other database files.
-$debug=$mediaitem."debug.txt";
-
+## $mediacheck - Directory where the EAC/UPC data. In my case, these are located in cgi-bin/eacupc.
+$media_check_eacupc="cgi-bin/eacupc";
+## $mediacheck - Directory where the ISBN data. In my case, these are located in cgi-bin/isbn.
+$media_check_isbn="cgi-bin/isbn";
+## $config_data - Location for the configuration data
+$config_data="cgi-bin/media/media_debug.txt";
+$config_indexsite="cgi-bin/media/index.cgi";
+$config_adminsite="cgi-bin/media/media.pl";
+$config_eacupcisbnsite="cgi-bin/media/media.pl";
+## $media_eacupcisbndb - Location for the EAC/UPC/ISBN database
+$media_eacupcisbndb="cgi-bin/media/eacupcisbn_db.txt";
+## $media_read - Location for the media data
+$media_read="cgi-bin/media/media_";
+	$media_books=$media_read."books.txt";
+	$media_games=$media_read."games.txt";
+	$media_music=$media_read."music.txt";
+	$media_videos=$media_read."videos.txt";
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2016.10.07";
+$dateupdated="2016.10.20";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -29,44 +34,53 @@ else {&header;&errorfatal("missing or invalid administration page<br>select a li
 
 
 sub media {
-	# If $dowhat equals 'mediaedit', go to the 'mediaedit' subroutine
-	if ($dowhat eq "mediaedit") {&mediaedit;}
+	# If $dowhat equals 'media_edit', go to the 'media_edit' subroutine
+	if ($dowhat eq "media_edit") {&media_edit;}
 
-	# If $dowhat equals 'mediaadd', go to the 'mediaedit' subroutine
-	elsif ($dowhat eq "mediaadd") {&mediaedit;}
+	# If $dowhat equals 'media_add', go to the 'media_edit' subroutine
+	elsif ($dowhat eq "media_add") {&media_edit;}
 
-	# If $dowhat equals 'mediabarcode', go to the 'mediaaddid' subroutine
-	elsif ($dowhat eq "mediabarcode") {&mediaaddid;}
+	# If $dowhat equals 'media_barcode' or 'media_isbn', go to the 'media_addid' subroutine
+	elsif (($dowhat eq "media_barcode") || ($dowhat eq "media_isbn")) {&media_addid;}
 
-	# If $dowhat equals 'mediaisbn', go to the 'mediaaddid' subroutine
-	elsif ($dowhat eq "mediaisbn") {&mediaaddid;}
+	# If $dowhat equals 'media_check', go to the 'media_check' subroutine
+	elsif ($dowhat eq "media_check") {&media_check;}
 
-	# If $dowhat equals 'mediacheck', go to the 'mediacheck' subroutine
-	elsif ($dowhat eq "mediacheck") {&mediacheck;}
+	# If $dowhat equals 'media_write', go to the 'media_write' subroutine
+	elsif ($dowhat eq "media_write") {&media_write;}
 
-	# If $dowhat equals 'mediawrite', go to the 'mediawrite' subroutine
-	elsif ($dowhat eq "mediawrite") {&mediawrite;}
+	# If $dowhat equals 'media_delete', go to the 'media_delete' subroutine
+	elsif ($dowhat eq "media_delete") {&media_delete;}
 
-	# If $dowhat equals 'mediadelete', go to the 'mediadelete' subroutine
-	elsif ($dowhat eq "mediadelete") {&mediadelete;}
+	# If $dowhat equals 'config_view', go to the 'config_view' subroutine
+	elsif ($dowhat eq "config_view") {&config_view;}
 
-	# If $dowhat equals 'debugview', go to the 'debugview' subroutine
-	elsif ($dowhat eq "debugview") {&debugview;}
+	# If $dowhat equals 'config_edit', go to the 'config_edit' subroutine
+	elsif ($dowhat eq "config_edit") {&config_edit;}
 
-	# If $dowhat equals 'debugedit', go to the 'debugedit' subroutine
-	elsif ($dowhat eq "debugedit") {&debugedit;}
+	# If $dowhat equals 'config_write', go to the 'config_write' subroutine
+	elsif ($dowhat eq "config_write") {&config_write;}
 
-	# If $dowhat equals 'debugwrite', go to the 'debugwrite' subroutine
-	elsif ($dowhat eq "debugwrite") {&debugwrite;}
+	# If $dowhat equals 'eacupcisbn_generate', go to the 'eacupcisbn_generate' subroutine
+	elsif ($dowhat eq "eacupcisbn_generate") {&eacupcisbn_generate;}
+
+	# If $dowhat equals 'eacupcisbn_verify', go to the 'eacupcisbn_verify' subroutine
+	elsif ($dowhat eq "eacupcisbn_verify") {&eacupcisbn_verify;}
+
+	# If $dowhat equals 'eacupc_edit' or 'isbn_edit', go to the 'edit' subroutine
+	elsif (($dowhat eq "eacupc_edit") || ($dowhat eq "isbn_edit")) {&eacupcisbn_edit;}
+
+	# If $dowhat equals 'eacupcisbn_write', go to the 'eacupcisbn_write' subroutine
+	elsif ($dowhat eq "eacupcisbn_write") {&eacupcisbn_write;}
 
 	# Since $dowhat doesn't match anything above, generate the database table
-	else {&mediamain;}
+	else {&media_main;}
 
 
-	# mediamain is the data display table
-	sub mediamain {
-		# Read the entry for $mediaitem. $mediaitem is established within the 'getqueries' subroutine.
-		open (media,"$basedir/$mediaitem") || &error("error: mediaitem /$mediaitem");
+	# media_main is the data display table
+	sub media_main {
+		# Read the entry for $media_read. $media_read is established within the 'getqueries' subroutine.
+		open (media,"$basedir/$media_read") || &error("error: media_read data /$media_read");
 		@in = <media>;
 		close (media);
 
@@ -89,7 +103,7 @@ sub media {
 			# Beginning of table body
 			print "    <tbody>\n";
 
-			# Read mediaitem line by line
+			# Read media_read data line by line
 			foreach $line(@in) {
 				$line =~ s/\n//g;                                                  # Strips new line character
 				$line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
@@ -120,17 +134,17 @@ sub media {
 					$authordisplay =~ s/\(pound\)/#/g;
 					$authordisplay =~ s/\(amp\)/\&/g;
 
-					# If $debugthesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
-					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+					# If $config_thesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
+					if ($config_thesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
 						$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
 					}
-					# If $debugthesort is equal to 1 and if the title begins with "The ", we'll put ", The" at the end of the title, and remove "The" from the beginning
-					if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+					# If $config_thesort is equal to 1 and if the title begins with "The ", we'll put ", The" at the end of the title, and remove "The" from the beginning
+					if ($config_thesort == "1" && substr($titledisplay,0,4) eq "The ") {
 						$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
 					}
 
 					# Now display the whole line of information
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td><div>$authordisplay</div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$titledisplay</a></div></td>\n     <td><div>$authordisplay</div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
 				}
 				# $title was equal to "#DATE#", so we'll set $update with the date the database was last updated
 				else {
@@ -167,7 +181,7 @@ sub media {
 			# Beginning of table body
 			print "    <tbody>\n";
 
-			# Read mediaitem line by line
+			# Read media_read data line by line
 			foreach $line(@in) {
 				$line =~ s/\n//g;                                                  # Strips new line character
 				$line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
@@ -232,17 +246,17 @@ sub media {
 					$titledisplay =~ s/\(pound\)/#/g;
 					$titledisplay =~ s/\(amp\)/\&/g;
 
-					# If $debugthesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
-					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+					# If $config_thesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
+					if ($config_thesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
 						$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
 					}
-					# If $debugthesort is equal to 1 and if the title begins with "The ", we'll put ", The" at the end of the title, and remove "The" from the beginning
-					if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+					# If $config_thesort is equal to 1 and if the title begins with "The ", we'll put ", The" at the end of the title, and remove "The" from the beginning
+					if ($config_thesort == "1" && substr($titledisplay,0,4) eq "The ") {
 						$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
 					}
 
 					# Now display the whole line of information
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$battlenet</td>\n     <td>$epic</td>\n     <td>$nes</td>\n     <td>$origin</td>\n     <td>$ps2</td>\n     <td>$steam</td>\n     <td>$uplay</td>\n     <td>$xbox360</td>\n     <td>$xboxone</td>\n     <td>$wii</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$battlenet</td>\n     <td>$epic</td>\n     <td>$nes</td>\n     <td>$origin</td>\n     <td>$ps2</td>\n     <td>$steam</td>\n     <td>$uplay</td>\n     <td>$xbox360</td>\n     <td>$xboxone</td>\n     <td>$wii</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
 				}
 				# $title was equal to "#DATE#", so we'll set $update with the date the database was last updated
 				else {
@@ -276,7 +290,7 @@ sub media {
 			# Beginning of table body
 			print "    <tbody>\n";
 
-			# Read mediaitem line by line
+			# Read media_read data line by line
 			foreach $line(@in) {
 				$line =~ s/\n//g;                                                  # Strips new line character
 				$line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
@@ -342,12 +356,12 @@ sub media {
 					$titledisplay =~ s/\(pound\)/#/g;
 					$titledisplay =~ s/\(amp\)/\&/g;
 
-					# If $debugthesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
-					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+					# If $config_thesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
+					if ($config_thesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
 						$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
 					}
-					# If $debugthesort is equal to 1 and if the title begins with "The ", we'll put ", The" at the end of the title, and remove "The" from the beginning
-					if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+					# If $config_thesort is equal to 1 and if the title begins with "The ", we'll put ", The" at the end of the title, and remove "The" from the beginning
+					if ($config_thesort == "1" && substr($titledisplay,0,4) eq "The ") {
 						$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
 					}
 
@@ -356,7 +370,7 @@ sub media {
 						$titledisplay.=" ($year)";
 					}
 					# Now display the whole line of information
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td>$mediadisplay</td>\n     <td>$amazon</td>\n     <td>$disneyanywhere</td>\n     <td>$googleplay</td>\n     <td>$itunes</td>\n     <td>$microsoft</td>\n     <td>$uvvu</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td>$mediadisplay</td>\n     <td>$amazon</td>\n     <td>$disneyanywhere</td>\n     <td>$googleplay</td>\n     <td>$itunes</td>\n     <td>$microsoft</td>\n     <td>$uvvu</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
 				}
 				# $title was equal to "#DATE#", so we'll set $update with the date the database was last updated
 				else {
@@ -389,7 +403,7 @@ sub media {
 			# Beginning of table body
 			print "    <tbody>\n";
 
-			# Read mediaitem line by line
+			# Read media_read data line by line
 			foreach $line(@in) {
 				$line =~ s/\n//g;                                                  # Strips new line character
 				$line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
@@ -442,17 +456,17 @@ sub media {
 					$artistdisplay =~ s/\(pound\)/#/g;
 					$artistdisplay =~ s/\(amp\)/\&/g;
 
-					# If $debugthesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
-					if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+					# If $config_thesort is equal to 0 and if the title ends with ", The", we'll put "The " at the beginning of the title, and remove ", The" from the end
+					if ($config_thesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
 						$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
 					}
-					# If $debugthesort is equal to 1 and if the title begins with "The ", we'll put ", The" at the end of the title, and remove "The" from the beginning
-					if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+					# If $config_thesort is equal to 1 and if the title begins with "The ", we'll put ", The" at the end of the title, and remove "The" from the beginning
+					if ($config_thesort == "1" && substr($titledisplay,0,4) eq "The ") {
 						$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
 					}
 
 					# Now display the whole line of information
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"$thispage?dotype=$dotype&dowhat=mediaedit&showline=$line\">$artistdisplay &ndash; $titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$cd</td>\n     <td>$amazon</td>\n     <td>$djbooth</td>\n     <td>$googleplay</td>\n     <td>$groove</td>\n     <td>$itunes</td>\n     <td>$reverbnation</td>\n     <td>$rhapsody</td>\n     <td>$topspin</td>\n     <td><a href=\"$thispage?dotype=$dotype&dowhat=mediadelete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$artistdisplay &ndash; $titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$cd</td>\n     <td>$amazon</td>\n     <td>$djbooth</td>\n     <td>$googleplay</td>\n     <td>$groove</td>\n     <td>$itunes</td>\n     <td>$reverbnation</td>\n     <td>$rhapsody</td>\n     <td>$topspin</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
 				}
 				# $title was equal to "#DATE#", so we'll set $update with the date the database was last updated
 				else {
@@ -467,9 +481,9 @@ sub media {
 			$tablestats="<b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>\n   CD $count_cd || Amazon $count_amazon || DJ Booth $count_djbooth || Google Play $count_googleplay || Groove $count_groove || iTunes $count_itunes || ReverbNation $count_reverbnation || TopSpin $count_topspin || Rhapsody $count_rhapsody";
 		}
 
-		# If $dotype is not equal to "debug" show the add item links 
-		if ($dotype ne "debug") {
-			$tablestats.="<br>\n   <br>\n   <a href=\"$thispage?dowhat=mediaadd&dotype=$dotype\">Add Item Manually</a> | <a href=\"$thispage?dowhat=mediabarcode&dotype=$dotype&addtype=eacupc\">Add Item by Barcode</a> | <a href=\"$thispage?dowhat=mediaisbn&dotype=$dotype&addtype=isbn\">Add Item by ISBN</a>";
+		# If $dotype is not equal to "config" show the add item links 
+		if ($dotype ne "config") {
+			$tablestats.="<br>\n   <br>\n   <a href=\"/$config_adminsite?dowhat=media_add&dotype=$dotype\">Add Item Manually</a> | <a href=\"/$config_adminsite?dowhat=media_barcode&dotype=$dotype&addtype=eacupc\">Add Item by Barcode</a> | <a href=\"/$config_adminsite?dowhat=media_isbn&dotype=$dotype&addtype=isbn\">Add Item by ISBN</a>";
 		}
 
 		# End table
@@ -480,8 +494,8 @@ sub media {
 	}
 
 
-	# mediaedit is where media entries are edited
-	sub mediaedit{
+	# media_edit is where media entries are edited
+	sub media_edit {
 		# Begin table
 		print "\n   <table cellspacing=2 cellpadding=2>\n";
 
@@ -496,8 +510,8 @@ sub media {
 
 		# If $dotype equals "books"...
 		if ($dotype eq 'books'){
-			# If $dowhat equals "mediaadd"...
-			if ($dowhat eq "mediaadd") {
+			# If $dowhat equals "media_add"...
+			if ($dowhat eq "media_add") {
 				# This part is primarily for the addition of media based on EAC/UPC/ISBN codes. This essentially passes the information from
 				# the "Add Item by EAC/UPC/ISBN" section to this part, whether information is found or not, and displays them in the correct
 				# fields for further editing by the user for the various media types or services.
@@ -507,15 +521,15 @@ sub media {
 				$isbn=$newisbn;
 				$type=$newtype;
 			}
-			# $dowhat doesn't equal "mediaadd", so the user has to be editing an already existing entry
+			# $dowhat doesn't equal "media_add", so the user has to be editing an already existing entry
 			else {
 				# Split each entry of $showline by the character '|'
 				($title,$author,$eacupc,$isbn,$type)=split(/\|/,$showline);
 			}
 
 			# Generate the necessary text input fields for adding/editing entries
-			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>Author:</th>\n      <td><input type=text name=newauthor value=\"$author\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>Author:</th>\n      <td><input type=text name=newauthor value=\"$author\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td>\n       <input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>ISBN:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
 
@@ -549,14 +563,14 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 		} elsif ($dotype eq 'games'){
-			if ($dowhat eq "mediaadd") {
+			if ($dowhat eq "media_add") {
 				$title=$newtitle;
 				$eacupc=$neweacupc;
 			} else {
 				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc)=split(/\|/,$showline);
 			}
 
-			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td>\n       <input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 
 			print "     <tr>\n      <th align=right>Epic:</th>\n      <td>\n";
@@ -723,7 +737,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 		} elsif ($dotype eq 'videos'){
-			if ($dowhat eq "mediaadd") {
+			if ($dowhat eq "media_add") {
 				$title=$newtitle;
 				$eacupc=$neweacupc;
 				$isbn=$newisbn;
@@ -732,7 +746,7 @@ sub media {
 				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year)=split(/\|/,$showline);
 			}
 
-			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>Year:</th>\n      <td><input type=text name=newyear value=\"$year\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td><input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>ISBN:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
@@ -867,7 +881,7 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 		} elsif ($dotype eq 'music'){
-			if ($dowhat eq "mediaadd") {
+			if ($dowhat eq "media_add") {
 				$artist=$newauthor;
 				$title=$newtitle;
 				$eacupc=$neweacupc;
@@ -876,8 +890,8 @@ sub media {
 				($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody)=split(/\|/,$showline);
 			}
 
-			print "     <tr>\n      <th align=right width=30%>Artist:</th>\n      <td><input type=text name=newartist value=\"$artist\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
-			print "     <tr>\n      <th align=right>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right width=30%>Artist:</th>\n      <td><input type=text name=newartist value=\"$artist\"></td>\n     </tr>\n";
+			print "     <tr>\n      <th align=right>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td><input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 
 			print "     <tr>\n      <th align=right>CD:</th>\n      <td>\n";
@@ -1016,7 +1030,7 @@ sub media {
 			print "      </td>\n     </tr>\n";
 		}
 
-		#### End of 'mediaedit' breakout, resuming text descriptions
+		#### End of 'media_edit' breakout, resuming text descriptions
 
 		# Create 'Submit' and 'Cancel' buttons for the edits.
 		print "     <tr>\n      <td colspan=2 align=center>\n       <input type=button value=\"Cancel\" onClick=\"history.back()\">\n       <input type=submit value=\"Submit\">\n      </td>\n     </tr>\n";
@@ -1024,7 +1038,7 @@ sub media {
 		# Hidden variables for passing onto the script for the next step to add/edit entries.
 		# dotype passes on the current media type to the 'mediawrite' subroutine, once the entry is submitted
 		# oldtitle is actually the current title, and is how 'mediawrite' finds an already existing entry for editing the entry
-		print "     <input type=hidden name=dowhat value=mediawrite>\n";
+		print "     <input type=hidden name=dowhat value=media_write>\n";
 		if (($dotype eq 'music') || ($dotype eq 'books') || ($dotype eq 'videos') || ($dotype eq 'games')) {
 				print "     <input type=hidden name=dotype value=$dotype>\n";
 		}
@@ -1054,13 +1068,13 @@ sub media {
 		# End table
 		print "    </table>";
 
-		# Generate footer
+		# Generate the footer
 		&footer;
 	}
 
-	sub mediadelete {
-		# Open and read $mediaitem
-		open (READINFO,"$basedir/$mediaitem") || &error("error: mediaitem /$mediaitem");
+	sub media_delete {
+		# Open and read $media_read
+		open (READINFO,"$basedir/$media_read") || &error("error: media_read data /$media_read");
 		@infile = <READINFO>;
 		close (READINFO);
 		@infile=sort(@infile);
@@ -1093,10 +1107,10 @@ sub media {
 					print " ($thisentry2)";
 				}
 			}
-			print "</b><br><br>Are you sure you want to do this?</P>\n   <input type=submit name=continue value=Yes>\n   <input type=button value=No onClick=\"history.back()\">\n   <input type=hidden name=gopage value=media>\n   <input type=hidden name=dotype value=$dotype>\n   <input type=hidden name=dowhat value=mediadelete>\n   <input type=hidden name=showline value=\"$showline\">";
+			print "</b><br><br>Are you sure you want to do this?</P>\n   <input type=submit name=continue value=Yes>\n   <input type=button value=No onClick=\"history.back()\">\n   <input type=hidden name=gopage value=media>\n   <input type=hidden name=dotype value=$dotype>\n   <input type=hidden name=dowhat value=media_delete>\n   <input type=hidden name=showline value=\"$showline\">";
 
-			# Generate footer
-			&footer;
+		# Generate the footer
+		&footer;
 		}
 
 		#### Like before, this is repeated three more times, so only one breakout description
@@ -1183,34 +1197,34 @@ sub media {
 			}
 		}
 
-		# If $debugwrite equals 1, update database with $writenew
-		if ($debugwrite eq "1") {
-			open (WRITEINFO,">$basedir/$mediaitem") || &error("error: mediaitem /$mediaitem");
+		# If $config_write equals 1, update database with $writenew
+		if ($config_write eq "1") {
+			open (WRITEINFO,">$basedir/$media_read") || &error("error: media_read data /$media_read");
 			print (WRITEINFO $writenew);
 			close (WRITEINFO);
 		}
 
-		# If $debugpreviewhide equals "1", make the preview hidden within the HTML comments
-		if ($debugpreviewhide eq "1") {
+		# If $config_previewhide equals "1", make the preview hidden within the HTML comments
+		if ($config_previewhide eq "1") {
 			print "$writenew";
 		}
 
-		# If $debugpreviewshow equals "1", make the preview shown within the administration window
-		if ($debugpreviewshow eq "1") {
+		# If $config_previewshow equals "1", make the preview shown within the administration window
+		if ($config_previewshow eq "1") {
 			print "$preview";
 		}
 
 		# Forward you back to the database table
-		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL=$thispage?dotype=$dotype\">\n";
-		print "     <p><a href=\"$thispage?dotype=$dotype\">main screen</a>";
+		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL=/$config_adminsite?dotype=$dotype\">\n";
+		print "     <p><a href=\"/$config_adminsite?dotype=$dotype\">main screen</a>";
 
-		# Generate footer
+		# Generate the footer
 		&footer;
 	}
 
-	sub mediawrite {
-		# Open and read $mediaitem
-		open (READINFO,"$basedir/$mediaitem") || &error("error: mediaitem /$mediaitem");
+	sub media_write {
+		# Open and read $media_read
+		open (READINFO,"$basedir/$media_read") || &error("error: media_read data /$media_read");
 		@infile = <READINFO>;
 		close (READINFO);
 		@infile=sort(@infile);
@@ -1347,9 +1361,9 @@ sub media {
 		@sorted_updateddb = sort @unsorted_updateddb;
 		@sorted_previewdb = sort @unsorted_previewdb;
 
-		# If $debugwrite is equal to "1", then writing is enabled
-		if ($debugwrite eq "1") {
-			open (WRITEINFO,">$basedir/$mediaitem") || &error("error: mediaitem $mediaitem<br>");
+		# If $config_write is equal to "1", then writing is enabled
+		if ($config_write eq "1") {
+			open (WRITEINFO,">$basedir/$media_read") || &error("error: media_read data $media_read<br>");
 			print (WRITEINFO @sorted_updateddb);
 			close (WRITEINFO);
 
@@ -1378,8 +1392,8 @@ sub media {
 			}
 		}
 
-		# If $debugpreviewhide equals 1, display the results as a hidden HTML comment
-		if ($debugpreviewhide eq "1") {
+		# If $config_previewhide equals 1, display the results as a hidden HTML comment
+		if ($config_previewhide eq "1") {
 			print "<!--\n unsorted_updateddb: @unsorted_updateddb\n-->\n";
 			print "<!- \n sorted_updateddb: @sorted_updateddb\n-->\n";
 			print "<!--\n unsorted_previewdb: @unsorted_previewdb\n-->\n";
@@ -1387,8 +1401,8 @@ sub media {
 			print "<!--\n mediawrite: $mediawrite\n-->\n";
 		}
 
-		# If $debugpreviewshow equals 1, display the results in the administration window
-		if ($debugpreviewshow eq "1") {
+		# If $config_previewshow equals 1, display the results in the administration window
+		if ($config_previewshow eq "1") {
 			print "<p><b>unsorted_updateddb</b>: <div style=\"text-align:left;width:700px;\">";
 			foreach (@unsorted_updateddb) {
  				print "$_<br>\n";
@@ -1413,14 +1427,14 @@ sub media {
 		}
 
 		# Forward you back to the media database table
-		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL=$thispage?dotype=$dotype\">\n";
-		print "     <p><a href=\"$thispage?dotype=$dotype\">main screen</a>";
+		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL=/$config_adminsite?dotype=$dotype\">\n";
+		print "     <p><a href=\"/$config_adminsite?dotype=$dotype\">main screen</a>";
 
 		# Generate the footer
 		&footer;
 	}
-	
-	sub mediaaddid{
+
+	sub media_addid {
 		# This section only generates the EAC/UPC or ISBN text input for checking whether the entries exist.
 		print "\n   <table cellspacing=2 cellpadding=2>\n";
 
@@ -1431,7 +1445,7 @@ sub media {
 		}
 		
 		print "     <tr>\n      <td colspan=2 align=center>\n       <input type=button value=\"Cancel\" onClick=\"history.back()\">\n       <input type=submit value=\"Submit\">\n      </td>\n     </tr>\n";
-		print "     <input type=hidden name=dowhat value=mediacheck>\n     <input type=hidden name=dotype value=$dotype>\n     <input type=hidden name=addtype value=$addtype>\n";
+		print "     <input type=hidden name=dowhat value=media_check>\n     <input type=hidden name=dotype value=$dotype>\n     <input type=hidden name=addtype value=$addtype>\n";
 
 		print "    </table>";
 
@@ -1439,9 +1453,9 @@ sub media {
 		&footer;
 	}
 
-	sub mediacheck{
+	sub media_check {
 		# This section checks for the EAC/UPC or ISBN entries if they exist. If they do exist, then the information will be filled
-		# for you! If not, then we'll forward you back to the 'mediaedit' subroutine where you can enter the details in. By doing so,
+		# for you! If not, then we'll forward you back to the 'media_edit' subroutine where you can enter the details in. By doing so,
 		# this will create a new entry for that EAC/UPC/ISBN! :D
 		print "\n   <table cellspacing=2 cellpadding=2>\n";
 
@@ -1478,122 +1492,121 @@ sub media {
 				($dotype,$title,$author,$eacupc,$isbn,$type,$year) = split(/\|/,$line);
 				# print "$dotype,$title,$author,$eacupc,$isbn,$type,$year<br>\n";
 			}
-			print "<p><META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL='$thispage?dowhat=mediaadd&dotype=$dotype&neweacupc=$eacupc&newisbn=$isbn&newtitle=$title&newauthor=$author&newtype=$type&newyear=$year'\">\n";
-			print "<a href=\"$thispage?dowhat=mediaadd&dotype=$dotype&neweacupc=$eacupc&newisbn=$isbn&newtitle=$title&newauthor=$author&newtype=$type&newyear=$year\">continue</a></p>";
+			print "<p><META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL='/$config_adminsite?dowhat=media_add&dotype=$dotype&neweacupc=$eacupc&newisbn=$isbn&newtitle=$title&newauthor=$author&newtype=$type&newyear=$year'\">\n";
+			print "<a href=\"/$config_adminsite?dowhat=media_add&dotype=$dotype&neweacupc=$eacupc&newisbn=$isbn&newtitle=$title&newauthor=$author&newtype=$type&newyear=$year\">continue</a></p>";
 		} else {
-			print "<p><META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL='$thispage?dowhat=mediaadd&dotype=$dotype&neweacupc=$neweacupc&newisbn=$newisbn&newyear=$year'\">\n";
-			print "<a href=\"$thispage?dowhat=mediaadd&dotype=$dotype&neweacupc=$neweacupc&newisbn=$newisbn&newyear=$year\">continue</a></p>";
+			print "<p><META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL='/$config_adminsite?dowhat=media_add&dotype=$dotype&neweacupc=$neweacupc&newisbn=$newisbn&newyear=$year'\">\n";
+			print "<a href=\"/$config_adminsite?dowhat=media_add&dotype=$dotype&neweacupc=$neweacupc&newisbn=$newisbn&newyear=$year\">continue</a></p>";
 		}
 
 		print "    </table>";
 
+		# Generate the footer
 		&footer;
 	}
 
-	sub debugview {
-		open (media,"$basedir/$mediaitem") || &error("error: mediaitem /$mediaitem");
-		@in = <media>;
-		close (media);
+	sub config_view {
+		local($e) = @_;
 
-		print "\n   <table cellspacing=10 cellpadding=10 id=\"mytable\">\n";
-		print "    <thead>\n     <th>enable write</th>\n     <th>preview hidden</th>\n     <th>preview shown</th>\n     <th>sort by</th>\n    </tr>\n    </thead>\n    <tbody>\n";
+		print "\n   <table cellspacing=10 cellpadding=10 id=\"mytable\" width=75%>\n";
 
-		foreach $line(@in) {
-			$line=~s/\n//g;
-			($debugwrite,$debugpreviewhide,$debugpreviewshow,$debugthesort) = split(/\|/,$line);
-			if ($debugwrite eq 0) {$dashwrite="off";} else {$dashwrite="on";}
-			if ($debugpreviewhide eq 0) {$dashpreviewhide="off";} else {$dashpreviewhide="on";}
-			if ($debugpreviewshow eq 0) {$dashpreviewshow="off";} else {$dashpreviewshow="on";}
-			if ($debugthesort eq 0) {$dashthesort="off";} else {$dashthesort="on";}
-			print "    <tr class=\"grid\">\n     <td>$dashwrite</td>\n     <td>$dashpreviewhide</td>\n     <td>$dashpreviewshow</td>\n     <td>$dashthesort</td>\n    </tr>\n";
+		if ($e) {
+			print "<tr><td colspan=3>$e</td></tr>\n";
 		}
 
-		print "    <tr><td align=center colspan=$columns><a href=\"$thispage?dowhat=debugedit&dotype=$dotype&fromtype=$fromtype\">Change Debug</a></td></tr>\n";
+		print "    <tbody>\n";
+		print "     <tr><th width=34%>HEADERS</th><th width=33%>CURRENT VALUES</th><th width=33%>CONFIG DEFAULTS</td></tr>\n";
+
+		if ($config_write eq 0) {$dashwrite="off";} else {$dashwrite="on";}
+		if ($config_previewhide eq 0) {$dashpreviewhide="off";} else {$dashpreviewhide="on";}
+		if ($config_previewshow eq 0) {$dashpreviewshow="off";} else {$dashpreviewshow="on";}
+		if ($config_thesort eq 0) {$dashthesort="off";} else {$dashthesort="on";}
+
+		print "    <tr class=\"grid\">\n     <th>enable write</th>\n     <td>$dashwrite</td>\n     <td>on</td>\n    </tr>\n";
+		print "    <tr class=\"grid\">\n     <th>preview hidden</th>\n     <td>$dashpreviewhide</td>\n     <td>off</td>\n    </tr>\n";
+		print "    <tr class=\"grid\">\n     <th>preview shown</th>\n     <td>$dashpreviewshow</td>\n     <td>off</td>\n    </tr>\n";
+		print "    <tr class=\"grid\">\n     <th>sort by</th>\n     <td>$dashthesort</td>\n     <td>off</td>\n    </tr>\n";
+
+		print "    <tr><td align=center colspan=3><a href=\"/$config_adminsite?dowhat=config_edit&dotype=$dotype&fromtype=$fromtype\">Change Debug</a></td></tr>\n";
 		print "    <tr>\n";
-		print "     <td style=\"text-align:left\" colspan=$columns>\n";
+		print "     <td style=\"text-align:left\" colspan=3>\n";
 		print "      <b>enable write</b>: enables content write when on, disabled when off<br>\n";
-		print "      <b>preview hidden</b>: enables content preview within HTML comments when on, disabled when off<br>\n";
+		print "      <b>preview hidden</b>: enables content preview within HTML comments when on, off disables<br>\n";
 		print "      <b>preview shown</b>: enables content preview in this window when on, disabled when off<br>\n";
-		print "      <b>sort by</b>: titles beginning with 'The' will instead appear with '<i>, The</i>' at the end when on, disabled when off<br>\n";
-		print "      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this applies to both the administrative and non-administrative pages, but not to the database,<br>\n";
-		print "      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;primarily for sorting purposes\n";
+		print "      <b>sort by</b>: when on, titles beginning with 'The' appear with '<i>, The</i>' at the end, off disables<br>\n";
+		print "      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This applies to both the administrative and non-administrative pages, but not to the<br>\n";
+		print "      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;database. This is primarily for sorting purposes.<br>\n";
 		print "     </td>\n";
 		print "    </tr>\n";
 		print "    </tbody>\n   </table>\n";
+
+		# Generate the footer
+		&footer;
 	}
 
-	sub debugedit {
-		open (media,"$basedir/$mediaitem") || &error("error: mediaitem /$mediaitem");
-		@in = <media>;
-		close (media);
-		print "\n   <table cellspacing=10 cellpadding=10 id=\"mytable\">\n";
-		print "    <thead>\n     <th>enable write</th>\n     <th>preview hidden</th>\n     <th>preview shown</th>\n     <th>sort by</th>\n    </tr>\n    </thead>\n    <tbody>\n";
+	sub config_edit {
+		print "\n   <table cellspacing=10 cellpadding=10 id=\"mytable\" width=75%>\n";
+		print "     <tr><th width=34%>HEADERS</th><th width=33%>CURRENT VALUES</th><th width=33%>CONFIG DEFAULTS</td></tr>\n";
 
-		foreach $line(@in) {
-			$line=~s/\n//g;
-			($debugwrite,$debugpreviewhide,$debugpreviewshow,$debugthesort) = split(/\|/,$line);
-			print "     <tr class=\"grid\">\n";
-
-			print "      <td>\n";
-			print "       <select name=debugwrite>\n";
-			if ($debugwrite eq '0'){
-				print "        <option value=\"0\" selected>off</option>\n";
-			} else {
-				print "        <option value=\"0\">off</option>\n";
-			}
-			if ($debugwrite eq '1'){
-				print "        <option value=\"1\" selected>on</option>\n";
-			} else {
-				print "        <option value=\"1\">on</option>\n";
-			}
-			print "       </select>\n";
-			print "      </td>\n";
-
-			print "      <td>\n";
-			print "       <select name=debugpreviewhide>\n";
-			if ($debugpreviewhide eq '0'){
-				print "        <option value=\"0\" selected>off</option>\n";
-			} else {
-				print "        <option value=\"0\">off</option>\n";
-			}
-			if ($debugpreviewhide eq '1'){
-				print "        <option value=\"1\" selected>on</option>\n";
-			} else {
-				print "        <option value=\"1\">on</option>\n";
-			}
-			print "       </select>\n";
-			print "      </td>\n";
-
-			print "      <td>\n";
-			print "       <select name=debugpreviewshow>\n";
-			if ($debugpreviewshow eq '0'){
-				print "        <option value=\"0\" selected>off</option>\n";
-			} else {
-				print "        <option value=\"0\">off</option>\n";
-			}
-			if ($debugpreviewshow eq '1'){
-				print "        <option value=\"1\" selected>on</option>\n";
-			} else {
-				print "        <option value=\"1\">on</option>\n";
-			}
-
-			print "      <td>\n";
-			print "       <select name=debugthesort>\n";
-			if ($debugthesort eq '0'){
-				print "        <option value=\"0\" selected>off</option>\n";
-			} else {
-				print "        <option value=\"0\">off</option>\n";
-			}
-			if ($debugthesort eq '1'){
-				print "        <option value=\"1\" selected>on</option>\n";
-			} else {
-				print "        <option value=\"1\">on</option>\n";
-			}
-			
-			print "       </select>\n";
-			print "      </td>\n";
-			print "     </tr>\n";
+		print "    <tr class=\"grid\">\n     <th>enable write</th>\n      <td>\n";
+		print "       <select name=config_write>\n";
+		if ($config_write eq '0'){
+			print "        <option value=\"0\" selected>off</option>\n";
+		} else {
+			print "        <option value=\"0\">off</option>\n";
 		}
+		if ($config_write eq '1'){
+			print "        <option value=\"1\" selected>on</option>\n";
+		} else {
+			print "        <option value=\"1\">on</option>\n";
+		}
+		print "       </select>\n";
+		print "      </td>\n      <td>on</td>\n    </tr>\n";
+
+		print "    <tr class=\"grid\">\n     <th>preview hidden</th>\n      <td>\n";
+		print "       <select name=config_previewhide>\n";
+		if ($config_previewhide eq '0'){
+			print "        <option value=\"0\" selected>off</option>\n";
+		} else {
+			print "        <option value=\"0\">off</option>\n";
+		}
+		if ($config_previewhide eq '1'){
+			print "        <option value=\"1\" selected>on</option>\n";
+		} else {
+			print "        <option value=\"1\">on</option>\n";
+		}
+		print "       </select>\n";
+		print "      </td>\n      <td>off</td>\n    </tr>\n";
+
+		print "    <tr class=\"grid\">\n     <th>preview shown</th>\n      <td>\n";
+		print "       <select name=config_previewshow>\n";
+		if ($config_previewshow eq '0'){
+			print "        <option value=\"0\" selected>off</option>\n";
+		} else {
+			print "        <option value=\"0\">off</option>\n";
+		}
+		if ($config_previewshow eq '1'){
+			print "        <option value=\"1\" selected>on</option>\n";
+		} else {
+			print "        <option value=\"1\">on</option>\n";
+		}
+		print "       </select>\n";
+		print "      </td>\n      <td>off</td>\n    </tr>\n";
+
+		print "    <tr class=\"grid\">\n     <th>sort by</th>\n      <td>\n";
+		print "       <select name=config_thesort>\n";
+		if ($config_thesort eq '0'){
+			print "        <option value=\"0\" selected>off</option>\n";
+		} else {
+			print "        <option value=\"0\">off</option>\n";
+		}
+		if ($config_thesort eq '1'){
+			print "        <option value=\"1\" selected>on</option>\n";
+		} else {
+			print "        <option value=\"1\">on</option>\n";
+		}
+		print "       </select>\n";
+		print "      </td>\n      <td>off</td>\n    </tr>\n";
 
 		print "     <tr>\n      <td colspan=$columns align=center>\n       <input type=button value=\"Cancel\" onClick=\"history.back()\">\n       <input type=submit value=\"Submit\">\n      </td>\n     </tr>\n";
 		print "     <tr>\n";
@@ -1606,17 +1619,376 @@ sub media {
 		print "       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;primarily for sorting purposes\n";
 		print "      </td>\n";
 		print "     </tr>\n";
-		print "     <input type=hidden name=dowhat value=debugwrite>\n     <input type=hidden name=dotype value=$dotype>\n     <input type=hidden name=fromtype value=$fromtype>\n";
+		print "     <input type=hidden name=dowhat value=config_write>\n     <input type=hidden name=dotype value=$dotype>\n     <input type=hidden name=fromtype value=$fromtype>\n";
 		print "    </tbody>\n   </table>\n";
+
+		# Generate the footer
+		&footer;
 	}
 
-	sub debugwrite {
-		$writenew="$editdebugwrite|$editdebugpreviewhide|$editdebugpreviewshow|$editdebugthesort|";
-		open (WRITEINFO,">$basedir/$mediaitem") || &error("error: mediaitem /$mediaitem");
+	sub config_write {
+		$writenew="$editconfig_write|$editconfig_previewhide|$editconfig_previewshow|$editconfig_thesort|";
+
+		if ($config_previewhide eq "1") {
+			print "<!--\n";
+			print "    $writenew\n";
+			print "    editconfig_write: $editconfig_write\n";
+			print "    editconfig_previewhide: $editconfig_previewhide\n";
+			print "    editconfig_previewshow: $editconfig_previewshow\n";
+			print "    editconfig_thesort: $editconfig_thesort\n";
+			print "-->\n";
+		}
+		if ($config_previewshow eq "1") {
+			print "$writenew<br>\n";
+			print "editconfig_write: $editconfig_write<br>";
+			print "editconfig_previewhide: $editconfig_previewhide<br>";
+			print "editconfig_previewshow: $editconfig_previewshow<br>";
+			print "editconfig_thesort: $editconfig_thesort<br>";
+		}
+		open (WRITEINFO,"+>$basedir/$config_data") || &error("error: config_data $basedir/$config_data");
 		print (WRITEINFO $writenew);
 		close (WRITEINFO);
-		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"4;URL=$thispage?dotype=$fromtype\">\n";
-		print "     <p><a href=\"$thispage?dotype=$fromtype\">main screen</a>";
+		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"10;URL=/$config_adminsite?dotype=$fromtype\">\n";
+		print "     <p><a href=\"/$config_adminsite?dotype=$fromtype\">main screen</a>";
+
+		# Generate the footer
+		&footer;
+	}
+
+	sub eacupcisbn_generate {
+		if ($continue ne 'Yes') {
+			print "\n   <P>Continuing this action will overwrite the entries for the UPC, EAC, and ISBN codes<br><br>\n";
+			print "   Are you sure you want to do this?</P>\n";
+			print "   <input type=submit name=continue value=Yes>\n   <input type=button value=No onClick=\"history.back()\">\n   <input type=hidden name=dotype value=eacupcisbn>\n   <input type=hidden name=dowhat value=eacupcisbn_generate>\n   <input type=hidden name=showline value=\"$showline\">\n";
+
+			# Generate footer
+			&footer;
+		}
+
+		open (media,"$basedir/$media_books") || &error("error: media_books /$media_books");
+		@in = <media>;
+		close (media);
+
+		print "\n   <table cellspacing=10 cellpadding=10>\n";
+
+		$mediacodesdb="";
+
+		foreach $line(@in) {
+			($title,$author,$eacupc,$isbn,$type) = split(/\|/,$line);
+			$mediawrite_books="books|$title|$author|$eacupc|$isbn|$type||";
+			if ($title ne "#DATE#") {
+				if ($isbn ne "") {
+					print "ISBN: $mediawrite_books $basedir/$media_check_isbn/$isbn<br>";
+					unless (-e "$basedir/$media_check_isbn/$isbn") {
+						open (WRITEINFO,"+>$basedir/$media_check_isbn/$isbn") || &error("error: mediaitem $basedir/$media_check_isbn/$isbn<br>");
+						print (WRITEINFO $mediawrite_books);
+						close (WRITEINFO);
+					}
+				}
+
+				if ($eacupc ne "") {
+					#print "EAC/UPC: $mediawrite_books<br>";
+					unless (-e "$basedir/$media_check_eacupc/$eacupc") {
+						open (WRITEINFO,"+>$basedir/$media_check_eacupc/$eacupc") || &error("error: mediaitem $basedir/$media_check_eacupc/$eacupc<br>");
+						print (WRITEINFO $mediawrite_books);
+						close (WRITEINFO);
+					}
+				}
+
+				if (($isbn ne "") || ($eacupc ne "")) {
+					push(@eacupcisbn_db,$mediawrite_books."\n");
+				}
+			}
+		}
+
+		open (media,"$basedir/$media_games") || &error("error: media_games /$media_games");
+		@in = <media>;
+		close (media);
+
+		foreach $line(@in) {
+			($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc) = split(/\|/,$line);
+			$mediawrite_games="games|$title||$eacupc||||";
+			if ($title ne "#DATE#") {
+				if ($eacupc ne "") {
+					unless (-e "$basedir/$media_check_eacupc/$eacupc") {
+						#print "EAC/UPC: $mediawrite_games<br>";
+						open (WRITEINFO,"+>$basedir/$media_check_eacupc/$eacupc") || &error("error: mediaitem $basedir/$media_check_eacupc/$eacupc<br>");
+						print (WRITEINFO $mediawrite_games);
+						close (WRITEINFO);
+					}
+				}
+
+				if ($eacupc ne "") {
+					push(@eacupcisbn_db,$mediawrite_games."\n");
+				}
+			}
+		}
+
+		open (media,"$basedir/$media_music") || &error("error: media_music /$media_music");
+		@in = <media>;
+		close (media);
+
+		foreach $line(@in) {
+			($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$line);
+			$mediawrite_music="music|$title|$artist|$eacupc||||";
+			if ($artist ne "#DATE#") {
+				if ($eacupc ne "") {
+					unless (-e "$basedir/$media_check_eacupc/$eacupc") {
+						#print "EAC/UPC: $mediawrite_music<br>";
+						open (WRITEINFO,"+>$basedir/$media_check_eacupc/$eacupc") || &error("error: mediaitem $basedir/$media_check_eacupc/$eacupc<br>");
+						print (WRITEINFO $mediawrite_music);
+						close (WRITEINFO);
+					}
+				}
+
+				if ($eacupc ne "") {
+					push(@eacupcisbn_db,$mediawrite_music."\n");
+				}
+			}
+		}
+
+		open (media,"$basedir/$media_videos") || &error("error: media_videos /$media_videos");
+		@in = <media>;
+		close (media);
+
+		foreach $line(@in) {
+			($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year) = split(/\|/,$line);
+			$mediawrite_videos="videos|$title||$eacupc|$isbn|$type|$year|";
+			if ($title ne "#DATE#") {
+				if ($isbn ne "") {
+					unless (-e "$basedir/$media_check_isbn/$isbn") {
+						#print "ISBN: $mediawrite_videos<br>";
+						open (WRITEINFO,"+>$basedir/$media_check_isbn/$isbn") || &error("error: mediaitem $basedir/$media_check_isbn/$isbn<br>");
+						print (WRITEINFO $mediawrite_videos);
+						close (WRITEINFO);
+					}
+				}
+
+				if ($eacupc ne "") {
+					unless (-e "$basedir/$media_check_eacupc/$eacupc") {
+						#print "EAC/UPC: $mediawrite_videos<br>";
+						open (WRITEINFO,"+>$basedir/$media_check_eacupc/$eacupc") || &error("error: mediaitem /$media_check_eacupc/$eacupc<br>");
+						print (WRITEINFO $mediawrite_videos);
+						close (WRITEINFO);
+					}
+				}
+
+				if (($isbn ne "") || ($eacupc ne "")) {
+					push(@eacupcisbn_db,$mediawrite_videos."\n");
+				}
+			}
+		}
+
+		print "    </tbody>\n";
+		print "   </table>";
+
+		@sorted_eacupcisbn_db = sort @eacupcisbn_db;
+		if ($config_write eq "1") {
+			open (WRITEINFO,">$basedir/$media_eacupcisbndb") || &error("error: media_eacupcisbndb /media_eacupcisbndb");
+			print (WRITEINFO @sorted_eacupcisbn_db);
+			close (WRITEINFO);
+		}
+
+		print "   <p>\n    <b>sorted_eacupcisbn_db</b>:\n    <div style=\"text-align:left;width:800px;\">\n";
+		foreach (@sorted_eacupcisbn_db) {
+			$_ =~ s/[\r\n]+$//;
+			print "     $_<br>\n";
+		}
+		print "    </div>\n   </p>\n";
+
+		# Generate the footer
+		&footer;
+	}
+
+	sub eacupcisbn_verify {
+		open (media,"$basedir/$media_eacupcisbndb") || &error("error: media_eacupcisbndb $media_eacupcisbndb. Select <b>Generate Database</b> above to create your database for comparison.");
+		@in = <media>;
+		close (media);
+
+		$count_books=0;
+		$count_music=0;
+		$count_games=0;
+		$count_videos=0;
+
+		print "\n   <table cellspacing=5 cellpadding=5 border=1 id=\"mytable\">\n";
+
+		foreach $line(@in) {
+			($entry1,$entry2,$entry3,$entry4,$entry5,$entry6,$entry7) = split(/\|/,$line);
+			if ($entry1 eq "books") {
+				if ($count_books < 1) {print "    <thead>\n     <tr><th>media</th><th>title</th><th>author</th><th>eac/upc</th></th><th>isbn</th><th>type</th><th></th></tr>\n    </thead>\n    <tbody>\n";$sections++;}
+				$count_books++;
+			} elsif ($entry1 eq "games") {
+				if ($count_games < 1) {print "     <tr><td colspan=$columns></td></tr>\n    </tbody>\n";print "    <thead>\n     <tr><th>media</th><th>title</th><th></th><th>eac/upc</th><th></th><th></th><th></th></tr>\n    </thead>\n    <tbody>\n";$sections++;}
+				$count_games++;
+			} elsif ($entry1 eq "music") {
+				if ($count_music < 1) {print "     <tr><td colspan=$columns></td></tr>\n    </tbody>\n";print "    <thead>\n     <tr><th>media</th><th>title</th><th>artist</th><th>eac/upc</th><th>isbn</th><th></th><th></th></tr>\n    </thead>\n    <tbody>\n";$sections++;}
+				$count_music++;
+			} elsif ($entry1 eq "videos") {
+				if ($count_videos < 1) {print "     <tr><td colspan=$columns></td></tr>\n    </tbody>\n";print "    <thead>\n     <tr><th>media</th><th>title</th><th></th><th>eac/upc</th><th>isbn</th><th>type</th><th>year</th></tr>\n    </thead>\n    <tbody>\n";$sections++;}
+				$count_videos++;
+			}
+
+			print "     <tr><td>$entry1</td><td>$entry2</td><td>$entry3</td><td>$entry4</td><td>$entry5</td><td>$entry6</td><td>$entry7</td></tr>\n";
+
+			if ($entry4) {
+				open (eacupc,"$basedir/$media_check_eacupc/$entry4") || &error("errorEACUPC: $basedir/$media_check_eacupc/$entry4");
+				@readeacupc = <eacupc>;
+				close (eacupc);
+				for $eacupc(@readeacupc) {
+					($checkeacupcentry1,$checkeacupcentry2,$checkeacupcentry3,$checkeacupcentry4,$checkeacupcentry5,$checkeacupcentry6,$checkeacupcentry7) = split(/\|/,$eacupc);
+					if ($checkeacupcentry1 eq $entry1) {$entry1class="good";} else {$entry1class="bad";}
+					if ($checkeacupcentry2 eq $entry2) {$entry2class="good";} else {$entry2class="bad";}
+					if ($checkeacupcentry3 eq $entry3) {$entry3class="good";} else {$entry3class="bad";}
+					if ($checkeacupcentry4 eq $entry4) {$entry4class="good";} else {$entry4class="bad";}
+					if ($checkeacupcentry5 eq $entry5) {$entry5class="good";} else {$entry5class="bad";}
+					if ($checkeacupcentry6 eq $entry6) {$entry6class="good";} else {$entry6class="bad";}
+					if ($checkeacupcentry7 eq $entry7) {$entry7class="good";} else {$entry7class="bad";}
+					print "     <tr><td class=$entry1class>$checkeacupcentry1</td><td class=$entry2class>$checkeacupcentry2</td><td class=$entry3class>$checkeacupcentry3</td><td class=$entry4class><a href=\"/$config_eacupcisbnsite?dowhat=eacupc_edit&dotype=eacupcisbn&fromtype=eacupcisbn_verify&entry=$checkeacupcentry4&showline=$line\">$checkeacupcentry4</a></td><td class=$entry5class>$checkeacupcentry5</td><td class=$entry6class>$checkeacupcentry6</td><td class=$entry7class>$checkeacupcentry7</td></tr>\n";
+				}
+			}
+			if ($entry5) {
+				open (isbn,"$basedir/$media_check_isbn/$entry5") || &error("errorISBN: $basedir/$media_check_isbn/$entry5");
+				@readisbn = <isbn>;
+				close (isbn);
+				for $isbn(@readisbn) {
+					($checkisbnentry1,$checkisbnentry2,$checkisbnentry3,$checkisbnentry4,$checkisbnentry5,$checkisbnentry6,$checkisbnentry7) = split(/\|/,$isbn);
+					if ($checkisbnentry1 eq $entry1) {$entry1class="good";} else {$entry1class="bad";}
+					if ($checkisbnentry2 eq $entry2) {$entry2class="good";} else {$entry2class="bad";}
+					if ($checkisbnentry3 eq $entry3) {$entry3class="good";} else {$entry3class="bad";}
+					if ($checkisbnentry4 eq $entry4) {$entry4class="good";} else {$entry4class="bad";}
+					if ($checkisbnentry5 eq $entry5) {$entry5class="good";} else {$entry5class="bad";}
+					if ($checkisbnentry6 eq $entry6) {$entry6class="good";} else {$entry6class="bad";}
+					if ($checkisbnentry7 eq $entry7) {$entry7class="good";} else {$entry7class="bad";}
+					print "     <tr><td class=$entry1class>$checkisbnentry1</td><td class=$entry2class>$checkisbnentry2</td><td class=$entry3class>$checkisbnentry3</td><td class=$entry4class>$checkisbnentry4</td><td class=$entry5class><a href=\"/$config_eacupcisbnsite?dowhat=isbn_edit&dotype=eacupcisbn&fromtype=eacupcisbn_verify&entry=$checkisbnentry5&showline=$line\">$checkisbnentry5</a></td><td class=$entry6class>$checkisbnentry6</td><td class=$entry7class>$checkisbnentry7</td></tr>\n";
+				}
+			}
+		}
+
+		print "    </tbody>\n   </table>";
+
+		# Generate the footer
+		&footer;
+	}
+
+	sub eacupcisbn_edit {
+		if ($dowhat eq "isbn_edit") {
+			$edittype="isbn";
+			open (isbn,"$basedir/$media_check_isbn/$entry") || &error("error: ISBN $entry");
+			@readisbn = <isbn>;
+			close (isbn);
+			for $isbn(@readisbn) {
+				($entry1,$entry2,$entry3,$entry4,$entry5,$entry6,$entry7) = split(/\|/,$isbn);
+			}
+		} else {
+			$edittype="eacupc";
+			open (eacupc,"$basedir/$media_check_eacupc/$entry") || &error("error: EAC/UPC $entry");
+			@readeacupc = <eacupc>;
+			close (eacupc);
+			for $eacupc(@readeacupc) {
+				($entry1,$entry2,$entry3,$entry4,$entry5,$entry6,$entry7) = split(/\|/,$eacupc);
+			}
+		}
+
+		($check_entry1,$check_entry2,$check_entry3,$check_entry4,$check_entry5,$check_entry6,$check_entry7) = split(/\|/,$showline);
+
+		print "    <table>\n";
+
+		my @list = split /,/, $entry1;
+		#print "@list<br>";
+		for (@list) {
+			if ($_ eq "books") {
+				$books_checked="checked=yes";
+			}
+			if ($_ eq "games") {
+				$games_checked="checked=yes";
+				if ($books_checked) {
+					$multi=1;
+				}
+			}
+			if ($_ eq "music") {
+				$music_checked="checked=yes";
+				if ($games_checked) {
+					$multi=1;
+				}
+			}
+			if ($_ eq "videos") {
+				$video_checked="checked=yes";
+				if ($music_checked) {
+					$multi=1;
+				}
+			}
+		}
+		print "     <tr>\n      <td colspan=2 align=right>books: <input type=\"checkbox\" name=\"type_books\" value=\"1\" $books_checked> games: <input type=\"checkbox\" name=\"type_games\" value=\"1\" $games_checked> music: <input type=\"checkbox\" name=\"type_music\" value=\"1\" $music_checked> videos: <input type=\"checkbox\" name=\"type_videos\" value=\"1\" $video_checked></td><td></td></tr>\n";
+		print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$entry2\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n      <td>$check_entry2</td>\n     </tr>\n";
+		if (($entry1 eq "music") || ($entry1 eq "books") || ($multi eq "1")) {print "     <tr>\n      <th align=right>Author:</th>\n      <td><input type=text name=newauthor value=\"$entry3\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n      <td>$check_entry3</td>\n     </tr>\n";}
+		print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td>\n       <input type=text name=neweacupc value=\"$entry4\"></td>\n      <td>$check_entry4</td>\n     </tr>\n";
+		if (($entry1 eq "books") || ($multi eq "1")) {print "     <tr>\n      <th align=right>ISBN:</th>\n      <td><input type=text name=newisbn value=\"$entry5\"></td>\n      <td>$check_entry5</td>\n     </tr>\n";}
+		if (($entry1 eq "videos") || ($entry1 eq "books") || ($multi eq "1")) {print "     <tr>\n      <th align=right>Type:</th>\n      <td><input type=text name=newtype value=\"$entry6\"></td>\n      <td>$check_entry6</td>\n     </tr>\n";}
+		if (($entry1 eq "videos") || ($multi eq "1")) {print "     <tr>\n      <th align=right>Year:</th>\n      <td><input type=text name=newyear value=\"$entry7\"></td>\n      <td>$check_entry7</td>\n     </tr>\n";}
+		print "     <tr>\n      <td colspan=3 align=center>\n       <input type=button value=\"Cancel\" onClick=\"history.back()\">\n       <input type=submit value=\"Submit\">\n      </td>\n     </tr>\n";
+		print "    </table>\n";
+
+		print "     <input type=hidden name=dotype value=eacupcisbn>\n     <input type=hidden name=edittype value=$edittype>\n     <input type=hidden name=entry value=$entry>\n     <input type=hidden name=dowhat value=eacupcisbn_write>\n     <input type=hidden name=fromtype value=$fromtype>\n";
+
+		# Generate the footer
+		&footer;
+	}
+
+	sub eacupcisbn_write {
+		if ($type_books) {
+			$mediatype="books";
+		}
+		if ($type_games) {
+			if ($mediatype) {
+				$mediatype.=",games";
+			} else {
+				$mediatype="games";
+			}
+		}
+		if ($type_music) {
+			if ($mediatype) {
+				$mediatype.=",music";
+			} else {
+				$mediatype="music";
+			}
+		}
+		if ($type_videos) {
+			if ($mediatype) {
+				$mediatype.=",videos";
+			} else {
+				$mediatype="videos";
+			}
+		}
+		$writefile="$mediatype|$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|$newyear|";
+
+		if ($edittype eq "eacupc") {
+			$editentry="$media_check_eacupc/$entry";
+		} else {
+			$editentry="$media_check_isbn/$entry";
+		}
+
+		# If $config_write is equal to "1", then writing is enabled
+		if ($config_write eq "1") {
+			open (WRITEINFO,">$basedir/$mediacheck/$editentry") || &error("error: editentry $edittype $basedir/$mediacheck/$editentry<br>");
+			print (WRITEINFO $writefile);
+			close (WRITEINFO);
+		}
+
+		# If $config_previewhide equals 1, display the results as a hidden HTML comment
+		if ($config_previewhide eq "1") {
+			print "<!--\n writefile: $writefile\n-->\n";
+		}
+
+		# If $config_previewshow equals 1, display the results in the administration window
+		if ($config_previewshow eq "1") {
+			print "<p><b>writefile</b>: $writefile\n";
+		}
+
+		# Forward you back to the media database table
+		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"4;URL=/$config_eacupcisbnsite?dowhat=$fromtype&dotype=eacupcisbn\">\n";
+		print "     <p><a href=\"/$config_eacupcisbnsite?dowhat=$fromtype&dotype=eacupcisbn\">main screen</a>";
+
+		# Generate the footer
 		&footer;
 	}
 }
@@ -1625,7 +1997,12 @@ sub header {
 	local($e) = @_;
 	print "$delay\n<html>\n<head>\n <title>EZ Editor: Media Admin</title>\n";
 	print " <LINK HREF=\"/styles/adminstyle.css\" REL=\"stylesheet\" TYPE=\"text/css\" />\n";
-	if ($dotype ne "debug") {
+
+	if ($dowhat eq "eacupcisbn_verify") {
+		print " <style>th {background-color: #4CAF50; color: white;} td.bad {background-color: red; color: white;} td.good {background-color: green; color: white;}</style>\n";
+	}
+
+	if (($dotype eq "books") || ($dotype eq "music") || ($dotype eq "games") || ($dotype eq "videos")) {
 		print " <script type=\"text/javascript\" src=\"/javascripts/gs_sortable.js\"></script>\n";
 		print " <script type=\"text/javascript\">\n  <!--\n";
 
@@ -1641,11 +2018,11 @@ sub header {
 	}
 
 	print "</head>\n<body topmargin=0 bottommargin=0 leftmargin=0 rightmargin=0";
-	if (($dowhat eq "mediabarcode") || ($dowhat eq "mediaisbn") || ($dowhat eq "mediaedit") || ($dowhat eq "mediaadd")) {
+	if (($dowhat eq "media_barcode") || ($dowhat eq "media_isbn") || ($dowhat eq "media_edit") || ($dowhat eq "media_add")) {
 		print " OnLoad=\"document.myform.";
-		if ($dowhat eq "mediabarcode") {
+		if ($dowhat eq "media_barcode") {
 			print "neweacupc";
-		} elsif ($dowhat eq "mediaisbn") {
+		} elsif ($dowhat eq "media_isbn") {
 			print "newisbn";
 		} elsif ($dotype eq "music") {
 			print "newartist";
@@ -1656,26 +2033,31 @@ sub header {
 	}
 	print ">\n";
 	print "<table width=100% height=100% border=1 align=center valign=center>\n";
-	print " <tr>\n  <td height=20 colspan=3 valign=top align=center class=header>\n";
+	print " <tr>\n  <td height=20 valign=top align=center>\n";
 	print "   <table width=100% cellspacing=0 cellpadding=0 border=0>\n";
 	print "    <tr>\n";
+	
+	$addtext="writing is $write";
 	if ($preview or $showhide) {
-		print "     <td align=center class=header width=30%>Media Admin: write $write | preview $preview, $showhide</td>\n";
-	} else {
-		print "     <td align=center class=header width=35%>Media Admin: write $write</td>\n";
+		$addtext.=", preview $preview, $showhide";
 	}
-	print "     <td align=center class=header width=35%>";
-	if ($dotype ne "debug") {
-		print "{ <a href=\"$thispage?dowhat=mediaadd&dotype=$dotype\">Add Item Manually</a> | <a href=\"$thispage?dowhat=mediabarcode&dotype=$dotype&addtype=eacupc\">Add Item by Barcode</a> | <a href=\"$thispage?dowhat=mediaisbn&dotype=$dotype&addtype=isbn\">Add Item by ISBN</a> }";
+	print "     <td align=center class=header width=30%><b>Media Admin</b><br>$addtext</td>\n";
+
+	if ($dotype ne "config") {
+		$headerlinks="<a href=\"/$config_adminsite?dowhat=media_add&dotype=$dotype\">Add $media_text Manually</a> | <a href=\"/$config_adminsite?dowhat=media_barcode&dotype=$dotype&addtype=eacupc\">Add $media_text by Barcode</a> | <a href=\"/$config_adminsite?dowhat=media_isbn&dotype=$dotype&addtype=isbn\">Add $media_text by ISBN</a>";
 	}
-	print "</td>\n";
-	print "     <td align=center class=header width=33%>{ <a href=\"$thispage?dotype=debug&dowhat=debugview&fromtype=$dotype\">debug</a> | <a href=\"$thispage?dotype=books\">books</a> | <a href=\"$thispage?dotype=games\">games</a> | <a href=\"$thispage?dotype=music\">music</a> | <a href=\"$thispage?dotype=videos\">videos</a> }</td>\n";
-	print "    </tr>\n   </table>\n  </td>\n </tr>\n\n <tr>\n <form method=get action=$thispage name=\"myform\">\n  <td align=center>";
+	if ($dotype eq "eacupcisbn") {
+		$headerlinks="<a href=\"/$config_adminsite?dotype=eacupcisbn&dowhat=eacupcisbn_generate\">Generate Database</a> | <a href=\"/$config_adminsite?dotype=eacupcisbn&dowhat=eacupcisbn_verify\">Verify Database Entries</a>";
+	}
+	print "     <td align=center class=header width=40%>$headerlinks</td>\n";
+
+	print "     <td align=center class=header width=30%><a href=\"/$config_adminsite?dotype=books\">books</a> | <a href=\"/$config_adminsite?dotype=games\">games</a> | <a href=\"/$config_adminsite?dotype=music\">music</a> | <a href=\"/$config_adminsite?dotype=videos\">videos</a><br><a href=\"/$config_adminsite?dotype=config&dowhat=config_view&fromtype=$dotype\">config</a> | <a href=\"/$config_eacupcisbnsite?dotype=eacupcisbn&dowhat=eacupcisbn_verify\">EAC/UPC/ISBN database</a></td>\n";
+	print "    </tr>\n   </table>\n  </td>\n </tr>\n\n <tr>\n <form method=post action=\"/$config_adminsite\" name=\"myform\">\n  <td align=center>";
 }
 
 sub footer {
 	print "\n  </td>\n </tr>\n";
-	print " <tr height=10>\n  <td align=center colspan=3>\n";
+	print " <tr height=10>\n  <td align=center>\n";
 	if ($tablestats){
 		print "   $tablestats<br>\n   <br>\n";
 	}
@@ -1692,7 +2074,10 @@ sub error {
 
 sub errorfatal {
 	local($e) = @_;
-	print "\n   $e\n  </td>\n </tr>\n </form>\n</table>\n</body>\n</html>";
+	print "\n   $e\n";
+	print " <tr height=10>\n  <td align=center>\n";
+	print "   <i>this script, <b>mediacollection</b>, is part of an open source Perl script available on <a href=\"https://github.com/rdgarfinkel/mediacollection\" target=\"_GitHub\">Github</a></i>\n";
+	print "  </td>\n </tr>\n </form>\n</table>\n</body>\n</html>";
 	exit;
 }
 
@@ -1716,25 +2101,25 @@ sub getqueries {
 	$today="$currentyear.$mnth.$day";
 
 	## Enable or disable update functions
-	open (debug,"$basedir/$debug") || &error("error: debug $debug");
-	@in = <debug>;
-	close (debug);
+	open (config,"$basedir/$config_data") || &config_view("incomplete or missing configuration file, $config_data. please configure these scripts using the form below<br>");
+	@in = <config>;
+	close (config);
 	for $line(@in) {
-		($debugwrite,$debugpreviewhide,$debugpreviewshow,$debugthesort) = split(/\|/,$line);
+		($config_write,$config_previewhide,$config_previewshow,$config_thesort) = split(/\|/,$line);
 	}
 
 	# Delay write information display
-	if ($debugpreviewhide eq "1") {
+	if ($config_previewhide eq "1") {
 		$preview="on";
 		$showhide="hidden";
 		$wait=10;
 	}
-	if ($debugpreviewshow eq "1") {
+	if ($config_previewshow eq "1") {
 		$preview="on";
 		$showhide="shown";
 		$wait=10;
 	}
-	if ($debugwrite eq "1") {
+	if ($config_write eq "1") {
 		$write="enabled";
 		$wait=4;
 	} else {
@@ -1745,10 +2130,20 @@ sub getqueries {
 	### Retrieve information passed from/to scripts
 
 	# $delay is for diagnostic purposes, just to check that all variables appear correctly when running
-	$delay="<!--ez editor v$dateupdated || today $today || debugpreviewshow $debugpreviewshow || debugpreviewhide $debugpreviewhide || wait $wait";
+	$delay="<!--ez editor v$dateupdated || today $today || config_previewshow $config_previewshow || config_previewhide $config_previewhide || wait $wait";
 
-	# Get the QUERY_STRING from URI and display as part of $delay
-	@querys = split(/&/, $ENV{'QUERY_STRING'});
+	# if the form request is a 'get', then process it, otherwise...
+	if ($ENV{'REQUEST_METHOD'} eq 'GET') {
+		@querys = split(/&/, $ENV{'QUERY_STRING'});
+	}
+	# the request is a 'post', process it....
+	elsif ($ENV{'REQUEST_METHOD'} eq 'POST') {
+		read (STDIN, $query, $ENV{'CONTENT_LENGTH'});
+		@querys = split(/&/, $query);
+	}
+
+	# Get the QUERY_STRING from GET or POST and display as part of $delay
+	#@querys = split(/&/, $ENV{'QUERY_STRING'});
 	foreach $query (@querys) {
 		($name, $value) = split(/=/, $query);
 		$value =~ tr/+/ /;
@@ -1771,6 +2166,15 @@ sub getqueries {
 	$continueisbn=$FORM{'continueisbn'};
 	$continueeacupc=$FORM{'continueeacupc'};
 	$addtype=$FORM{'addtype'};
+	$fromtype=$FORM{'fromtype'};
+	$entry=$FORM{'entry'};
+	## Variable sets for EAC/UPC/ISBN editing
+	$mediatype=$FORM{'mediatype'};
+	$type_books=$FORM{'type_books'};
+	$type_music=$FORM{'type_music'};
+	$type_games=$FORM{'type_games'};
+	$type_videos=$FORM{'type_videos'};
+	$edittype=$FORM{'edittype'};
 	## Multi-use variable sets
 	$newtitle=$FORM{'newtitle'};
 	$oldtitle=$FORM{'oldtitle'};
@@ -1839,32 +2243,38 @@ sub getqueries {
 	$oldtopspin=$FORM{'oldtopspin'};
 	$newreverbnation=$FORM{'newreverbnation'};
 	$oldreverbnation=$FORM{'oldreverbnation'};
-	## Variable sets for debug
-	$editdebugwrite=$FORM{'debugwrite'};
-	$editdebugpreviewhide=$FORM{'debugpreviewhide'};
-	$editdebugpreviewshow=$FORM{'debugpreviewshow'};
-	$editdebugthesort=$FORM{'debugthesort'};
-	$fromtype=$FORM{'fromtype'};
+	## Variable sets for config
+	$editconfig_write=$FORM{'config_write'};
+	$editconfig_previewhide=$FORM{'config_previewhide'};
+	$editconfig_previewshow=$FORM{'config_previewshow'};
+	$editconfig_thesort=$FORM{'config_thesort'};
 
-	## The next few lines define the location of $mediaitem for media types, and how many columns are in the data display table.
+	## The next few lines define the location of $media_read for media types, and how many columns are in the data display table.
 	if ($dotype eq "books") {
-		$mediaitem.="books.txt";
+		$media_read.="books.txt";
+		$media_text="Book";
 		$columns=7;
 	} elsif ($dotype eq "games") {
-		$mediaitem.="games.txt";
+		$media_read.="games.txt";
+		$media_text="Game";
 		$columns=14;
 	} elsif ($dotype eq "music") {
-		$mediaitem.="music.txt";
+		$media_read.="music.txt";
+		$media_text="Music";
 		$columns=13;
 	} elsif ($dotype eq "videos") {
-		$mediaitem.="videos.txt";
+		$media_read.="videos.txt";
+		$media_text="Video";
 		$columns=13;
-	} elsif ($dotype eq "debug") {
-		if ($dowhat eq "") {$dowhat="debugview";}
-		$mediaitem.="debug.txt";
+	} elsif ($dotype eq "config") {
+		if ($dowhat eq "") {$dowhat="config_view";}
 		$columns=4;
+	} elsif ($dotype eq "eacupcisbn") {
+		if ($dowhat eq "") {$dowhat="eacupcisbn_verify";}
+		$columns=7;
 	} else {
 		&header;
 		&errorfatal("missing \'dotype\'");
+		&footer;
 	}
 }
