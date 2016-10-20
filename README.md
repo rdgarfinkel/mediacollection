@@ -39,10 +39,12 @@ The public server I use for the demonstration (as well as my other sites there) 
 - Hosted website with these scripts put online, with member signup abilities.
 
 # change log
-- 2016.10.??
-  - As of the next update, several new features, including a EAC/UPC/ISBN entry verification/editing option.
-  - Made naming adjustments to the subroutines and links, ie 'debug' is now 'config'
-  - Switched media edits now 'POST' data to the script, so now edits are generally unlimited in length
+- 2016.10.20
+  - There's now a EAC/UPC/ISBN entry verification/editing option, it compares each media type's database of entries with a value of EAC/UPC/ISBN content against the EAC/UPC/ISBN entries, and highlights individual cells green if they match, or red if they don't match. It's not necessarily a bad thing if they don't match, of course. It's limited only to what is in your database
+  - Made naming adjustments to the variables, subroutines and links, ie 'debug' is now 'config'.
+  - Switched media edits now 'POST' data to the script, so now edits are generally unlimited in length.
+  - The header of the admin pages is now two lines in height, so I spread out the links a bit.
+  - The automatic switch of the <b>+</b> plus symbol worked well at times, but I found that it also caused issues, for example, typing the apostrophe would be replaced with <b>(plus)</b> as well, for whatever reason.
 - 2016.10.07
   - When adding entries, it will be sorted into the database.
   - $basedir is now automatically discovered by the scripts.
