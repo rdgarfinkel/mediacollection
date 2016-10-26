@@ -23,28 +23,30 @@ The public server I use for the demonstration (as well as my other sites there) 
 - When using the <b>&</b> ampersand symbol in text fields, the editing feature didn't work. It seems that the 'query string' parsing splits this like it is a separate entry. Text replacement will occur server side, swapping the <b>&</b> symbol for <b>(amp)</b> text.
 - When using the <b>"</b> double quotation symbol in text fields, the editing feature didn't work. When clicking an entry to edit, the browser would interpret the quotations as the end of an <b>A HREF</b> HTML tag. Text replacement will occur server side, swapping the <b>"</b> double quotation mark for <b>''</b> two single quotation symbols for storing the entries, and <b>''</b> two single quotation symbols will be swapped for the <b>"</b> double quotation mark for display in the user facing tables.
 - When using the <b>#</b> pound symbol in text fields, the editing feature didn't work. I think what happens is the script thinks that the entry is supposed to be hidden, like it is a comment in Perl. When a pound sign is needed in titles, use <b>(pound)</b>, and it will be entered into the database that way, and <b>(pound)</b> will be swapped for <b>#</b> pound symbol in the user facing tables.
-- When the <b>+</b> plus symbol is used, the editing feature works, but not as expected. The plus symbol is the indicator these scripts use for spaces, and would be interpreted as such. Now, assuming that Javascript is enabled client-side, when the <b>+</b> plus symbol is entered by the user, the field will automatically change the character to <b>(plus)</b>, otherwise it'll need to be entered manually. <b>(plus)</b> will be entered into the database, and <b>(plus)</b> will be swapped for <b>+</b> plus symbol in the user facing tables.
+- When using the <b>+</b> plus symbol, the editing feature works, but not as expected. The plus symbol is the indicator that forms use for spaces, and would be interpreted as such. When the <b>+</b> plus symbol is to be used within a text field, use <b>(plus)</b>. This will be entered into the database, and <b>(plus)</b> will be swapped for <b>+</b> plus symbol in the user facing tables.
 - When movies are redone and the titles are the same, you'll get unwanted results when trying to edit one of the two entries. For example, the 1967 movie, *The Jungle Book* and the 2016 movie, *The Jungle Book*. When both exist in the database, both entries would be edited when editing one of the entries. To work around this, there is now a year input box within the media editor for videos, and entries are now compared by title and year, when the year has a value.
 - The columns currently within each media section are the media types that I have. As an example, I don't have a Sony Playstation 1, 3, or 4 system/games, so those columns don't exist yet in the games section. If you need these or other options, file an issue here on Github, and I'll add whatever you need, or if anyone wants to contribute, that's okay too.
 
-# things to add
+# things to add/research
 - Make code comments on files and processes for helping others' understand what is doing what. (media.pl is close to finished, index.cgi will be next)
 - Work on the wiki for this project.
 - EAC/UPC/ISBN approval script to verify that public entries are at a good quality.
 - Ability to hide/show columns, ie if there are media types that you don't personally have/use. This will require a slight revamp of code, but will make additions of media types easier in the future. Currently column numbers are adjusted manually by myself, so when a column is added, I have to manually increment a variable number by one. The method I've come up with will essentially automate that. This will not require adjustments to the database files, either.
 - Researching other options for having a fixed header upon scrolling. The one that was in place is not 100% reliable.<br>
 
-# things to add way down the road</b><br>
+# things to add way down the road<br>
 - TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
 - Hosted website with these scripts put online, with member signup abilities.
 
 # change log
+- 2016.10.25
+  - 2016.10.20 update had some variable naming adjustments that I missed, now fixed with this update.
 - 2016.10.20
-  - There's now a EAC/UPC/ISBN entry verification/editing option, it compares each media type's database of entries with a value of EAC/UPC/ISBN content against the EAC/UPC/ISBN entries, and highlights individual cells green if they match, or red if they don't match. It's not necessarily a bad thing if they don't match, of course. It's limited only to what is in your database
+  - There's now a EAC/UPC/ISBN entry verification/editing option, it compares each media type's database of entries with EAC/UPC/ISBN values against their EAC/UPC/ISBN entries; individual cells are highlighted cells green if they match, or red if they don't match. It's not necessarily a bad thing if they don't match, of course. It's limited only to what is in your database, it doesn't open each EAC/UPC/ISBN entry within each directory, at least, not yet.
   - Made naming adjustments to the variables, subroutines and links, ie 'debug' is now 'config'.
-  - Switched media edits now 'POST' data to the script, so now edits are generally unlimited in length.
+  - Media edits now 'POST' data to the script, so edits are generally unlimited in length.
   - The header of the admin pages is now two lines in height, so I spread out the links a bit.
-  - The automatic switch of the <b>+</b> plus symbol worked well at times, but I found that it also caused issues, for example, typing the apostrophe would be replaced with <b>(plus)</b> as well, for whatever reason.
+  - The automatic switch of the <b>+</b> plus symbol worked well at times, but I found that it also caused issues, for example, typing the apostrophe would be replaced with <b>(plus)</b> as well, for whatever reason; you'll have to do this manually now.
 - 2016.10.07
   - When adding entries, it will be sorted into the database.
   - $basedir is now automatically discovered by the scripts.
