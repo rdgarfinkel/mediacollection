@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
 ### MEDIACOLLECTION SETTINGS
-## $mediacheck - Directory where the EAC/UPC data. In my case, these are located in cgi-bin/eacupc.
+## $media_check_eacupc - Directory where the EAC/UPC data. In my case, these are located in cgi-bin/eacupc.
 $media_check_eacupc="cgi-bin/eacupc";
-## $mediacheck - Directory where the ISBN data. In my case, these are located in cgi-bin/isbn.
+## $media_check_isbn - Directory where the ISBN data. In my case, these are located in cgi-bin/isbn.
 $media_check_isbn="cgi-bin/isbn";
 ## $config_data - Location for the configuration data
 $config_data="cgi-bin/media/media_debug.txt";
@@ -20,7 +20,7 @@ $media_read="cgi-bin/media/media_";
 	$media_videos=$media_read."videos.txt";
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2016.10.20";
+$dateupdated="2016.10.25";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -1369,7 +1369,7 @@ sub media {
 
 			# If $neweacupc exists...
 			if ($neweacupc) {
-				$file_eacupc="$basedir/$mediacheck/eacupc/$neweacupc";
+				$file_eacupc="$basedir/$media_check_eacupc/$neweacupc";
 				# Create an EAC/UPC entry if the file does not exist
 				unless (-e $file_eacupc) {
 					print "$neweacupc EAC/UPC entry added<br>\n";
@@ -1381,7 +1381,7 @@ sub media {
 
 			# If $newisbn exists...
 			if ($newisbn) {
-				$file_isbn="$basedir/$mediacheck/isbn/$newisbn";
+				$file_isbn="$basedir/$media_check_isbn/$newisbn";
 				# Create an ISBN entry if the file does not exist
 				unless (-e $file_isbn) {
 					print "$newisbn ISBN entry added<br>\n";
@@ -1462,27 +1462,27 @@ sub media {
 
 		# If $neweacupc exists...
 		if ($neweacupc) {
-			# We'll set $mediacheck to look for that file in the directory
-			$mediacheck.="/eacupc/$neweacupc";
+			# We'll set $media_check to look for that file in the directory
+			$media_check="$media_check_eacupc/$neweacupc";
 			# We'll set $textcheck to show what EAC/UPC has been entered
 			$textcheck="EAC/UPC code $neweacupc";
 		}
 		# If $newisbn exists...
 		if ($newisbn) {
-			# We'll set $mediacheck to look for that file in the directory
-			$mediacheck.="/isbn/$newisbn";
+			# We'll set $media_check to look for that file in the directory
+			$media_check="$media_check_isbn/$newisbn";
 			# We'll set $textcheck to show what ISBN has been entered
 			$textcheck="ISBN code $newisbn";
 		}
 		print "checking for an existing entry for $textcheck<br>\n";
-		# print "$mediacheck<br>\n";
+		# print "$media_check<br>\n";
 
 		# There's some trickery going on below! ;) $foundentry is established as '1', but there's no $foundentry=0; around
 		# the read file area below?! What gives?!
 		# If the file is not present, the || &error("") part calls the error subroutine, where $foundentry=0; is established.
 		# Unfortunately, variables can't be set within subroutine calls, so that's the workaround.
 		$foundentry=1;
-		open (media,"$basedir/$mediacheck") || &error("did not find an entry for $textcheck<br>forwarding to create an entry<br>");
+		open (media,"$basedir/$media_check") || &error("did not find an entry for $textcheck<br>forwarding to create an entry<br>");
 		@in = <media>;
 		close (media);
 
@@ -1969,7 +1969,7 @@ sub media {
 
 		# If $config_write is equal to "1", then writing is enabled
 		if ($config_write eq "1") {
-			open (WRITEINFO,">$basedir/$mediacheck/$editentry") || &error("error: editentry $edittype $basedir/$mediacheck/$editentry<br>");
+			open (WRITEINFO,">$basedir/$editentry") || &error("error: editentry $edittype /$editentry<br>");
 			print (WRITEINFO $writefile);
 			close (WRITEINFO);
 		}
