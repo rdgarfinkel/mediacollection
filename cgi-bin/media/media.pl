@@ -20,7 +20,7 @@ $media_read="cgi-bin/media/media_";
 	$media_videos=$media_read."videos.txt";
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2016.10.25";
+$dateupdated="2016.10.31";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -64,14 +64,17 @@ sub media {
 	# If $dowhat equals 'eacupcisbn_generate', go to the 'eacupcisbn_generate' subroutine
 	elsif ($dowhat eq "eacupcisbn_generate") {&eacupcisbn_generate;}
 
-	# If $dowhat equals 'eacupcisbn_verify', go to the 'eacupcisbn_verify' subroutine
-	elsif ($dowhat eq "eacupcisbn_verify") {&eacupcisbn_verify;}
+	# If $dowhat equals 'eacupcisbn_compare', go to the 'eacupcisbn_compare' subroutine
+	elsif ($dowhat eq "eacupcisbn_compare") {&eacupcisbn_compare;}
 
 	# If $dowhat equals 'eacupc_edit' or 'isbn_edit', go to the 'edit' subroutine
 	elsif (($dowhat eq "eacupc_edit") || ($dowhat eq "isbn_edit")) {&eacupcisbn_edit;}
 
 	# If $dowhat equals 'eacupcisbn_write', go to the 'eacupcisbn_write' subroutine
 	elsif ($dowhat eq "eacupcisbn_write") {&eacupcisbn_write;}
+
+	# If $dowhat equals 'eacupcisbn_viewall', go to the 'eacupcisbn_viewall' subroutine
+	elsif ($dowhat eq "eacupcisbn_viewall") {&eacupcisbn_viewall;}
 
 	# Since $dowhat doesn't match anything above, generate the database table
 	else {&media_main;}
@@ -1657,7 +1660,7 @@ sub media {
 
 	sub eacupcisbn_generate {
 		if ($continue ne 'Yes') {
-			print "\n   <P>Continuing this action will overwrite the entries for the UPC, EAC, and ISBN codes<br><br>\n";
+			print "\n   <P>Continuing this action will generate a database to compare your entries against the EAC, UPC, and ISBN data.<br><br>\n";
 			print "   Are you sure you want to do this?</P>\n";
 			print "   <input type=submit name=continue value=Yes>\n   <input type=button value=No onClick=\"history.back()\">\n   <input type=hidden name=dotype value=eacupcisbn>\n   <input type=hidden name=dowhat value=eacupcisbn_generate>\n   <input type=hidden name=showline value=\"$showline\">\n";
 
@@ -1800,7 +1803,7 @@ sub media {
 		&footer;
 	}
 
-	sub eacupcisbn_verify {
+	sub eacupcisbn_compare {
 		open (media,"$basedir/$media_eacupcisbndb") || &error("error: media_eacupcisbndb $media_eacupcisbndb. Select <b>Generate Database</b> above to create your database for comparison.");
 		@in = <media>;
 		close (media);
@@ -1843,7 +1846,7 @@ sub media {
 					if ($checkeacupcentry5 eq $entry5) {$entry5class="good";} else {$entry5class="bad";}
 					if ($checkeacupcentry6 eq $entry6) {$entry6class="good";} else {$entry6class="bad";}
 					if ($checkeacupcentry7 eq $entry7) {$entry7class="good";} else {$entry7class="bad";}
-					print "     <tr><td class=$entry1class>$checkeacupcentry1</td><td class=$entry2class>$checkeacupcentry2</td><td class=$entry3class>$checkeacupcentry3</td><td class=$entry4class><a href=\"/$config_eacupcisbnsite?dowhat=eacupc_edit&dotype=eacupcisbn&fromtype=eacupcisbn_verify&entry=$checkeacupcentry4&showline=$line\">$checkeacupcentry4</a></td><td class=$entry5class>$checkeacupcentry5</td><td class=$entry6class>$checkeacupcentry6</td><td class=$entry7class>$checkeacupcentry7</td></tr>\n";
+					print "     <tr><td class=$entry1class>$checkeacupcentry1</td><td class=$entry2class>$checkeacupcentry2</td><td class=$entry3class>$checkeacupcentry3</td><td class=$entry4class><a href=\"/$config_eacupcisbnsite?dowhat=eacupc_edit&dotype=eacupcisbn&fromtype=eacupcisbn_compare&entry=$checkeacupcentry4&showline=$line\">$checkeacupcentry4</a></td><td class=$entry5class>$checkeacupcentry5</td><td class=$entry6class>$checkeacupcentry6</td><td class=$entry7class>$checkeacupcentry7</td></tr>\n";
 				}
 			}
 			if ($entry5) {
@@ -1859,7 +1862,7 @@ sub media {
 					if ($checkisbnentry5 eq $entry5) {$entry5class="good";} else {$entry5class="bad";}
 					if ($checkisbnentry6 eq $entry6) {$entry6class="good";} else {$entry6class="bad";}
 					if ($checkisbnentry7 eq $entry7) {$entry7class="good";} else {$entry7class="bad";}
-					print "     <tr><td class=$entry1class>$checkisbnentry1</td><td class=$entry2class>$checkisbnentry2</td><td class=$entry3class>$checkisbnentry3</td><td class=$entry4class>$checkisbnentry4</td><td class=$entry5class><a href=\"/$config_eacupcisbnsite?dowhat=isbn_edit&dotype=eacupcisbn&fromtype=eacupcisbn_verify&entry=$checkisbnentry5&showline=$line\">$checkisbnentry5</a></td><td class=$entry6class>$checkisbnentry6</td><td class=$entry7class>$checkisbnentry7</td></tr>\n";
+					print "     <tr><td class=$entry1class>$checkisbnentry1</td><td class=$entry2class>$checkisbnentry2</td><td class=$entry3class>$checkisbnentry3</td><td class=$entry4class>$checkisbnentry4</td><td class=$entry5class><a href=\"/$config_eacupcisbnsite?dowhat=isbn_edit&dotype=eacupcisbn&fromtype=eacupcisbn_compare&entry=$checkisbnentry5&showline=$line\">$checkisbnentry5</a></td><td class=$entry6class>$checkisbnentry6</td><td class=$entry7class>$checkisbnentry7</td></tr>\n";
 				}
 			}
 		}
@@ -1919,8 +1922,8 @@ sub media {
 			}
 		}
 		print "     <tr>\n      <td colspan=2 align=right>books: <input type=\"checkbox\" name=\"type_books\" value=\"1\" $books_checked> games: <input type=\"checkbox\" name=\"type_games\" value=\"1\" $games_checked> music: <input type=\"checkbox\" name=\"type_music\" value=\"1\" $music_checked> videos: <input type=\"checkbox\" name=\"type_videos\" value=\"1\" $video_checked></td><td></td></tr>\n";
-		print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$entry2\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n      <td>$check_entry2</td>\n     </tr>\n";
-		if (($entry1 eq "music") || ($entry1 eq "books") || ($multi eq "1")) {print "     <tr>\n      <th align=right>Author:</th>\n      <td><input type=text name=newauthor value=\"$entry3\" onchange=\"this.value=this.value.replace(/['+']/g,'(plus)');\"></td>\n      <td>$check_entry3</td>\n     </tr>\n";}
+		print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$entry2\"></td>\n      <td>$check_entry2</td>\n     </tr>\n";
+		if (($entry1 eq "music") || ($entry1 eq "books") || ($multi eq "1")) {print "     <tr>\n      <th align=right>Author:</th>\n      <td><input type=text name=newauthor value=\"$entry3\"></td>\n      <td>$check_entry3</td>\n     </tr>\n";}
 		print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td>\n       <input type=text name=neweacupc value=\"$entry4\"></td>\n      <td>$check_entry4</td>\n     </tr>\n";
 		if (($entry1 eq "books") || ($multi eq "1")) {print "     <tr>\n      <th align=right>ISBN:</th>\n      <td><input type=text name=newisbn value=\"$entry5\"></td>\n      <td>$check_entry5</td>\n     </tr>\n";}
 		if (($entry1 eq "videos") || ($entry1 eq "books") || ($multi eq "1")) {print "     <tr>\n      <th align=right>Type:</th>\n      <td><input type=text name=newtype value=\"$entry6\"></td>\n      <td>$check_entry6</td>\n     </tr>\n";}
@@ -1991,6 +1994,76 @@ sub media {
 		# Generate the footer
 		&footer;
 	}
+
+	sub eacupcisbn_viewall {
+		# This generates a list of all files within the EAC/UPC folder for checking the database entries.
+		my $eacupc_dir = "$basedir/$media_check_eacupc";
+		#print "eacupc_dir: $eacupc_dir<br>";
+		opendir(eacupc_tmp,"$eacupc_dir/"); 
+		@sub_contents = grep !/\./ && !/^_/, sort readdir(eacupc_tmp);
+		foreach $line(@sub_contents) {
+			#print "$line: ";
+			# Open individual items to put these all within a list.
+			open (item,"$eacupc_dir/$line");
+			@infile = <item>;
+			foreach (@infile) {
+				($entry1,$entry2,$entry3,$entry4,$entry5,$entry6,$entry7) = split(/\|/,$_);
+				push(@unsorted,"$entry1|$entry2|$entry3|$entry4|$entry5|$entry6|$entry7|EACUPC|\n");
+			}
+			close (item);
+		}
+		closedir(eacupc_tmp);
+
+		# This generates a list of all files within the ISBN folder for checking the database entries.
+		my $isbn_dir = "$basedir/$media_check_isbn";
+		#print "isbn_dir: $isbn_dir<br>";
+		opendir(isbn_tmp,"$isbn_dir/"); 
+		@sub_contents = grep !/\./ && !/^_/, sort readdir(isbn_tmp);
+		foreach $line(@sub_contents) {
+			#print "$line: ";
+			# Open individual items to put these all within a list.
+			open (item,"$isbn_dir/$line");
+			@infile = <item>;
+			foreach (@infile) {
+				($entry1,$entry2,$entry3,$entry4,$entry5,$entry6,$entry7) = split(/\|/,$_);
+				push(@unsorted,"$entry1|$entry2|$entry3|$entry4|$entry5|$entry6|$entry7|ISBN|\n");
+			}
+			close (item);
+		}
+		closedir(isbn_tmp);
+
+		#print @unsorted;
+
+		@sorted = sort @unsorted;
+
+		print "\n   <table id=\"mytable\">\n";
+		$rows=0;
+		foreach (@sorted) {
+			($entry1,$entry2,$entry3,$entry4,$entry5,$entry6,$entry7,$type) = split(/\|/,$_);
+			if (($rows eq 0) || ($rows/20 eq int($rows/20))) {
+				print "    <tr><th>MEDIA</th><th>TITLE</th><th>AUTHOR/ARTIST</th><th>EAC/UPC</th><th>ISBN</th><th>MEDIA TYPE</th><th>YEAR</th></tr>\n";
+			}
+			print "    <tr><td>$entry1</td><td>$entry2</td><td>$entry3</td>";
+			if (($type eq "EACUPC") && ($entry4)) {
+				print "<td style=\"background-color: #00cc33\"><a href=\"/$config_eacupcisbnsite?dowhat=eacupc_edit&dotype=eacupcisbn&fromtype=eacupcisbn_viewall&entry=$entry4\">$entry4</a></td>";
+			} else {
+				print "<td>$entry4</td>";
+			}
+			if (($type eq "ISBN") && ($entry5)) {
+				print "<td style=\"background-color: #00cc33\"><a href=\"/$config_eacupcisbnsite?dowhat=isbn_edit&dotype=eacupcisbn&fromtype=eacupcisbn_viewall&entry=$entry5\">$entry5</a></td>";
+			} else {
+				print "<td>$entry5</td>";
+			}
+			print "<td>$entry6</td><td>$entry7</td></tr>\n";
+			$rows++;
+		}
+		print "   </table>";
+
+		#print @sorted;
+
+		# Generate the footer
+		&footer;
+	}
 }
 
 sub header {
@@ -1998,7 +2071,7 @@ sub header {
 	print "$delay\n<html>\n<head>\n <title>EZ Editor: Media Admin</title>\n";
 	print " <LINK HREF=\"/styles/adminstyle.css\" REL=\"stylesheet\" TYPE=\"text/css\" />\n";
 
-	if ($dowhat eq "eacupcisbn_verify") {
+	if ($dowhat eq "eacupcisbn_compare") {
 		print " <style>th {background-color: #4CAF50; color: white;} td.bad {background-color: red; color: white;} td.good {background-color: green; color: white;}</style>\n";
 	}
 
@@ -2047,11 +2120,11 @@ sub header {
 		$headerlinks="<a href=\"/$config_adminsite?dowhat=media_add&dotype=$dotype\">Add $media_text Manually</a> | <a href=\"/$config_adminsite?dowhat=media_barcode&dotype=$dotype&addtype=eacupc\">Add $media_text by Barcode</a> | <a href=\"/$config_adminsite?dowhat=media_isbn&dotype=$dotype&addtype=isbn\">Add $media_text by ISBN</a>";
 	}
 	if ($dotype eq "eacupcisbn") {
-		$headerlinks="<a href=\"/$config_adminsite?dotype=eacupcisbn&dowhat=eacupcisbn_generate\">Generate Database</a> | <a href=\"/$config_adminsite?dotype=eacupcisbn&dowhat=eacupcisbn_verify\">Verify Database Entries</a>";
+		$headerlinks="<a href=\"/$config_adminsite?dotype=eacupcisbn&dowhat=eacupcisbn_generate\">Generate Database</a> | <a href=\"/$config_adminsite?dotype=eacupcisbn&dowhat=eacupcisbn_compare\">Compare Database Entries</a> | <a href=\"/$config_adminsite?dotype=eacupcisbn&dowhat=eacupcisbn_viewall\">View All Entries</a>";
 	}
 	print "     <td align=center class=header width=40%>$headerlinks</td>\n";
 
-	print "     <td align=center class=header width=30%><a href=\"/$config_adminsite?dotype=books\">books</a> | <a href=\"/$config_adminsite?dotype=games\">games</a> | <a href=\"/$config_adminsite?dotype=music\">music</a> | <a href=\"/$config_adminsite?dotype=videos\">videos</a><br><a href=\"/$config_adminsite?dotype=config&dowhat=config_view&fromtype=$dotype\">config</a> | <a href=\"/$config_eacupcisbnsite?dotype=eacupcisbn&dowhat=eacupcisbn_verify\">EAC/UPC/ISBN database</a></td>\n";
+	print "     <td align=center class=header width=30%><a href=\"/$config_adminsite?dotype=books\">books</a> | <a href=\"/$config_adminsite?dotype=games\">games</a> | <a href=\"/$config_adminsite?dotype=music\">music</a> | <a href=\"/$config_adminsite?dotype=videos\">videos</a><br><a href=\"/$config_adminsite?dotype=config&dowhat=config_view&fromtype=$dotype\">config</a> | <a href=\"/$config_eacupcisbnsite?dotype=eacupcisbn&dowhat=eacupcisbn_compare\">EAC/UPC/ISBN database</a></td>\n";
 	print "    </tr>\n   </table>\n  </td>\n </tr>\n\n <tr>\n <form method=post action=\"/$config_adminsite\" name=\"myform\">\n  <td align=center>";
 }
 
@@ -2270,7 +2343,7 @@ sub getqueries {
 		if ($dowhat eq "") {$dowhat="config_view";}
 		$columns=4;
 	} elsif ($dotype eq "eacupcisbn") {
-		if ($dowhat eq "") {$dowhat="eacupcisbn_verify";}
+		if ($dowhat eq "") {$dowhat="eacupcisbn_compare";}
 		$columns=7;
 	} else {
 		&header;
