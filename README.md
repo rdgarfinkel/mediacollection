@@ -39,46 +39,49 @@ The public server I use for the demonstration (as well as my other sites there) 
 - Hosted website with these scripts put online, with member signup abilities.
 
 # change log
+- 2016.10.31
+  - Administration: With this update, the entire EAC/UPC and ISBN directory is displayed for review in the EAC/UPC/ISBN database link, and you can also edit entries from within the web interface.
+  - Non-administrative: When accessing the index.cgi site thru Firefox, I noticed that the scrollbars weren't available in the pop-up window. This is now fixed.
 - 2016.10.25
-  - 2016.10.20 update had some variable naming adjustments that I missed, now fixed with this update.
+  - Administration: 2016.10.20 update had some variable naming adjustments that I missed, now fixed with this update.
 - 2016.10.20
-  - There's now a EAC/UPC/ISBN entry verification/editing option, it compares each media type's database of entries with EAC/UPC/ISBN values against their EAC/UPC/ISBN entries; individual cells are highlighted cells green if they match, or red if they don't match. It's not necessarily a bad thing if they don't match, of course. It's limited only to what is in your database, it doesn't open each EAC/UPC/ISBN entry within each directory, at least, not yet.
-  - Made naming adjustments to the variables, subroutines and links, ie 'debug' is now 'config'.
-  - Media edits now 'POST' data to the script, so edits are generally unlimited in length.
-  - The header of the admin pages is now two lines in height, so I spread out the links a bit.
-  - The automatic switch of the <b>+</b> plus symbol worked well at times, but I found that it also caused issues, for example, typing the apostrophe would be replaced with <b>(plus)</b> as well, for whatever reason; you'll have to do this manually now.
+  - Administration: There's now a EAC/UPC/ISBN entry comparison/editing option, in which the media type's database of entries is compared with their EAC/UPC/ISBN entries, when available. Individual cells are highlighted cells green if they match, or red if they don't match. It's not necessarily a bad thing if they don't match, of course. It's limited only to what is in your database, it doesn't open each EAC/UPC/ISBN entry within each directory.
+  - Administration: Made naming adjustments to the variables, subroutines and links, ie 'debug' is now 'config'.
+  - Administration: Media edits now 'POST' data to the script, so edits are generally unlimited in length.
+  - Administration: The header of the admin pages is now two lines in height, so I spread out the links a bit.
+  - Administration: The automatic switch of the <b>+</b> plus symbol worked well at times, but I found that it also caused issues. For example, typing the apostrophe would be replaced with <b>(plus)</b> as well, for whatever reason; you'll have to do this manually now.
 - 2016.10.07
-  - When adding entries, it will be sorted into the database.
-  - $basedir is now automatically discovered by the scripts.
-  - (amp) can now be used so that the ampersand symbol appears in the user facing tables.
-  - Some code cleanup and optimizing.
+  - Administration: When adding entries, it will be sorted into the database.
+  - Administration: $basedir is now automatically discovered by the scripts.
+  - Administration: (amp) can now be used so that the ampersand symbol appears in the user facing tables.
+  - Administration: Some code cleanup and optimizing.
 - 2016.10.05
-  - Added ability for new/editing titles to have the ability to swap the <b>+</b> plus symbol for <b>(plus)</b> automatically upon entry by the user.
-  - EAC/UPC barcodes are strictly numbers. If anything else is entered, it is stripped server-side.
-  - ISBN barcodes are strictly numbers and the upper/lowercase letter 'X'. If anything else is entered, it is stripped server-side, and 'x' will be capitalized.
+  - ~~Administration: Added ability for new/editing titles to have the ability to swap the <b>+</b> plus symbol for <b>(plus)</b> automatically upon entry by the user.~~
+  - Administration: EAC/UPC barcodes are strictly numbers. If anything else is entered, it is stripped server-side.
+  - Administration: ISBN barcodes are strictly numbers and the upper/lowercase letter 'X'. If anything else is entered, it is stripped server-side, and 'x' will be capitalized.
 - 2016.10.01
-  - When items have specific symbols, they don't always make it through to the text title, for example, Ed Sheeran's album, "+", because the script interprets the plus symbol as a space. In this case, you can't use the plus symbol directly in the title, and it can't be automatically swapped, at least server side- I'd like to find a way to swap these prior to submitting using JavaScript client side. Currently, the only workaround is to use <b>(plus)</b> instead.
-  - The <b>#</b> pound symbol is another case, and it seems this is because Perl interprets it as a comment within the script, and it breaks the editing ability. The <b>#</b> pound symbol will be automatically swapped for <b>(pound)</b> server side.
-  - Found an error in the code on the admin side where the month was lost on date updated entry, now fixed.
-  - Table display on non-admin side is now centered, and also contains the github mention footer.
+  - Administration: When items have specific symbols, they don't always make it through to the text title, for example, Ed Sheeran's album, "+", because the script interprets the plus symbol as a space. In this case, you can't use the plus symbol directly in the title, and it can't be automatically swapped, at least server side- I'd like to find a way to swap these prior to submitting using JavaScript client side. Currently, the only workaround is to use <b>(plus)</b> instead.
+  - Administration: The <b>#</b> pound symbol is another case, and it seems this is because Perl interprets it as a comment within the script, and it breaks the editing ability. The <b>#</b> pound symbol will be automatically swapped for <b>(pound)</b> server side.
+  - Administration: Found an error in the code on the admin side where the month was lost on date updated entry, now fixed.
+  - Non-administrative: Table display on non-admin side is now centered, and also contains the github mention footer.
 - 2016.09.19
-  - Up until now, when EAC/UPC/ISBN codes were found, the entry was overwritten upon each edit. Now entries are only created and not updated/overwritten.
-  - Added a year input option to videos on the administration side, and also added the display of the year on the non-administrative side. I now have two movies that were named the same, and editing one would edit the other. This is now fixed, as long as one or both of the movies have a year attached to it.
+  - Administration: Up until now, when EAC/UPC/ISBN codes were found, the entry was overwritten upon each edit. Now entries are only created and not updated/overwritten.
+  - Administration: Added a year input option to videos on the administration side, and also added the display of the year on the non-administrative side. I now have two movies that were named the same, and editing one would edit the other. This is now fixed, as long as one or both of the movies have a year attached to it.
 - 2016.09.16
-  - Some code cleanup/rearranging.
-  - Added the ability to sort the table columns in the administration pages.
-  - In the 'debug' menu, there's now an option for sorting titles with "The" at the beginning, and this effects both the non-administration and administration side. Using *The Sandlot* as an example, when 'sort by' is on, the title will appear as, *Sandlot, The*. Otherwise, it will appear as *The Sandlot*. For adding/changing *The Sandlot*, you can enter *Sandlot, The* or *The Sandlot*, and it will be entered into the database as *Sandlot, The* server side.
-  - Added descriptions for the functions of each option in the 'debug' menu.
-  - If I add more options on the 'debug' menu, I may switch the name to be 'options' instead.
-  - While testing the sorting in the administration side, the media collection totals would sometimes also be included in the sort. To prevent this from happening now, those totals now appear separate of the sortable table.
-  - When you first visited the non-administration page, there would be no 'dotype' variable passed to the administration page, if you clicked on the admin link. This would result in the administration page displaying only the text, "missing 'dotype'." This is now fixed, and shows the headers as well.
+  - Administration: Some code cleanup/rearranging.
+  - Administration: Added the ability to sort the table columns in the administration pages.
+  - Administration: In the 'config' menu, there's now an option for sorting titles with "The" at the beginning, and this effects both the non-administration and administration side. Using *The Sandlot* as an example, when 'sort by' is on, the title will appear as, *Sandlot, The*. Otherwise, it will appear as *The Sandlot*. For adding/changing *The Sandlot*, you can enter *Sandlot, The* or *The Sandlot*, it will be entered into the database as *Sandlot, The* regardless.
+  - Administration: Added descriptions for the functions of each option in the 'config' menu.
+  - ~~Administration: If I add more options on the 'debug' menu, I may switch the name to be 'options' instead.~~
+  - Administration: While testing the sorting in the administration side, the media collection totals would sometimes also be included in the sort. To prevent this from happening now, those totals now appear separate of the sortable table.
+  - Non-administrative: When you first visited the non-administration page, there would be no 'dotype' variable passed to the administration page, if you clicked on the admin link. This would result in the administration page displaying only the text, "missing 'dotype'." This is now fixed, and shows the headers as well.
 - 2016.09.09
-  - Added the ability to add items based on ISBN codes or EAC/UPC barcodes! I haven't found a "universal" barcode service that can provide DVD/BluRay/CD/Movie/TV/Books barcodes, so I built one into the script. At the center of the top of the administration pages, there's now the option to add items based on ISBN and EAC/UPC barcodes. The only text input available there are either the ISBN or EAC/UPC barcode textbox. If the code is not found, you'll be directed to add it manually. Upon submitting the manual entry, the entry is created within the 'upc' or 'eacupc' folders that contains the items' EAC/UPC code, ISBN code, title, artist(s)/author(s), database type, and physical media type. I've started these folders with my collections of ISBN/UPC/EAC codes, hopefully more people can contribute theirs as well.
-  - When adding entries, the first text box in the editing screen receives focus so you can start typing right away, rather than clicking first then typing.
+  - Administration: Added the ability to add items based on ISBN codes or EAC/UPC barcodes! I haven't found a "universal" barcode service that can provide DVD/BluRay/CD/Movie/TV/Books barcodes, so I built one into the script. At the center of the top of the administration pages, there's now the option to add items based on ISBN and EAC/UPC barcodes. The only text input available there are either the ISBN or EAC/UPC barcode textbox. If the code is not found, you'll be directed to add it manually. Upon submitting the manual entry, the entry is created within the 'upc' or 'eacupc' folders that contains the items' EAC/UPC code, ISBN code, title, artist(s)/author(s), database type, and physical media type. I've started these folders with my collections of ISBN/UPC/EAC codes, hopefully more people can contribute theirs as well.
+  - Administration: When adding entries, the first text box in the editing screen receives focus so you can start typing right away, rather than clicking first then typing.
 - 2016.09.08
-  - In the video section, BluRay and DVD columns are now combined into one, which will allow for adding more media types in the future, if needed (ie. VHS, LaserDisc, HD-DVD, etc. if it is requested). There is a "transfer" script that is in the cgi-bin/media folder that will combine the BluRay and DVD entries into one entry, run it only once.
+  - Administration: Prior to this update, in the video section, BluRay and DVD were separate columns. Going forward, these are now combined into one, which will allow for adding more media types in the future, if needed (ie. VHS, LaserDisc, HD-DVD, etc. if there are requests for these). There is a "transfer" script that is in the cgi-bin/media folder that will combine the BluRay and DVD entries into one entry, run it *<b>only</b>* once.
 - 2016.09.07
-  - Forced width of title column on non-admin and admin pages
-  - Changed color of row highlight to a darker color
-  - Put UPC/ISBN closer to the left side, where appropriate on the different media types. some were on the left, others on the right
-  - Turned off "fixed header" on the non-admin page; sometimes the header stayed fixed, other times not, and would sometimes not be scaled with the columns below
+  - Administration/Non-administrative: Forced width of title column on non-admin and admin pages
+  - Administration: Changed color of row highlight to a darker color
+  - Administration: Put UPC/ISBN closer to the left side, where appropriate on the different media types. some were on the left, others on the right
+  - Non-administrative: Turned off "fixed header" on the non-admin page; sometimes the header stayed fixed, other times not, and would sometimes not be scaled with the columns below
