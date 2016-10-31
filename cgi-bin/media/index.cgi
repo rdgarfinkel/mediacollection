@@ -18,7 +18,7 @@ $thispage="index.cgi";
 $empty="0";
 
 #  headers for the non-admin pages
-$dateupdated="2016.10.07";
+$dateupdated="2016.10.31";
 
 #  Open and process the "debug" file. On this page, the article sort is the only variable that matters.
 open (debug,"$basedir/$debugitem") || &error("error: mediaitem $debugitem");
@@ -39,7 +39,7 @@ print " <script type=\"text/javascript\" src=\"/javascripts/gs_sortable.js\"></s
 #print " <script type=\"text/javascript\" src=\"/javascripts/jquery.freezeheader.js\"></script>\n";
 print " <script type=\"text/javascript\">\n  <!--\n";
 print "   function SizedPop(dir,page,type,width,height) {\n    window.open('/cgi-bin/' + dir + '/' + page + '?dotype=' + type, dir, \n";
-print "    'toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=no,resizable=no,width=' + width + ',height=' + height);\n";
+print "    'toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=yes,resizable=no,width=' + width + ',height=' + height);\n";
 print "   }\n   self.name = \"main\";\n";
 
 #  Get the query from the URI address
