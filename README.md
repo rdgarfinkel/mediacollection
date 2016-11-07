@@ -1,5 +1,5 @@
 # mediacollection
-Simple data display/management for physical and digital music, video (movies/tv), books, and games collections
+Simple data (no images to load) display and management for physical and digital music, video (movies/tv), books, and games collections
 
 # first things first
 If you will be using this on a public server, put the /cgi-bin/media/media.pl file within a separate directory that is password protected so that only you can add/amend/delete your database entries.<br>
@@ -11,13 +11,16 @@ Please note that the "modification" date in the shown/hidden HTML on the demonst
 
 # requirements
 For this script to run, you'll need to have a web server and it needs to be capable of running Perl scripts. It can be a public server or just a local server.<br>
-I use Aprelium's Abyss Web Server for local server scripting/testing, free and available for Windows/Mac/Linux; http://aprelium.com/. Perl installation instructions are here: http://aprelium.com/abyssws/perl.html.<br>
+I use Aprelium's Abyss Web Server for local server scripting/testing, free and available for Windows/Mac/Linux; http://aprelium.com/. Perl installation instructions can be found here: http://aprelium.com/abyssws/perl.html.<br>
 The public server I use for the demonstration (as well as my other sites there) is also free; http://heliohost.org. Highly suggest signing up with the Stevie server if you go with this option, the Johnny server isn't quite as good in terms of reliability. Stevie has daily signup limits, and the clock resets at midnight UTC (http://www.timeanddate.com/worldclock/timezone/utc). You do need to remember to login to your account once a month to keep your account active–I can say comfortably that your account and all files will be recovered if you do forget.
 
+# optional
+I highly recommend an external barcode scanner, since it will help tremendously when initially entering your items into the database; it will act as a keyboard input when adding thru either the EAC/UPC/ISBN entry, or as a manual entry. Personally,  I use a <b>:CueCat</b> that has been modified to have a USB connector, rather than a PS/2 connector; the :CueCat can be found thru ebay.com for less than $10 USD.
+
 # what is included
-- /javascripts/gs_sortable.js, http://www.allmyscripts.com/Table_Sort/index.html: allows for the dynamic sorting of table headers (only accessible when page has not been scrolled down)<br>
-- /javascripts/jquery-1.5.1.min.js, http://jquery.com/, http://sizzlejs.com/: disabled, required for use of freezeheader below<br>
-- /javascripts/jquery.freezeheader.js, http://brentmuir.com/projects/freezeheader: disabled because it's unreliable in operation. freezes table header at the top of the screen when scrolling down
+- /javascripts/gs_sortable.js, http://www.allmyscripts.com/Table_Sort/index.html: allows for the dynamic sorting of table headers (only accessible when the page has not been scrolled down)<br>
+- ~~/javascripts/jquery-1.5.1.min.js, http://jquery.com/, http://sizzlejs.com/: disabled, required for use of freezeheader below~~<br>
+- ~~/javascripts/jquery.freezeheader.js, http://brentmuir.com/projects/freezeheader: disabled because it's unreliable in operation. freezes table header at the top of the screen when scrolling down~~
 
 # items of note
 - When using the <b>&</b> ampersand symbol in text fields, the editing feature didn't work. It seems that the 'query string' parsing splits this like it is a separate entry. Text replacement will occur server side, swapping the <b>&</b> symbol for <b>(amp)</b> text.
