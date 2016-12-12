@@ -25,7 +25,7 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 # items of note
 - When using the <b>&</b> ampersand symbol in text fields, the editing feature didn't work. It seems that the 'query string' parsing splits this like it is a separate entry. Text replacement will occur server side, swapping the <b>&</b> symbol for <b>(amp)</b> text.
 - When using the <b>"</b> double quotation symbol in text fields, the editing feature didn't work. When clicking an entry to edit, the browser would interpret the quotations as the end of an <b>A HREF</b> HTML tag. Text replacement will occur server side, swapping the <b>"</b> double quotation mark for <b>''</b> two single quotation symbols for storing the entries, and <b>''</b> two single quotation symbols will be swapped for the <b>"</b> double quotation mark for display in the user facing tables.
-- When using the <b>#</b> pound symbol in text fields, the editing feature didn't work. I think what happens is the script thinks that the entry is supposed to be hidden, like it is a comment in Perl. When a pound sign is needed in titles, use <b>(pound)</b>, and it will be entered into the database that way, and <b>(pound)</b> will be swapped for <b>#</b> pound symbol in the user facing tables.
+- When using the <b>#</b> pound symbol in text fields, the editing feature didn't work. I think what happens is the script thinks that the entry is supposed to be hidden, like it is a comment in Perl. When a pound sign is needed in titles, use <b>(pound)</b>. This will be entered into the database, and <b>(pound)</b> will be swapped for <b>#</b> pound symbol in the user facing tables.
 - When using the <b>+</b> plus symbol, the editing feature works, but not as expected. The plus symbol is the indicator that forms use for spaces, and would be interpreted as such. When the <b>+</b> plus symbol is to be used within a text field, use <b>(plus)</b>. This will be entered into the database, and <b>(plus)</b> will be swapped for <b>+</b> plus symbol in the user facing tables.
 - When movies are redone and the titles are the same, you'll get unwanted results when trying to edit one of the two entries. For example, the 1967 movie, *The Jungle Book* and the 2016 movie, *The Jungle Book*. When both exist in the database, both entries would be edited when editing one of the entries. To work around this, there is now a year input box within the media editor for videos, and entries are now compared by title and year, when the year has a value.
 - The columns currently within each media section are the media types that I have. As an example, I don't have a Sony Playstation 1, 3, or 4 system/games, so those columns don't exist yet in the games section. If you need these or other options, file an issue here on Github, and I'll add whatever you need, or if anyone wants to contribute, that's okay too.
@@ -35,16 +35,17 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 - Work on the wiki for this project.
 - EAC/UPC/ISBN approval script to verify that public entries are at a good quality.
 - Ability to hide/show columns, ie if there are media types that you don't personally have/use. This will require a slight revamp of code, but will make additions of media types easier in the future. Currently column numbers are adjusted manually by myself, so when a column is added, I have to manually increment a variable number by one. The method I've come up with will essentially automate that. This will not require adjustments to the database files, either.
-- Researching other options for having a fixed header upon scrolling. The one that was in place is not 100% reliable.<br>
+- Researching other options for having a fixed header upon scrolling. The one that was in place is not 100% reliable.
+- Ability to add date media was purchased; by default, it'll use the current date, but the date can be changed.
+- Hosted website with these scripts put online, with member signup abilities- researching how to do member logins now.
 
 # things to add way down the road<br>
 - TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
-- Hosted website with these scripts put online, with member signup abilities.
 
 # change log
 - 2016.10.31
   - Administration: With this update, the entire EAC/UPC and ISBN directory is displayed for review in the EAC/UPC/ISBN database link, and you can also edit entries from within the web interface.
-  - Non-administrative: When accessing the index.cgi site thru Firefox, I noticed that the scrollbars weren't available in the pop-up window. This is now fixed.
+  - Non-administrative: When accessing the index.cgi site thru Firefox, I noticed that the scrollbars weren't available in the pop-up administration window. This is now fixed.
 - 2016.10.25
   - Administration: 2016.10.20 update had some variable naming adjustments that I missed, now fixed with this update.
 - 2016.10.20
