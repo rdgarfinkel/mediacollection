@@ -38,6 +38,7 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 - Researching other options for having a fixed header upon scrolling. The one that was in place is not 100% reliable.
 - Ability to add date media was purchased; by default, it'll use the current date, but the date can be changed.
 - Hosted website with these scripts put online, with member signup abilities- researching how to do member logins now.
+- With games having additional downloadable content, I'll be adding an option for this specifically just for games. I'm not sure how I'll implement it yet.
 
 # things to add way down the road<br>
 - TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
