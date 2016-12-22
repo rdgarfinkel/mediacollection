@@ -7,7 +7,7 @@ Aside from editing the "#!/usr/bin/perl" line at the top of each script, things 
 
 # demonstration
 ~~A demonstration of the script and it's abilities is online and available, with editing abilities enabled. No password is required for the admin side. Test it out as you wish, http://rgarfinkel.heliohost.org/cgi-bin/mediademo/index.cgi.<br>
-Please note that the "modification" date in the shown/hidden HTML on the demonstration sites may be newer than the one present here on Github. I do the coding offline on a local server, post it to the public site to verify it still works on there, then I'll post it here.~~
+Please note that the "modification" date in the shown/hidden HTML on the demonstration sites may be newer than the one present here on Github. I do the coding offline on a local server, post it to the public site to verify it still works on there, then I'll post it here.~~<br>
 The server I use for hosting my public sites for free on heliohost is undergoing maintenance for an undetermined time, so a public demonstration site is not online as of this writing, December 22, 2016.
 
 # requirements
