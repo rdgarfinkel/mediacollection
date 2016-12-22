@@ -6,13 +6,14 @@ If you will be using this on a public server, put the /cgi-bin/media/media.pl fi
 Aside from editing the "#!/usr/bin/perl" line at the top of each script, things *should* work "directly out of the box." 
 
 # demonstration
-A demonstration of the script and it's abilities is online and available, with editing abilities enabled. No password is required for the admin side. Test it out as you wish, http://rgarfinkel.heliohost.org/cgi-bin/mediademo/index.cgi.<br>
-Please note that the "modification" date in the shown/hidden HTML on the demonstration sites may be newer than the one present here on Github. I do the coding offline on a local server, post it to the public site to verify it still works on there, then I'll post it here.
+~~A demonstration of the script and it's abilities is online and available, with editing abilities enabled. No password is required for the admin side. Test it out as you wish, http://rgarfinkel.heliohost.org/cgi-bin/mediademo/index.cgi.<br>
+Please note that the "modification" date in the shown/hidden HTML on the demonstration sites may be newer than the one present here on Github. I do the coding offline on a local server, post it to the public site to verify it still works on there, then I'll post it here.~~
+The server I use for hosting my public sites for free on heliohost is undergoing maintenance for an undetermined time, so a public demonstration site is not online as of this writing, December 22, 2016.
 
 # requirements
 For this script to run, you'll need to have a web server and it needs to be capable of running Perl scripts. It can be a public server or just a local server.<br>
 I use Aprelium's Abyss Web Server for local server scripting/testing, free and available for Windows/Mac/Linux; http://aprelium.com/. Perl installation instructions can be found here: http://aprelium.com/abyssws/perl.html.<br>
-The public server I use for the demonstration (as well as my other sites there) is also free; http://heliohost.org. Highly suggest signing up with the Stevie server if you go with this option, the Johnny server isn't quite as good in terms of reliability. Stevie has daily signup limits, and the clock resets at midnight UTC (http://www.timeanddate.com/worldclock/timezone/utc). You do need to remember to login to your account once a month to keep your account active–I can say comfortably that your account and all files will be recovered if you do forget.
+The public server I use for the demonstration (as well as my other sites there) is also free; http://heliohost.org. Highly suggest signing up with the Stevie server if you go with this option, the Johnny server isn't quite as good in terms of reliability. Stevie and Johnny servers have daily signup limits, and the clock resets at midnight UTC (http://www.timeanddate.com/worldclock/timezone/utc). You do need to remember to login to your account once a month to keep your account active–I can say comfortably that your account and all files will be recovered if you do forget.
 
 # optional
 I highly recommend an external barcode scanner, since it will help tremendously when initially entering your items into the database; it will act as a keyboard input when adding thru either the EAC/UPC/ISBN entry, or as a manual entry. Personally,  I use a <b>:CueCat</b> that has been modified to have a USB connector, rather than a PS/2 connector; the :CueCat can be found thru ebay.com for less than $10 USD.
