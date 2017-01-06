@@ -37,14 +37,16 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 - EAC/UPC/ISBN approval script to verify that public entries are at a good quality.
 - Ability to hide/show columns, ie if there are media types that you don't personally have/use. This will require a slight revamp of code, but will make additions of media types easier in the future. Currently column numbers are adjusted manually by myself, so when a column is added, I have to manually increment a variable number by one. The method I've come up with will essentially automate that. This will not require adjustments to the database files, either.
 - Researching other options for having a fixed header upon scrolling. The one that was in place is not 100% reliable.
-- Ability to add date media was purchased; by default, it'll use the current date, but the date can be changed.
 - Hosted website with these scripts put online, with member signup abilities- researching how to do member logins now.
-- With games having additional downloadable content, I'll be adding an option for this specifically just for games. I'm not sure how I'll implement it yet.
+- With games having additional downloadable content, I'll be adding an option for this specifically just for games, where ideally the entries will show up underneath the game the content is connected to. I'm not sure how I'll implement it yet.
+- Currently, the only place the dates show up is in the media editing screens, a "most recent purchase" may be implemented in the future.
 
 # things to add way down the road<br>
 - TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
 
 # change log
+- 2017.01.05
+  - Administration: Ability to add the date that media was purchased; by default, it'll use the current date, but the date can be changed to be any date. Currently, the only place the dates show up is in the media editing screens, a "most recent purchase" may be implemented in the future.
 - 2016.10.31
   - Administration: With this update, the entire EAC/UPC and ISBN directory is displayed for review in the EAC/UPC/ISBN database link, and you can also edit entries from within the web interface.
   - Non-administrative: When accessing the index.cgi site thru Firefox, I noticed that the scrollbars weren't available in the pop-up administration window. This is now fixed.
