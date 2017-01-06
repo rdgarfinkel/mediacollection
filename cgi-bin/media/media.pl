@@ -20,7 +20,7 @@ $media_read="cgi-bin/media/media_";
 	$media_videos=$media_read."videos.txt";
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2016.10.31";
+$dateupdated="2017.01.05";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -113,7 +113,7 @@ sub media {
 				$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
 
 				# Split each variable by the | character
-				($title,$author,$eacupc,$isbn,$type) = split(/\|/,$line);
+				($title,$author,$eacupc,$isbn,$type,$purchasedate) = split(/\|/,$line);
 
 				# If $title doesn't equal "#DATE#"
 				if ($title ne "#DATE#") {
@@ -191,7 +191,7 @@ sub media {
 				$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
 
 				# Split each variable by the | character
-				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc) = split(/\|/,$line);
+				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc,$purchasedate) = split(/\|/,$line);
 
 				# If $title doesn't equal "#DATE#"
 				if ($title ne "#DATE#") {
@@ -288,7 +288,7 @@ sub media {
 			$count_uvvu=0;
 
 			# Generate table headers
-			print "    <thead>\n     <th>#</th>\n     <th>Title (Year)</th>\n     <th>EAC/UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Physical<br>Media</th>\n     <th>Amazon</th>\n     <th>Disney<br>Anywhere</th>\n     <th>Google<br>Play</th>\n     <th>iTunes</th>\n     <th>Microsoft</th>\n     <th>UVVU</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n";
+			print "    <thead>\n     <th>#</th>\n     <th>Title (Year)</th>\n     <th>EAC/UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Physical<br>Media</th>\n     <th>Amazon<br>Video</th>\n     <th>Disney<br>Anywhere</th>\n     <th>Google<br>Play</th>\n     <th>iTunes</th>\n     <th>Microsoft</th>\n     <th>UVVU</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n";
 
 			# Beginning of table body
 			print "    <tbody>\n";
@@ -300,7 +300,7 @@ sub media {
 				$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
 
 				# Split each variable by the | character
-				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year) = split(/\|/,$line);
+				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year,$purchasedate) = split(/\|/,$line);
 
 				# If $title doesn't equal "#DATE#"
 				if ($title ne "#DATE#") {
@@ -413,7 +413,7 @@ sub media {
 				$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
 
 				# Split each variable by the | character
-				($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$line);
+				($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody,$purchasedate) = split(/\|/,$line);
 
 				# If $title doesn't equal "#DATE#"
 				if ($artist ne "#DATE#") {
@@ -527,7 +527,7 @@ sub media {
 			# $dowhat doesn't equal "media_add", so the user has to be editing an already existing entry
 			else {
 				# Split each entry of $showline by the character '|'
-				($title,$author,$eacupc,$isbn,$type)=split(/\|/,$showline);
+				($title,$author,$eacupc,$isbn,$type,$purchasedate)=split(/\|/,$showline);
 			}
 
 			# Generate the necessary text input fields for adding/editing entries
@@ -535,6 +535,8 @@ sub media {
 			print "     <tr>\n      <th align=right>Author:</th>\n      <td><input type=text name=newauthor value=\"$author\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td>\n       <input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>ISBN:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
+			if ($purchasedate) {$todaysdate=$purchasedate;}
+			print "     <tr>\n      <th align=right>Date:</th>\n      <td><input type=date id=newpurchasedate name=newpurchasedate value=\"$todaysdate\"/></td>\n     </tr>\n";
 
 			# Generate the dropdown menu for book type.
 			print "     <tr>\n      <th align=right>Type:</th>\n      <td>\n";
@@ -570,11 +572,13 @@ sub media {
 				$title=$newtitle;
 				$eacupc=$neweacupc;
 			} else {
-				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc)=split(/\|/,$showline);
+				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc,$purchasedate)=split(/\|/,$showline);
 			}
 
 			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td>\n       <input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
+			if ($purchasedate) {$todaysdate=$purchasedate;}
+			print "     <tr>\n      <th align=right>Date:</th>\n      <td><input type=date id=newpurchasedate name=newpurchasedate value=\"$todaysdate\"/></td>\n     </tr>\n";
 
 			print "     <tr>\n      <th align=right>Epic:</th>\n      <td>\n";
 			print "       <select name=newepic>\n";
@@ -746,13 +750,15 @@ sub media {
 				$isbn=$newisbn;
 				$type=$newtype;
 			} else {
-				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year)=split(/\|/,$showline);
+				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year,$purchasedate)=split(/\|/,$showline);
 			}
 
 			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>Year:</th>\n      <td><input type=text name=newyear value=\"$year\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td><input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>ISBN:</th>\n      <td><input type=text name=newisbn value=\"$isbn\"></td>\n     </tr>\n";
+			if ($purchasedate) {$todaysdate=$purchasedate;}
+			print "     <tr>\n      <th align=right>Date:</th>\n      <td><input type=date id=\"newpurchasedate\" name=newpurchasedate value=\"$todaysdate\"/></td>\n     </tr>\n";
 
 			print "     <tr>\n      <th align=right>Type:</th>\n      <td>\n";
 			print "       <select name=newtype>\n";
@@ -890,12 +896,14 @@ sub media {
 				$eacupc=$neweacupc;
 				$isbn=$newisbn;
 			} else {
-				($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody)=split(/\|/,$showline);
+				($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody,$purchasedate)=split(/\|/,$showline);
 			}
 
 			print "     <tr>\n      <th align=right width=30%>Artist:</th>\n      <td><input type=text name=newartist value=\"$artist\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
 			print "     <tr>\n      <th align=right>EAC/UPC:</th>\n      <td><input type=text name=neweacupc value=\"$eacupc\"></td>\n     </tr>\n";
+			if ($purchasedate) {$todaysdate=$purchasedate;}
+			print "     <tr>\n      <th align=right>Date:</th>\n      <td><input type=date id=newpurchasedate name=newpurchasedate value=\"$todaysdate\"/></td>\n     </tr>\n";
 
 			print "     <tr>\n      <th align=right>CD:</th>\n      <td>\n";
 			print "       <select name=newcd>\n";
@@ -1091,7 +1099,7 @@ sub media {
 		# For 'books', 'games', and 'music', the database was setup ideally with the first two entries in the line being the identifiers
 		# for the entries. The year variable was added late in the game for 'movies', so have to work around it using this.
 		if ($dotype eq "videos") {
-			($thisentry1,$null,$null,$null,$null,$null,$null,$null,$null,$null,$null,$thisentry2)=split(/\|/,$showline);
+			($thisentry1,$null,$null,$null,$null,$null,$null,$null,$null,$null,$null,$thisentry2,$null)=split(/\|/,$showline);
 		} else {
 			($thisentry1,$thisentry2) = split(/\|/,$showline);
 		}
@@ -1128,7 +1136,7 @@ sub media {
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
-				($intitle,$inauthor,$ineacupc,$inisbn,$intype) = split(/\|/,$line);
+				($intitle,$inauthor,$ineacupc,$inisbn,$intype,$inpurchasedate) = split(/\|/,$line);
 				if ($intitle eq "#DATE#") {
 					# skip
 				}
@@ -1137,37 +1145,37 @@ sub media {
 					# this essentially acts as a skip also
 					print "$thisauthor, $thistitle removed<br><br>\n";
 				} else {
-					$writenew.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|\n";
-					$preview.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|<br>\n";
+					$writenew.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|\n";
+					$preview.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|<br>\n";
 				}
 			}
 		} elsif ($dotype eq 'games'){
-			($thistitle,$thisepic,$thissteam,$thisbattlenet,$thisorigin,$thisuplay,$thisnes,$thiswii,$thisps2,$thisxboxone,$thisxbox360,$thiseacupc)=split(/\|/,$showline);
+			($thistitle,$thisepic,$thissteam,$thisbattlenet,$thisorigin,$thisuplay,$thisnes,$thiswii,$thisps2,$thisxboxone,$thisxbox360,$thiseacupc,$thispurchasedate)=split(/\|/,$showline);
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
 
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
-				($intitle,$inepic,$insteam,$inbattlenet,$inorigin,$inuplay,$innes,$inwii,$inps2,$inxboxone,$inxbox360,$ineacupc) = split(/\|/,$line);
+				($intitle,$inepic,$insteam,$inbattlenet,$inorigin,$inuplay,$innes,$inwii,$inps2,$inxboxone,$inxbox360,$ineacupc,$inpurchasedate) = split(/\|/,$line);
 				if ($intitle eq "#DATE#") {
 					# Skip
 				} elsif ($intitle eq $thistitle) {
 					print "$thistitle removed<br><br>\n";
 				} else {
-					$writenew.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|\n";
-					$preview.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|<br>\n";
+					$writenew.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|\n";
+					$preview.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|<br>\n";
 				}
 			}
 		} elsif ($dotype eq 'videos'){
-			($thistitle,$thistype,$thismedia,$thisamazon,$thisdisneyanywhere,$thisgoogleplay,$thisitunes,$thisuvvu,$thiseacupc,$thisisbn,$thismicrosoft,$thisyear)=split(/\|/,$showline);
+			($thistitle,$thistype,$thismedia,$thisamazon,$thisdisneyanywhere,$thisgoogleplay,$thisitunes,$thisuvvu,$thiseacupc,$thisisbn,$thismicrosoft,$thisyear,$thispurchasedate)=split(/\|/,$showline);
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|<br>\n";
 
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
-				($intitle,$intype,$inmedia,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn,$inmicrosoft,$inyear) = split(/\|/,$line);
+				($intitle,$intype,$inmedia,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn,$inmicrosoft,$inyear,$inpurchasedate) = split(/\|/,$line);
 				if ($intitle eq "#DATE#") {
 					# Skip
 				} elsif (($intitle eq $thistitle) && ($inyear eq $thisyear)) {
@@ -1176,26 +1184,26 @@ sub media {
 					}
 					print "$thistitle removed<br><br>\n";
 				} else {
-					$writenew.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|\n";
-					$preview.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|<br>\n";
+					$writenew.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n";
+					$preview.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|<br>\n";
 				}
 			}
 		} elsif ($dotype eq 'music'){
-			($thisartist,$thistitle,$thiseacupc,$thiscd,$thisamazon,$thisdjbooth,$thisgoogleplay,$thisgroove,$thisitunes,$thisreverbnation,$thistopspin,$thisrhapsody)=split(/\|/,$showline);
+			($thisartist,$thistitle,$thiseacupc,$thiscd,$thisamazon,$thisdjbooth,$thisgoogleplay,$thisgroove,$thisitunes,$thisreverbnation,$thistopspin,$thisrhapsody,$thispurchasedate)=split(/\|/,$showline);
 			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
 			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
 
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
-				($inartist,$intitle,$ineacupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody) = split(/\|/,$line);
+				($inartist,$intitle,$ineacupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody,$inpurchasedate) = split(/\|/,$line);
 				if ($inartist eq "#DATE#") {
 					# Skip
 				} elsif (($intitle eq $thistitle) && ($inartist eq $thisartist)) {
 					print "$thisartist, $thistitle removed<br><br>\n";
 				} else {
-					$writenew.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n";
-					$preview.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|<br>\n";
+					$writenew.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|\n";
+					$preview.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|<br>\n";
 				}
 			}
 		}
@@ -1243,14 +1251,14 @@ sub media {
 			push(@unsorted_updateddb,"#DATE#|$today|#|#|#|\n");
 			push(@unsorted_previewdb,"#DATE#|$today|#|#|#|\n");
 			# $update_entry is the new entry that can be written to the database, $previewentry creates the new entry for the preview.
-			$update_entry="$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|\n";
+			$update_entry="$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|$newpurchasedate|\n";
 			$previewentry=$update_entry;
 			# $mediawrite is the new EAC/UPC/ISBN entry that can be written to the database.
 			$mediawrite="$dotype|$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
-				($intitle,$inauthor,$ineacupc,$inisbn,$intype) = split(/\|/,$line);
+				($intitle,$inauthor,$ineacupc,$inisbn,$intype,$inpurchasedate) = split(/\|/,$line);
 				if (substr($intitle,0,4) eq "The ") {
 					$intitle=substr($intitle,4,length($intitle)).", The";
 				}
@@ -1262,20 +1270,20 @@ sub media {
 					$changed=1;
 					print "$newauthor, $newtitle updated<br><br>\n";
 				} else {
-					push(@unsorted_updateddb,"$intitle|$inauthor|$ineacupc|$inisbn|$intype|\n");
-					push(@unsorted_previewdb,"$intitle|$inauthor|$ineacupc|$inisbn|$intype|\n");
+					push(@unsorted_updateddb,"$intitle|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|\n");
+					push(@unsorted_previewdb,"$intitle|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|\n");
 				}
 			}
 		} elsif ($dotype eq 'games'){
 			push(@unsorted_updateddb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n");
 			push(@unsorted_previewdb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n");
-			$update_entry="$newtitle|$newepic|$newsteam|$newbattlenet|$neworigin|$newuplay|$newnes|$newwii|$newps2|$newxboxone|$newxbox360|$neweacupc|\n";
+			$update_entry="$newtitle|$newepic|$newsteam|$newbattlenet|$neworigin|$newuplay|$newnes|$newwii|$newps2|$newxboxone|$newxbox360|$neweacupc|$newpurchasedate|\n";
 			$previewentry=$update_entry;
 			$mediawrite="$dotype|$newtitle||$neweacupc|$newisbn||";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
-				($intitle,$inepic,$insteam,$inbattlenet,$inorigin,$inuplay,$innes,$inwii,$inps2,$inxboxone,$inxbox360,$ineacupc) = split(/\|/,$line);
+				($intitle,$inepic,$insteam,$inbattlenet,$inorigin,$inuplay,$innes,$inwii,$inps2,$inxboxone,$inxbox360,$ineacupc,$inpurchasedate) = split(/\|/,$line);
 				if (substr($intitle,0,4) eq "The ") {
 					$intitle=substr($intitle,4,length($intitle)).", The";
 				}
@@ -1287,20 +1295,20 @@ sub media {
 					$changed=1;
 					print "$newtitle updated<br><br>\n";
 				} else {
-					push(@unsorted_updateddb,"$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|\n");
-					push(@unsorted_previewdb,"$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|\n");
+					push(@unsorted_updateddb,"$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|\n");
+					push(@unsorted_previewdb,"$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|\n");
 				}
 			}
 		} elsif ($dotype eq 'videos'){
 			push(@unsorted_updateddb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|\n");
 			push(@unsorted_previewdb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|\n");
-			$update_entry="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|$newmicrosoft|$newyear|\n";
+			$update_entry="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|$newmicrosoft|$newyear|$newpurchasedate|\n";
 			$previewentry=$update_entry;
 			$mediawrite="$dotype|$newtitle||$neweacupc|$newisbn|$newtype|$newyear|";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
-				($intitle,$intype,$inmedia,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn,$inmicrosoft,$inyear) = split(/\|/,$line);
+				($intitle,$intype,$inmedia,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn,$inmicrosoft,$inyear,$inpurchasedate) = split(/\|/,$line);
 				if (substr($intitle,0,4) eq "The ") {
 					$intitle=substr($intitle,4,length($intitle)).", The";
 				}
@@ -1315,20 +1323,20 @@ sub media {
 					}
 					print "$newtitle updated<br><br>\n";
 				} else {
-					push(@unsorted_updateddb,"$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|\n");
-					push(@unsorted_previewdb,"$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|\n");
+					push(@unsorted_updateddb,"$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
+					push(@unsorted_previewdb,"$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
 				}
 			}
 		} elsif ($dotype eq 'music'){
 			push(@unsorted_updateddb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n");
 			push(@unsorted_previewdb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n");
-			$update_entry="$newartist|$newtitle|$neweacupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|\n";
+			$update_entry="$newartist|$newtitle|$neweacupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|$newpurchasedate|\n";
 			$previewentry=$update_entry;
 			$mediawrite="$dotype|$newtitle|$newartist|$neweacupc|$newisbn|$newtype|";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
-				($inartist,$intitle,$ineacupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody) = split(/\|/,$line);
+				($inartist,$intitle,$ineacupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody,$inpurchasedate) = split(/\|/,$line);
 				if (substr($intitle,0,4) eq "The ") {
 					$intitle=substr($intitle,4,length($intitle)).", The";
 				}
@@ -1340,8 +1348,8 @@ sub media {
 					$changed=1;
 					print "$newartist, $newtitle updated<br><br>\n";
 				} else {
-					push(@unsorted_updateddb,"$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n");
-					push(@unsorted_previewdb,"$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|\n");
+					push(@unsorted_updateddb,"$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|\n");
+					push(@unsorted_previewdb,"$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|\n");
 				}
 			}
 		}
@@ -1677,7 +1685,7 @@ sub media {
 		$mediacodesdb="";
 
 		foreach $line(@in) {
-			($title,$author,$eacupc,$isbn,$type) = split(/\|/,$line);
+			($title,$author,$eacupc,$isbn,$type,$purchasedate) = split(/\|/,$line);
 			$mediawrite_books="books|$title|$author|$eacupc|$isbn|$type||";
 			if ($title ne "#DATE#") {
 				if ($isbn ne "") {
@@ -1709,7 +1717,7 @@ sub media {
 		close (media);
 
 		foreach $line(@in) {
-			($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc) = split(/\|/,$line);
+			($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc,$purchasedate) = split(/\|/,$line);
 			$mediawrite_games="games|$title||$eacupc||||";
 			if ($title ne "#DATE#") {
 				if ($eacupc ne "") {
@@ -1732,7 +1740,7 @@ sub media {
 		close (media);
 
 		foreach $line(@in) {
-			($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$line);
+			($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody,$purchasedate) = split(/\|/,$line);
 			$mediawrite_music="music|$title|$artist|$eacupc||||";
 			if ($artist ne "#DATE#") {
 				if ($eacupc ne "") {
@@ -1755,7 +1763,7 @@ sub media {
 		close (media);
 
 		foreach $line(@in) {
-			($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year) = split(/\|/,$line);
+			($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year,$purchasedate) = split(/\|/,$line);
 			$mediawrite_videos="videos|$title||$eacupc|$isbn|$type|$year|";
 			if ($title ne "#DATE#") {
 				if ($isbn ne "") {
@@ -2090,6 +2098,26 @@ sub header {
 		print " </script>\n";
 	}
 
+	if ($dowhat eq "media_edit") {
+		print " <script type=\"text/javascript\">\n";
+		print "  var datefield=document.createElement(\"input\")\n";
+		print "  datefield.setAttribute(\"type\", \"date\")\n";
+		print "  if (datefield.type!=\"date\"){ //if browser doesn't support input type=\"date\", load files for jQuery UI Date Picker\n";
+		print "    document.write('<link href=\"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css\" rel=\"stylesheet\" type=\"text/css\"/>')\n";
+		print "    document.write('<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js\"><\script>')\n";
+		print "    document.write('<script src=\"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js\"><\script>')\n";
+		print "  }\n";
+		print " </script>\n";
+
+		print " <script>\n";
+		print "  if (datefield.type!=\"date\"){ //if browser doesn't support input type=\"date\", initialize date picker widget:\n";
+		print "   jQuery(function(\$){ //on document.ready\n";
+		print "    \$('#newpurchasedate').datepicker();\n";
+		print "   })\n";
+		print "  }\n";
+		print " </script>\n";
+	}
+
 	print "</head>\n<body topmargin=0 bottommargin=0 leftmargin=0 rightmargin=0";
 	if (($dowhat eq "media_barcode") || ($dowhat eq "media_isbn") || ($dowhat eq "media_edit") || ($dowhat eq "media_add")) {
 		print " OnLoad=\"document.myform.";
@@ -2172,6 +2200,7 @@ sub getqueries {
 	if(length($sec) eq '1') {$sec="0$sec";}
 	$currentyear=$currentyear+1900;
 	$today="$currentyear.$mnth.$day";
+	$todaysdate="$currentyear-$mnth-$day";
 
 	## Enable or disable update functions
 	open (config,"$basedir/$config_data") || &config_view("incomplete or missing configuration file, $config_data. please configure these scripts using the form below<br>");
@@ -2266,6 +2295,7 @@ sub getqueries {
 	$oldgoogleplay=$FORM{'oldgoogleplay'};
 	$newitunes=$FORM{'newitunes'};
 	$olditunes=$FORM{'olditunes'};
+	$newpurchasedate=$FORM{'newpurchasedate'};
 	## Variable sets for books
 	$newauthor=$FORM{'newauthor'};
 	$oldauthor=$FORM{'oldauthor'};
