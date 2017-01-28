@@ -16,9 +16,11 @@ $debugitem="cgi-bin/$directory/media_debug.txt";
 $thispage="index.cgi";
 #  $empty gets the value of 0 here, and will be tested a little later on to be sure that there is a media type.
 $empty="0";
+#  $userAgent gets the platform being used by the browser
+$userAgent=$ENV{"HTTP_USER_AGENT"};
 
 #  headers for the non-admin pages
-$dateupdated="2016.10.31";
+$dateupdated="2017.01.28";
 
 #  Open and process the "debug" file. On this page, the article sort is the only variable that matters.
 open (debug,"$basedir/$debugitem") || &error("error: mediaitem $debugitem");
@@ -93,6 +95,10 @@ print "  #mytable tr:hover {background-color: #ccc;}\n\n";
 print "  #mytable th {\n    padding-top: 12px;\n    padding-bottom: 12px;\n    background-color: #4CAF50;\n    color: white;\n  }\n";
 print " </style>\n";
 
+if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
+	print " <META NAME=\"VIEWPORT\" CONTENT=\"WIDTH=DEVICE-WIDTH\"/>\n";
+}
+
 print "</HEAD>\n";
 print "<BODY BGCOLOR=#ffffff>\n";
 
@@ -105,6 +111,7 @@ if ($empty != "1") {
 	#print "<!--@in-->";
 
 	$table= "<div align=center>\n<table cellspacing=10 cellpadding=10 id=\"mytable\" class=\"data-table\">\n";
+	$mobiletable="<div align=center>\n<table cellspacing=10 cellpadding=10 id=\"mytable\" class=\"data-table\">\n";
 	$table.= " <colgroup>\n";
 	$table.= "  <col style=\"background-color: #ddd\">\n";
   
@@ -118,8 +125,11 @@ if ($empty != "1") {
 	if ($pagetitle eq "game") {
 		##Video Games#|#Epic#|#Steam#|#Battle.net#|#Origin#|#uplay#|#NES#|#Wii#|#PS2#|#Xbox One#|#Xbox 360#|#UPC#|||||||||||
 		$table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>UPC</th>\n   <th>Battle.net</th>\n   <th>Epic</th>\n   <th>NES</th>\n   <th>Origin</th>\n   <th>PS2</th>\n   <th>Steam</th>\n   <th>Uplay</th>\n   <th>XBox 360</th>\n   <th>XBox One</th>\n   <th>Wii</th>\n  </tr>\n </thead>\n";
+		$mobiletable.= " <thead>\n  <tr>\n   <th>Title</th>\n  </tr>\n </thead>\n";
 
 		$table.= " <tbody>\n";
+		$mobiletable.= " <tbody>\n";
+
 		foreach (@in) {
 			($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$upc) = split(/\|/,$_);
 			$titledisplay=$title;
@@ -133,18 +143,34 @@ if ($empty != "1") {
 			$titledisplay =~ s/\(plus\)/+/g;
 			$titledisplay =~ s/\(pound\)/#/g;
 			$titledisplay =~ s/\(amp\)/\&/g;
+			$titleinformation="";
+			if ($battlenet eq "X") {$titleinformation.="Battle.net<br>";}
+			if ($epic eq "X") {$titleinformation.="Epic<br>";}
+			if ($nes eq "X") {$titleinformation.="Nintendo Entertainment System<br>";}
+			if ($origin eq "X") {$titleinformation.="Origin<br>";}
+			if ($ps2 eq "X") {$titleinformation.="Sony PlayStation 2<br>";}
+			if ($steam eq "X") {$titleinformation.="Steam<br>";}
+			if ($uplay eq "X") {$titleinformation.="uPlay<br>";}
+			if ($wii eq "X") {$titleinformation.="Nintendo Wii<br>";}
+			if ($xbox360 eq "X, DL") {$titleinformation.="XBox360 Download<br>";} elsif ($xbox360 eq "X, DK") {$titleinformation.="XBox360 Disk<br>";}
+			if ($xboxone eq "X, DL") {$titleinformation.="XBoxOne Download";}  elsif ($xboxone eq "X, DK") {$titleinformation.="XBoxOne Disk";} elsif ($xboxone eq "X, BC") {$titleinformation.="XBoxOne Backwards Compatibility";}
 			if ($title eq "#DATE#") {
 				$dataupdated=$epic;
 			} else {
 				$table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td><td>$upc</td><td>$battlenet</td><td>$epic</td><td>$nes</td><td>$origin</td><td>$ps2</td><td>$steam</td><td>$uplay</td><td>$xbox360</td><td>$xboxone</td><td>$wii</td>\n  </tr>\n";
+				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
 			}
 		}
 		$table.= " </tbody>\n";
+		$mobiletable.= " </tbody>\n";
 	} elsif ($pagetitle eq "video") {
 		##Movie#|#Movie/TV#|#Media#|#Amazon#|#Disney Anywhere#|#Google Play#|#iTunes#|#UVVU#|#UPC#|#ISBN#|#Microsoft#|
 		$table.= " <thead>\n  <tr>\n   <th>Title (Year)</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Movie/TV</th>\n   <th>Physical<br>Media</th>\n   <th>Amazon</th>\n   <th>Disney<br>Anywhere</th>\n   <th>Google<br>Play</th>\n   <th>iTunes</th>\n   <th>Microsoft</th>\n<th>UVVU</th>\n  </tr>\n </thead>\n";
+		$mobiletable.= " <thead>\n  <tr>\n   <th>Title</th>\n  </tr>\n </thead>\n";
 
 		$table.= " <tbody>\n";
+		$mobiletable.= " <tbody>\n";
+
 		foreach (@in) {
 			($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn,$microsoft,$year) = split(/\|/,$_);
 			$mediadisplay="";
@@ -154,6 +180,8 @@ if ($empty != "1") {
 				$mediadisplay="DVD";
 			} elsif ($media eq "diskcombo") {
 				$mediadisplay="BluRay/DVD";
+			} else {
+				$mediadisplay="Streaming";
 			}
 			$titledisplay=$title;
 			if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
@@ -166,21 +194,33 @@ if ($empty != "1") {
 			$titledisplay =~ s/\(plus\)/+/g;
 			$titledisplay =~ s/\(pound\)/#/g;
 			$titledisplay =~ s/\(amp\)/\&/g;
+			$titleinformation="$mediadisplay, $type<br>";
+			if ($amazon eq "X") {$titleinformation.="Amazon Video<br>";}
+			if ($itunes eq "X") {$titleinformation.="Apple iTunes<br>";}
+			if ($disneyanywhere eq "X") {$titleinformation.="Disney Anywhere<br>";}
+			if ($googleplay eq "X") {$titleinformation.="Google Play Video<br>";}
+			if ($microsoft eq "X") {$titleinformation.="Microsoft Movies & TV<br>";}
+			if ($uvvu eq "X") {$titleinformation.="UltraViolet<br>";}
 			if ($year) {
 				$titledisplay.=" ($year)";
 			}
 			if ($title eq "#DATE#") {
 				$dataupdated=$type;
 			} else {
-				$table.= "  <tr class=\"grid\">\n   <td class=\"title\"><div>$titledisplay</div></td><td>$upc</td><td>$isbn</td><td>$type</td><td>$mediadisplay</td><td>$amazon</td><td>$disneyanywhere</td><td>$googleplay</td><td>$itunes</td><td>$microsoft</td><td>$uvvu</td>\n  </tr>\n";
+				$table.= "  <tr class=\"grid\">\n   <td class=\"title\"><div><b>$titledisplay</b></div></td><td>$upc</td><td>$isbn</td><td>$type</td><td>$mediadisplay</td><td>$amazon</td><td>$disneyanywhere</td><td>$googleplay</td><td>$itunes</td><td>$microsoft</td><td>$uvvu</td>\n  </tr>\n";
+				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
 			}
 		}
 		$table.= " </tbody>\n";
+		$mobiletable.= " </tbody>\n";
 	}  elsif ($pagetitle eq "book") {
 		##Books#|#Authors#|#UPC#|#ISBN#|#Type#|
 		$table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>Authors</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Type</th>\n  </tr>\n </thead>\n";
+		$mobiletable.= " <thead>\n  <tr>\n   <th>Title</th>\n  </tr>\n </thead>\n";
 
 		$table.= " <tbody>\n";
+		$mobiletable.= " <tbody>\n";
+
 		foreach (@in) {
 			($title,$author,$upc,$isbn,$type) = split(/\|/,$_);
 			$titledisplay=$title;
@@ -199,18 +239,27 @@ if ($empty != "1") {
 			$authordisplay =~ s/\(plus\)/+/g;
 			$authordisplay =~ s/\(pound\)/#/g;
 			$authordisplay =~ s/\(amp\)/\&/g;
+			if (($author) && $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {$titledisplay.=" &ndash; ";}
+
+			$titleinformation="";
+			if ($type eq "book") {$titleinformation.="Book<br>";} else {$titleinformation.="eBook<br>";}
 			if ($title eq "#DATE#") {
 				$dataupdated=$author;
 			} else {
 				$table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td><td><div>$authordisplay</div></td><td>$upc</td><td>$isbn</td><td>$type</td>\n  </tr>\n";
+				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay $authordisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
 			}
 		}
 		$table.= " </tbody>\n";
+		$mobiletable.= " </tbody>\n";
 	}  elsif ($pagetitle eq "music") {
 		##Artist#|#Title#|#UPC#|#CD#|#Amazon#|#DJBooth#|#Google#|#Groove#|#iTunes#|#ReverbNation#|#TopSpin#|#Rhapsody#|
 		$table.= " <thead>\n  <tr>\n   <th>Artist &ndash; Album</th>\n   <th>UPC</th>\n   <th>CD</th>\n   <th>Amazon</th>\n   <th>DJ Booth</th>\n   <th>Google Play</th>\n   <th>Groove</th>\n   <th>iTunes</th>\n   <th>ReverbNation</th>\n   <th>Rhapsody</th>\n   <th>TopSpin</th>\n  </tr>\n </thead>\n";
+		$mobiletable.= " <thead>\n  <tr>\n   <th>Title</th>\n  </tr>\n </thead>\n";
 
 		$table.= " <tbody>\n";
+		$mobiletable.= " <tbody>\n";
+
 		foreach (@in) {
 			($artist,$title,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$_);
 			$titledisplay=$title;
@@ -229,22 +278,44 @@ if ($empty != "1") {
 			$artistdisplay =~ s/\(plus\)/+/g;
 			$artistdisplay =~ s/\(pound\)/#/g;
 			$artistdisplay =~ s/\(amp\)/\&/g;
+			$titleinformation="";
+			if ($amazon eq "X") {$titleinformation.="Amazon MP3<br>";}
+			if ($cd eq "X") {$titleinformation="Compact Disc<br>";}
+			if ($itunes eq "X") {$titleinformation.="Apple iTunes<br>";}
+			if ($djbooth eq "X") {$titleinformation.="DJ Booth<br>";}
+			if ($googleplay eq "X") {$titleinformation.="Google Play Music<br>";}
+			if ($groove eq "X") {$titleinformation.="Microsoft Groove<br>";}
+			if ($reverbnation eq "X") {$titleinformation.="ReverbNation<br>";}
+			if ($rhapsody eq "X") {$titleinformation.="Rhapsody<br>";}
+			if ($topspin eq "X") {$titleinformation.="TopSpin<br>";}
 			if ($artist eq "#DATE#") {
 				$dataupdated=$title;
 			} else {
 				$table.= "  <tr class=\"grid\">\n   <td><div>$artistdisplay &ndash; $titledisplay</div></td><td>$upc</td><td>$cd</td><td>$amazon</td><td>$djbooth</td><td>$googleplay</td><td>$groove</td><td>$itunes</td><td>$reverbnation</td><td>$rhapsody</td><td>$topspin</td>\n  </tr>\n";
+				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$artistdisplay &ndash; $titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
 			}
 		}
 		$table.= " </tbody>\n";
+		$mobiletable.= " </tbody>\n";
 	}
 	$table.= "</table>\n</div>\n";
+	$mobiletable.= "</table>\n</div>\n";
 }
 
 print "<div align=center>";
 if ($empty != "1") {
- print "data updated: $dataupdated | ";
+	print "data updated: $dataupdated";
+	if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
+		print "<br>";
+	} else {
+		print " | ";
+	}
 }
-print "<a href=\"javascript:SizedPop('$admindirectory','media.pl','$query',1325,625);\">admin</a> | ";
+if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
+	#skip
+} else {
+	print "<a href=\"javascript:SizedPop('$admindirectory','media.pl','$query',1325,625);\">admin</a> | ";
+}
 print "<a href=\"$thispage?books\">books</a> | ";
 print "<a href=\"$thispage?games\">games</a> | ";
 print "<a href=\"$thispage?music\">music</a> | ";
@@ -253,7 +324,11 @@ print "</div>\n";
 
 print "<br>\n";
 
-print $table;
+if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
+	print $mobiletable;
+} else {
+	print $table;
+}
 
 print "<br>\n<div align=center>";
 print "<i>this script, <b>mediacollection</b>, is part of an open source Perl script available on <a href=\"https://github.com/rdgarfinkel/mediacollection\" target=\"_GitHub\">Github</a></i>";
@@ -261,4 +336,3 @@ print "</div>\n";
 
 print "</body>\n";
 print "</html>";
-exit;
