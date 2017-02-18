@@ -35,18 +35,24 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 - Make code comments on files and processes for helping others' understand what is doing what. (media.pl is close to finished, index.cgi will be next)
 - Work on the wiki for this project.
 - EAC/UPC/ISBN approval script to verify that public entries are at a good quality.
-- Ability to hide/show columns, ie if there are media types that you don't personally have/use. This will require a slight revamp of code, but will make additions of media types easier in the future. Currently column numbers are adjusted manually by myself, so when a column is added, I have to manually increment a variable number by one. The method I've come up with will essentially automate that. This will not require adjustments to the database files, either.
 - Researching other options for having a fixed header upon scrolling. The one that was in place is not 100% reliable.
 - Hosted website with these scripts put online, with member signup abilities- researching how to do member logins now.
 - With games having additional downloadable content, I'll be adding an option for this specifically just for games, where ideally the entries will show up underneath the game the content is connected to. I'm not sure how I'll implement it yet.
-- Currently, the only place the dates show up is in the media editing screens, a "most recent purchase" may be implemented in the future.
+- Ability to hide/show columns, ie if there are media types that you don't personally have/use. This will require a slight revamp of code, but will make additions of media types easier in the future. Currently column numbers are adjusted manually by myself, so when a column is added, I have to manually increment a variable number by one. The method I've come up with will essentially automate that. (50% finished!)
 
 # things to add way down the road<br>
 - TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
 
 # change log
+- 2017.??.??
+  - Non-administrative: In cgi-bin/media/, there is now a "testing_index.cgi" file.
+    - With this, the automated column count of table headers is now present, and full columns can now be hidden/shown. I still have to go thru editing the administrative side for changing the ability to show/hide columns, so this is not ready for full integration into the set of scripts, but available if desired to show the progress.
+    - I did have to change the first line a bit, as I didn't realize that having the date in the second entry would cause issues for the column show/hide ability. So, rather than "#DATE#|2017.02.18|", this will now be "#DATE#,2017.02.18|".
+    - To show/hide columns, currently you have to manually edit the first line of the database files to be "#DATE#,2017.02.18|" followed the addition of "show|" to display columns or "hide|" to hide columns. This will be integrated into the administrative side soon.
+    - There is now a "Purchased Date" column integrated into the database views for each media type. It can be hidden or shown.
 - 2017.01.05
   - Administration: Ability to add the date that media was purchased; by default, it'll use the current date, but the date can be changed to be any date. Currently, the only place the dates show up is in the media editing screens, a "most recent purchase" may be implemented in the future.
+  - Non-administrative: When browsing the collection pages from a mobile device, it's only a one column view with physical/digital media listed underneath the titles/authors/artists, rather than the full table.
 - 2016.10.31
   - Administration: With this update, the entire EAC/UPC and ISBN directory is displayed for review in the EAC/UPC/ISBN database link, and you can also edit entries from within the web interface.
   - Non-administrative: When accessing the index.cgi site thru Firefox, I noticed that the scrollbars weren't available in the pop-up administration window. This is now fixed.
