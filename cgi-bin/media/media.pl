@@ -20,7 +20,7 @@ $media_read="cgi-bin/media/media_";
 	$media_videos=$media_read."videos.txt";
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2017.01.05";
+$dateupdated="2017.03.09";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -60,6 +60,15 @@ sub media {
 
 	# If $dowhat equals 'config_write', go to the 'config_write' subroutine
 	elsif ($dowhat eq "config_write") {&config_write;}
+
+	# If $dowhat equals 'config_columns_view', go to the 'config_columns_view' subroutine
+	elsif ($dowhat eq "config_columns_view") {&config_columns_view;}
+
+	# If $dowhat equals 'config_columns_edit', go to the 'config_columns_edit' subroutine
+	elsif ($dowhat eq "config_columns_edit") {&config_columns_edit;}
+
+	# If $dowhat equals 'config_columns_write', go to the 'config_columns_write' subroutine
+	elsif ($dowhat eq "config_columns_write") {&config_columns_write;}
 
 	# If $dowhat equals 'eacupcisbn_generate', go to the 'eacupcisbn_generate' subroutine
 	elsif ($dowhat eq "eacupcisbn_generate") {&eacupcisbn_generate;}
@@ -101,7 +110,7 @@ sub media {
 			$count_book=0;
 
 			# Generate table headers
-			print "    <thead>\n     <th>#</th>\n     <th>Title</th>\n     <th>Author(s)</th>\n     <th>EAC/UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n";
+			print "    <thead>\n     <th>#</th>\n     <th>Title</th>\n     <th>Author(s)</th>\n     <th>EAC/UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Purchase<br>Date</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n";
 
 			# Beginning of table body
 			print "    <tbody>\n";
@@ -116,7 +125,7 @@ sub media {
 				($title,$author,$eacupc,$isbn,$type,$purchasedate) = split(/\|/,$line);
 
 				# If $title doesn't equal "#DATE#"
-				if ($title ne "#DATE#") {
+				if (substr($title,0,6) ne "#DATE#") {
 					# Increment counters by 1
 					$count_title=$count_title+1;
 					if ($type eq "ebook") {
@@ -147,11 +156,11 @@ sub media {
 					}
 
 					# Now display the whole line of information
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$titledisplay</a></div></td>\n     <td><div>$authordisplay</div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$titledisplay</a></div></td>\n     <td><div>$authordisplay</div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td>$purchasedate</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
 				}
 				# $title was equal to "#DATE#", so we'll set $update with the date the database was last updated
 				else {
-					$update=$author;
+					$update=substr($title,(length($title)-10),10);
 				}
 			}
 
@@ -179,7 +188,7 @@ sub media {
 			$count_xbox360dl=0;
 
 			# Generate table headers
-			print "    <thead>\n     <th>#</th>\n     <th>Title</th>\n     <th>EAC/UPC</th>\n     <th>Battle.net</th>\n     <th>Epic</th>\n     <th>NES</th>\n     <th>Origin</th>\n     <th>PS2</th>\n     <th>Steam</th>\n     <th>Uplay</th>\n     <th>XBox 360</th>\n     <th>XBox One</th>\n     <th>Wii</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n";
+			print "    <thead>\n     <th>#</th>\n     <th>Title</th>\n     <th>EAC/UPC</th>\n     <th>Battle.net</th>\n     <th>Epic</th>\n     <th>NES</th>\n     <th>Origin</th>\n     <th>PS2</th>\n     <th>Steam</th>\n     <th>Uplay</th>\n     <th>XBox 360</th>\n     <th>XBox One</th>\n     <th>Wii</th>\n    <th>Purchase<br>Date</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n";
 
 			# Beginning of table body
 			print "    <tbody>\n";
@@ -194,7 +203,7 @@ sub media {
 				($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc,$purchasedate) = split(/\|/,$line);
 
 				# If $title doesn't equal "#DATE#"
-				if ($title ne "#DATE#") {
+				if (substr($title,0,6) ne "#DATE#") {
 					# Increment counters by 1
 					$count_title=$count_title+1;
 					if ($epic eq "X") {
@@ -259,11 +268,11 @@ sub media {
 					}
 
 					# Now display the whole line of information
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$battlenet</td>\n     <td>$epic</td>\n     <td>$nes</td>\n     <td>$origin</td>\n     <td>$ps2</td>\n     <td>$steam</td>\n     <td>$uplay</td>\n     <td>$xbox360</td>\n     <td>$xboxone</td>\n     <td>$wii</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$battlenet</td>\n     <td>$epic</td>\n     <td>$nes</td>\n     <td>$origin</td>\n     <td>$ps2</td>\n     <td>$steam</td>\n     <td>$uplay</td>\n     <td>$xbox360</td>\n     <td>$xboxone</td>\n     <td>$wii</td>\n     <td>$purchasedate</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
 				}
 				# $title was equal to "#DATE#", so we'll set $update with the date the database was last updated
 				else {
-					$update=$epic;
+					$update=substr($title,(length($title)-10),10);
 				}
 			}
 
@@ -288,7 +297,7 @@ sub media {
 			$count_uvvu=0;
 
 			# Generate table headers
-			print "    <thead>\n     <th>#</th>\n     <th>Title (Year)</th>\n     <th>EAC/UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Physical<br>Media</th>\n     <th>Amazon<br>Video</th>\n     <th>Disney<br>Anywhere</th>\n     <th>Google<br>Play</th>\n     <th>iTunes</th>\n     <th>Microsoft</th>\n     <th>UVVU</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n";
+			print "    <thead>\n     <th>#</th>\n     <th>Title (Year)</th>\n     <th>EAC/UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Physical<br>Media</th>\n     <th>Amazon<br>Video</th>\n     <th>Disney<br>Anywhere</th>\n     <th>Google<br>Play</th>\n     <th>iTunes</th>\n     <th>Microsoft</th>\n     <th>UVVU</th>\n    <th>Purchase<br>Date</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n";
 
 			# Beginning of table body
 			print "    <tbody>\n";
@@ -303,7 +312,7 @@ sub media {
 				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year,$purchasedate) = split(/\|/,$line);
 
 				# If $title doesn't equal "#DATE#"
-				if ($title ne "#DATE#") {
+				if (substr($title,0,6) ne "#DATE#") {
 					# $mediadisplay is set to empty text here because once it was set, it would keep that text and because it would
 					# keep displaying it on the table until another media entry changed it, which threw off the media type count
 					$mediadisplay="";
@@ -373,11 +382,11 @@ sub media {
 						$titledisplay.=" ($year)";
 					}
 					# Now display the whole line of information
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td>$mediadisplay</td>\n     <td>$amazon</td>\n     <td>$disneyanywhere</td>\n     <td>$googleplay</td>\n     <td>$itunes</td>\n     <td>$microsoft</td>\n     <td>$uvvu</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td>$mediadisplay</td>\n     <td>$amazon</td>\n     <td>$disneyanywhere</td>\n     <td>$googleplay</td>\n     <td>$itunes</td>\n     <td>$microsoft</td>\n     <td>$uvvu</td>\n     <td>$purchasedate</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
 				}
 				# $title was equal to "#DATE#", so we'll set $update with the date the database was last updated
 				else {
-					$update=$type;
+					$update=substr($title,(length($title)-10),10);
 				}
 			}
 
@@ -401,7 +410,7 @@ sub media {
 			$count_rhapsody=0;
 
 			# Generate table headers
-			print "    <thead>\n     <th>#</th>\n     <th>Artist &ndash; Title</th>\n     <th>EAC/UPC</th>\n     <th>CD</th>\n     <th>Amazon</th>\n     <th>DJ Booth</th>\n     <th>Google<br>Play</th>\n     <th>Groove</th>\n     <th>iTunes</th>\n     <th>ReverbNation</th>\n     <th>Rhapsody</th>\n     <th>TopSpin</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n";
+			print "    <thead>\n     <th>#</th>\n     <th>Artist &ndash; Title</th>\n     <th>EAC/UPC</th>\n     <th>CD</th>\n     <th>Amazon</th>\n     <th>DJ Booth</th>\n     <th>Google<br>Play</th>\n     <th>Groove</th>\n     <th>iTunes</th>\n     <th>ReverbNation</th>\n     <th>Rhapsody</th>\n     <th>TopSpin</th>\n    <th>Purchase<br>Date</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n";
 
 			# Beginning of table body
 			print "    <tbody>\n";
@@ -416,7 +425,7 @@ sub media {
 				($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody,$purchasedate) = split(/\|/,$line);
 
 				# If $title doesn't equal "#DATE#"
-				if ($artist ne "#DATE#") {
+				if (substr($artist,0,6) ne "#DATE#") {
 					# Increment counters by 1
 					$count_title=$count_title+1;
 					if ($cd eq "X") {
@@ -469,11 +478,11 @@ sub media {
 					}
 
 					# Now display the whole line of information
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$artistdisplay &ndash; $titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$cd</td>\n     <td>$amazon</td>\n     <td>$djbooth</td>\n     <td>$googleplay</td>\n     <td>$groove</td>\n     <td>$itunes</td>\n     <td>$reverbnation</td>\n     <td>$rhapsody</td>\n     <td>$topspin</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$artistdisplay &ndash; $titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$cd</td>\n     <td>$amazon</td>\n     <td>$djbooth</td>\n     <td>$googleplay</td>\n     <td>$groove</td>\n     <td>$itunes</td>\n     <td>$reverbnation</td>\n     <td>$rhapsody</td>\n     <td>$topspin</td>\n     <td>$purchasedate</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
 				}
-				# $title was equal to "#DATE#", so we'll set $update with the date the database was last updated
+				# $artist was equal to "#DATE#", so we'll set $update with the date the database was last updated
 				else {
-					$update=$title;
+					$update=substr($artist,(length($artist)-10),10);
 				}
 			}
 
@@ -495,7 +504,6 @@ sub media {
 		# Generate the footer
 		&footer;
 	}
-
 
 	# media_edit is where media entries are edited
 	sub media_edit {
@@ -1128,82 +1136,81 @@ sub media {
 		# If $dotype equals 'books'...
 		if ($dotype eq 'books'){
 			($thistitle,$thisauthor,$thiseacupc,$thisisbn)=split(/\|/,$showline);
-			# $writenew is the start of the text that will be written to the database.
-			$writenew="#DATE#|$today|#|#|#|\n";
-			# $preview is the start of the text that will be shown when show preview options are enabled.
-			$preview="#DATE#|$today|#|#|#|<br>\n";
-
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
 				($intitle,$inauthor,$ineacupc,$inisbn,$intype,$inpurchasedate) = split(/\|/,$line);
-				if ($intitle eq "#DATE#") {
-					# skip
-				}
-				# If $intitle equals $thistitle and if $inauthor equals $thisauthor...
-				elsif (($intitle eq $thistitle) && ($inauthor eq $thisauthor)) {
-					# this essentially acts as a skip also
-					print "$thisauthor, $thistitle removed<br><br>\n";
+				if (substr($intitle,0,6) eq "#DATE#") {
+					# $writenew is the start of the text that will be written to the database.
+					$writenew="#DATE#,$today|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|\n";
+					# $preview is the start of the text that will be shown when show preview options are enabled.
+					 $preview="#DATE#,$today|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|<br>\n";
 				} else {
-					$writenew.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|\n";
-					$preview.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|<br>\n";
+					# If $intitle equals $thistitle and if $inauthor equals $thisauthor...
+					if (($intitle eq $thistitle) && ($inauthor eq $thisauthor)) {
+						# this essentially acts as a skip also
+						print "$thisauthor, $thistitle removed<br><br>\n";
+					} else {
+						$writenew.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|\n";
+						 $preview.="$intitle|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|<br>\n";
+					}
 				}
 			}
 		} elsif ($dotype eq 'games'){
 			($thistitle,$thisepic,$thissteam,$thisbattlenet,$thisorigin,$thisuplay,$thisnes,$thiswii,$thisps2,$thisxboxone,$thisxbox360,$thiseacupc,$thispurchasedate)=split(/\|/,$showline);
-			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
-			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
-
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
 				($intitle,$inepic,$insteam,$inbattlenet,$inorigin,$inuplay,$innes,$inwii,$inps2,$inxboxone,$inxbox360,$ineacupc,$inpurchasedate) = split(/\|/,$line);
-				if ($intitle eq "#DATE#") {
-					# Skip
-				} elsif ($intitle eq $thistitle) {
-					print "$thistitle removed<br><br>\n";
+				if (substr($intitle,0,6) eq "#DATE#") {
+					$writenew="#DATE#,$today|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|\n";
+					 $preview="#DATE#,$today|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|<br>\n";
 				} else {
-					$writenew.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|\n";
-					$preview.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|<br>\n";
+					if ($intitle eq $thistitle) {
+						print "$thistitle removed<br><br>\n";
+					} else {
+						$writenew.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|\n";
+						 $preview.="$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|<br>\n";
+					}
 				}
 			}
 		} elsif ($dotype eq 'videos'){
 			($thistitle,$thistype,$thismedia,$thisamazon,$thisdisneyanywhere,$thisgoogleplay,$thisitunes,$thisuvvu,$thiseacupc,$thisisbn,$thismicrosoft,$thisyear,$thispurchasedate)=split(/\|/,$showline);
-			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|\n";
-			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|<br>\n";
-
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
 				($intitle,$intype,$inmedia,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn,$inmicrosoft,$inyear,$inpurchasedate) = split(/\|/,$line);
-				if ($intitle eq "#DATE#") {
-					# Skip
-				} elsif (($intitle eq $thistitle) && ($inyear eq $thisyear)) {
-					if ($thisyear) {
-						$thistitle.=" ($thisyear)";
-					}
-					print "$thistitle removed<br><br>\n";
+				if (substr($intitle,0,6) eq "#DATE#") {
+					$writenew="#DATE#,$today|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n";
+					 $preview="#DATE#,$today|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|<br>\n";
 				} else {
-					$writenew.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n";
-					$preview.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|<br>\n";
+					if (($intitle eq $thistitle) && ($inyear eq $thisyear)) {
+						if ($thisyear) {
+							$thistitle.=" ($thisyear)";
+						}
+						print "$thistitle removed<br><br>\n";
+					} else {
+						$writenew.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n";
+						 $preview.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|<br>\n";
+					}
 				}
 			}
 		} elsif ($dotype eq 'music'){
 			($thisartist,$thistitle,$thiseacupc,$thiscd,$thisamazon,$thisdjbooth,$thisgoogleplay,$thisgroove,$thisitunes,$thisreverbnation,$thistopspin,$thisrhapsody,$thispurchasedate)=split(/\|/,$showline);
-			$writenew="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n";
-			$preview="#DATE#|$today|#|#|#|#|#|#|#|#|#|#|<br>\n";
-
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
 				($inartist,$intitle,$ineacupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody,$inpurchasedate) = split(/\|/,$line);
-				if ($inartist eq "#DATE#") {
-					# Skip
-				} elsif (($intitle eq $thistitle) && ($inartist eq $thisartist)) {
-					print "$thisartist, $thistitle removed<br><br>\n";
+				if (substr($inartist,0,6) eq "#DATE#") {
+					$writenew="#DATE#,$today|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|\n";
+					 $preview="#DATE#,$today|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|<br>\n";
 				} else {
-					$writenew.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|\n";
-					$preview.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|<br>\n";
+					if (($intitle eq $thistitle) && ($inartist eq $thisartist)) {
+						print "$thisartist, $thistitle removed<br><br>\n";
+					} else {
+						$writenew.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|\n";
+						 $preview.="$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|<br>\n";
+					}
 				}
 			}
 		}
@@ -1248,8 +1255,6 @@ sub media {
 		# If $dotype equals 'books'...
 		if ($dotype eq 'books'){
 			# the next two lines begin the unsorted_updatedb and unsorted_previewdb arrays, and begins establishing the date last modified of the database.
-			push(@unsorted_updateddb,"#DATE#|$today|#|#|#|\n");
-			push(@unsorted_previewdb,"#DATE#|$today|#|#|#|\n");
 			# $update_entry is the new entry that can be written to the database, $previewentry creates the new entry for the preview.
 			$update_entry="$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|$newpurchasedate|\n";
 			$previewentry=$update_entry;
@@ -1257,26 +1262,27 @@ sub media {
 			$mediawrite="$dotype|$newtitle|$newauthor|$neweacupc|$newisbn|$newtype|";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
-				# print "$line\n";
+				#print "$line<br>\n";
 				($intitle,$inauthor,$ineacupc,$inisbn,$intype,$inpurchasedate) = split(/\|/,$line);
-				if (substr($intitle,0,4) eq "The ") {
-					$intitle=substr($intitle,4,length($intitle)).", The";
-				}
-				if ($intitle eq "#DATE#") {
-					# Skip
-				} elsif ($intitle eq $oldtitle) {
-					push(@unsorted_updateddb,$update_entry);
-					push(@unsorted_previewdb,$previewentry);
-					$changed=1;
-					print "$newauthor, $newtitle updated<br><br>\n";
+				if (substr($intitle,0,6) eq "#DATE#") {
+					push(@unsorted_updateddb,"#DATE#,$today|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|\n");
+					push(@unsorted_previewdb,"#DATE#,$today|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|\n");
 				} else {
-					push(@unsorted_updateddb,"$intitle|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|\n");
-					push(@unsorted_previewdb,"$intitle|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|\n");
+					if (substr($intitle,0,4) eq "The ") {
+						$intitle=substr($intitle,4,length($intitle)).", The";
+					}
+					if ($intitle eq $oldtitle) {
+						push(@unsorted_updateddb,$update_entry);
+						push(@unsorted_previewdb,$previewentry);
+						$changed=1;
+						print "$newauthor, $newtitle updated<br><br>\n";
+					} else {
+						push(@unsorted_updateddb,"$intitle|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|\n");
+						push(@unsorted_previewdb,"$intitle|$inauthor|$ineacupc|$inisbn|$intype|$inpurchasedate|\n");
+					}
 				}
 			}
 		} elsif ($dotype eq 'games'){
-			push(@unsorted_updateddb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n");
-			push(@unsorted_previewdb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n");
 			$update_entry="$newtitle|$newepic|$newsteam|$newbattlenet|$neworigin|$newuplay|$newnes|$newwii|$newps2|$newxboxone|$newxbox360|$neweacupc|$newpurchasedate|\n";
 			$previewentry=$update_entry;
 			$mediawrite="$dotype|$newtitle||$neweacupc|$newisbn||";
@@ -1284,24 +1290,25 @@ sub media {
 				$line=~s/\n//g;
 				# print "$line\n";
 				($intitle,$inepic,$insteam,$inbattlenet,$inorigin,$inuplay,$innes,$inwii,$inps2,$inxboxone,$inxbox360,$ineacupc,$inpurchasedate) = split(/\|/,$line);
-				if (substr($intitle,0,4) eq "The ") {
-					$intitle=substr($intitle,4,length($intitle)).", The";
-				}
-				if ($intitle eq "#DATE#") {
-					# Skip
-				} elsif ($intitle eq $oldtitle) {
-					push(@unsorted_updateddb,$update_entry);
-					push(@unsorted_previewdb,$previewentry);
-					$changed=1;
-					print "$newtitle updated<br><br>\n";
+				if (substr($intitle,0,6) eq "#DATE#") {
+					push(@unsorted_updateddb,"#DATE#,$today|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|\n");
+					push(@unsorted_previewdb,"#DATE#,$today|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|\n");
 				} else {
-					push(@unsorted_updateddb,"$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|\n");
-					push(@unsorted_previewdb,"$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|\n");
+					if (substr($intitle,0,4) eq "The ") {
+						$intitle=substr($intitle,4,length($intitle)).", The";
+					}
+					if ($intitle eq $oldtitle) {
+						push(@unsorted_updateddb,$update_entry);
+						push(@unsorted_previewdb,$previewentry);
+						$changed=1;
+						print "$newtitle updated<br><br>\n";
+					} else {
+						push(@unsorted_updateddb,"$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|\n");
+						push(@unsorted_previewdb,"$intitle|$inepic|$insteam|$inbattlenet|$inorigin|$inuplay|$innes|$inwii|$inps2|$inxboxone|$inxbox360|$ineacupc|$inpurchasedate|\n");
+					}
 				}
 			}
 		} elsif ($dotype eq 'videos'){
-			push(@unsorted_updateddb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|\n");
-			push(@unsorted_previewdb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|\n");
 			$update_entry="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|$newmicrosoft|$newyear|$newpurchasedate|\n";
 			$previewentry=$update_entry;
 			$mediawrite="$dotype|$newtitle||$neweacupc|$newisbn|$newtype|$newyear|";
@@ -1309,27 +1316,28 @@ sub media {
 				$line=~s/\n//g;
 				# print "$line\n";
 				($intitle,$intype,$inmedia,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn,$inmicrosoft,$inyear,$inpurchasedate) = split(/\|/,$line);
-				if (substr($intitle,0,4) eq "The ") {
-					$intitle=substr($intitle,4,length($intitle)).", The";
-				}
-				if ($intitle eq "#DATE#") {
-					# Skip
-				} elsif (($intitle eq $oldtitle) && ($inyear eq $oldyear)) {
-					push(@unsorted_updateddb,$update_entry);
-					push(@unsorted_previewdb,$previewentry);
-					$changed=1;
-					if ($oldyear) {
-						$newtitle.=" ($newyear)";
-					}
-					print "$newtitle updated<br><br>\n";
+				if (substr($intitle,0,6) eq "#DATE#") {
+					push(@unsorted_updateddb,"#DATE#,$today|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
+					push(@unsorted_previewdb,"#DATE#,$today|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
 				} else {
-					push(@unsorted_updateddb,"$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
-					push(@unsorted_previewdb,"$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
+					if (substr($intitle,0,4) eq "The ") {
+						$intitle=substr($intitle,4,length($intitle)).", The";
+					}
+					if (($intitle eq $oldtitle) && ($inyear eq $oldyear)) {
+						push(@unsorted_updateddb,$update_entry);
+						push(@unsorted_previewdb,$previewentry);
+						$changed=1;
+						if ($oldyear) {
+							$newtitle.=" ($newyear)";
+						}
+						print "$newtitle updated<br><br>\n";
+					} else {
+						push(@unsorted_updateddb,"$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
+						push(@unsorted_previewdb,"$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
+					}
 				}
 			}
 		} elsif ($dotype eq 'music'){
-			push(@unsorted_updateddb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n");
-			push(@unsorted_previewdb,"#DATE#|$today|#|#|#|#|#|#|#|#|#|#|\n");
 			$update_entry="$newartist|$newtitle|$neweacupc|$newcd|$newamazon|$newdjbooth|$newgoogleplay|$newgroove|$newitunes|$newreverbnation|$newtopspin|$newrhapsody|$newpurchasedate|\n";
 			$previewentry=$update_entry;
 			$mediawrite="$dotype|$newtitle|$newartist|$neweacupc|$newisbn|$newtype|";
@@ -1337,25 +1345,28 @@ sub media {
 				$line=~s/\n//g;
 				# print "$line\n";
 				($inartist,$intitle,$ineacupc,$incd,$inamazon,$indjbooth,$ingoogleplay,$ingroove,$initunes,$inreverbnation,$intopspin,$inrhapsody,$inpurchasedate) = split(/\|/,$line);
-				if (substr($intitle,0,4) eq "The ") {
-					$intitle=substr($intitle,4,length($intitle)).", The";
-				}
-				if ($inartist eq "#DATE#") {
-					# Skip
-				} elsif (($intitle eq $oldtitle) && ($inartist eq $oldartist)) {
-					push(@unsorted_updateddb,$update_entry);
-					push(@unsorted_previewdb,$previewentry);
-					$changed=1;
-					print "$newartist, $newtitle updated<br><br>\n";
+				if (substr($inartist,0,6) eq "#DATE#") {
+					push(@unsorted_updateddb,"#DATE#,$today|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|\n");
+					push(@unsorted_previewdb,"#DATE#,$today|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|\n");
 				} else {
-					push(@unsorted_updateddb,"$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|\n");
-					push(@unsorted_previewdb,"$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|\n");
+					if (substr($intitle,0,4) eq "The ") {
+						$intitle=substr($intitle,4,length($intitle)).", The";
+					}
+					if (($intitle eq $oldtitle) && ($inartist eq $oldartist)) {
+						push(@unsorted_updateddb,$update_entry);
+						push(@unsorted_previewdb,$previewentry);
+						$changed=1;
+						print "$newartist, $newtitle updated<br><br>\n";
+					} else {
+						push(@unsorted_updateddb,"$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|\n");
+						push(@unsorted_previewdb,"$inartist|$intitle|$ineacupc|$incd|$inamazon|$indjbooth|$ingoogleplay|$ingroove|$initunes|$inreverbnation|$intopspin|$inrhapsody|$inpurchasedate|\n");
+					}
 				}
 			}
 		}
 
-		# If $changed does not equal 1, then it is assumed that what has been entered is a completely new entry, so we'll add
-		# $new to $writenew and $preview
+		# If $changed does not equal 1, then it is assumed that what has been entered is a completely new entry,
+		# so we'll add $update_entry and #previewentry string to @unsorted_updateddb and @unsorted_previewdb arrays
 		if ($changed != 1) {
 			push(@unsorted_updateddb,$update_entry);
 			push(@unsorted_previewdb,$previewentry);
@@ -1419,17 +1430,17 @@ sub media {
  				print "$_<br>\n";
 			}
 			print "</div></p>\n";
-			print "<p><b>sorted_updateddb </b>: <div style=\"text-align:left;width:700px;\">";
+			print "<p><b>sorted_updateddb</b>: <div style=\"text-align:left;width:700px;\">";
 			foreach (@sorted_updateddb) {
  				print "$_<br>\n";
 			}
 			print "</div></p>\n";
-			print "<p><b> unsorted_previewdb </b>: <div style=\"text-align:left;width:700px;\">";
+			print "<p><b> unsorted_previewdb</b>: <div style=\"text-align:left;width:700px;\">";
 			foreach (@unsorted_previewdb) {
  				print "$_<br>\n";
 			}
 			print "</div></p>\n";
-			print "<p><b>sorted_previewdb </b>: <div style=\"text-align:left;width:700px;\">";
+			print "<p><b>sorted_previewdb</b>: <div style=\"text-align:left;width:700px;\">";
 			foreach (@sorted_previewdb) {
  				print "$_<br>\n";
 			}
@@ -1526,29 +1537,29 @@ sub media {
 		}
 
 		print "    <tbody>\n";
-		print "     <tr><th width=34%>HEADERS</th><th width=33%>CURRENT VALUES</th><th width=33%>CONFIG DEFAULTS</td></tr>\n";
+		print "     <tr><th width=34%>&nbsp;</th><th width=33%>CURRENT VALUES</th><th width=33%>CONFIG DEFAULTS</th></tr>\n";
 
 		if ($config_write eq 0) {$dashwrite="off";} else {$dashwrite="on";}
 		if ($config_previewhide eq 0) {$dashpreviewhide="off";} else {$dashpreviewhide="on";}
 		if ($config_previewshow eq 0) {$dashpreviewshow="off";} else {$dashpreviewshow="on";}
 		if ($config_thesort eq 0) {$dashthesort="off";} else {$dashthesort="on";}
 
-		print "    <tr class=\"grid\">\n     <th>enable write</th>\n     <td>$dashwrite</td>\n     <td>on</td>\n    </tr>\n";
-		print "    <tr class=\"grid\">\n     <th>preview hidden</th>\n     <td>$dashpreviewhide</td>\n     <td>off</td>\n    </tr>\n";
-		print "    <tr class=\"grid\">\n     <th>preview shown</th>\n     <td>$dashpreviewshow</td>\n     <td>off</td>\n    </tr>\n";
-		print "    <tr class=\"grid\">\n     <th>sort by</th>\n     <td>$dashthesort</td>\n     <td>off</td>\n    </tr>\n";
+		print "     <tr class=\"grid\">\n      <th>enable write</th>\n      <td>$dashwrite</td>\n      <td>on</td>\n     </tr>\n";
+		print "     <tr class=\"grid\">\n      <th>preview hidden</th>\n      <td>$dashpreviewhide</td>\n      <td>off</td>\n     </tr>\n";
+		print "     <tr class=\"grid\">\n      <th>preview shown</th>\n      <td>$dashpreviewshow</td>\n      <td>off</td>\n     </tr>\n";
+		print "     <tr class=\"grid\">\n      <th>sort by</th>\n      <td>$dashthesort</td>\n      <td>off</td>\n     </tr>\n";
 
-		print "    <tr><td align=center colspan=3><a href=\"/$config_adminsite?dowhat=config_edit&dotype=$dotype&fromtype=$fromtype\">Change Debug</a></td></tr>\n";
-		print "    <tr>\n";
-		print "     <td style=\"text-align:left\" colspan=3>\n";
+		print "     <tr><td align=center colspan=3><a href=\"/$config_adminsite?dowhat=config_edit&dotype=$dotype&fromtype=$fromtype\">Change Configuration</a> | <a href=\"/$config_adminsite?dotype=config&dowhat=config_columns_view\">Show/Hide Headers</a></td></tr>\n";
+		print "     <tr>\n";
+		print "      <td style=\"text-align:left\" colspan=3>\n";
 		print "      <b>enable write</b>: enables content write when on, disabled when off<br>\n";
 		print "      <b>preview hidden</b>: enables content preview within HTML comments when on, off disables<br>\n";
 		print "      <b>preview shown</b>: enables content preview in this window when on, disabled when off<br>\n";
 		print "      <b>sort by</b>: when on, titles beginning with 'The' appear with '<i>, The</i>' at the end, off disables<br>\n";
 		print "      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This applies to both the administrative and non-administrative pages, but not to the<br>\n";
 		print "      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;database. This is primarily for sorting purposes.<br>\n";
-		print "     </td>\n";
-		print "    </tr>\n";
+		print "      </td>\n";
+		print "     </tr>\n";
 		print "    </tbody>\n   </table>\n";
 
 		# Generate the footer
@@ -1661,6 +1672,568 @@ sub media {
 		close (WRITEINFO);
 		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"10;URL=/$config_adminsite?dotype=$fromtype\">\n";
 		print "     <p><a href=\"/$config_adminsite?dotype=$fromtype\">main screen</a>";
+
+		# Generate the footer
+		&footer;
+	}
+
+	sub config_columns_view {
+		print "  <p>\n   Each green row contains all of the headers that are available for display in the non-administrative and administrative tables.<br>\n   Below these rows are the indicators of whether those headers will be shown or hidden on the non-administrative pages.\n<br>   The white background cells below the green rows indicate that these fields are always shown,<br>\n   while the grey background cells indicate that their visibility can be turned on or off.\n  </p>\n";
+
+		print "   <table cellspacing=10 cellpadding=10 id=\"mytable\">\n";
+		print "    <tbody>\n";
+
+		# Read the entry for $media_books.
+		open (books,"$basedir/$media_books") || &error("error: media_books data /$media_books");
+		@media_books = <books>;
+		close (books);
+
+		print "     <tr>\n     <th>BOOKS</th>\n      <th>author</th>\n      <th>title</th>\n      <th>eacupc</th>\n      <th>isbn</th>\n      <th>type</th>\n      <th>purchasedate</th>\n     </tr>\n";
+
+		print "     <tr>\n";
+		foreach $books_line(@media_books) {
+			$books_line =~ s/\n//g;                                                  # Strips new line character
+			$books_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
+			$books_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
+
+			($books_title,$books_author,$books_eacupc,$books_isbn,$books_type,$books_purchasedate) = split(/\|/,$books_line);
+
+			if (substr($books_title,0,6) eq "#DATE#") {
+				print "     <td><a href=\"/$config_adminsite?dotype=books&dowhat=config_columns_edit\">CHANGE</a></td>\n     <td>author</td>\n     <td>title</td>\n";
+				if (($books_eacupc eq "show") || ($books_eacupc eq "#")) {print "     <td class=edit>show</td>\n";} else {print "     <td class=edit>hide</td>\n";}
+				if (($books_isbn eq "show") || ($books_isbn eq "#")) {print "     <td class=edit>show</td>\n";} else {print "     <td class=edit>hide</td>\n";}
+				if (($books_type eq "show") || ($books_type eq "#")) {print "     <td class=edit>show</td>\n";} else {print "     <td class=edit>hide</td>\n";}
+				if (($books_purchasedate eq "show") || ($books_purchasedate eq "#")) {print "     <td class=edit>show</td>\n";} else {print "     <td class=edit>hide</td>\n";}
+			}
+		}
+		print "     </tr>\n";
+		print "    </tbody>\n";
+		print "   </table>\n";
+
+		print "   <table cellspacing=10 cellpadding=10 id=\"mytable\">\n";
+		print "    <tbody>\n";
+
+		# Read the entry for $media_games.
+		open (games,"$basedir/$media_games") || &error("error: media_games data /$media_games");
+		@media_games = <games>;
+		close (games);
+
+		print "     <tr>\n      <th>GAMES</th>\n      <th>title</th>\n      <th>eacupc</th>\n      <th>epic</th>\n      <th>steam</th>\n      <th>battlenet</th>\n      <th>origin</th>\n      <th>uplay</th>\n      <th>nes</th>\n      <th>wii</th>\n      <th>ps2</th>\n      <th>xboxone</th>\n      <th>xbox360</th>\n      <th>purchasedate</th>\n     </tr>\n";
+
+		print "     <tr>\n";
+		foreach $games_line(@media_games) {
+			$games_line =~ s/\n//g;                                                  # Strips new line character
+			$games_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
+			$games_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
+
+			($games_title,$games_epic,$games_steam,$games_battlenet,$games_origin,$games_uplay,$games_nes,$games_wii,$games_ps2,$games_xboxone,$games_xbox360,$games_eacupc,$games_purchasedate) = split(/\|/,$games_line);
+
+			if (substr($games_title,0,6) eq "#DATE#") {
+				print "      <td><a href=\"/$config_adminsite?dotype=games&dowhat=config_columns_edit\">CHANGE</a></td>\n      <td>title</td>\n";
+				if (($games_eacupc eq "show") || ($games_eacupc eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($games_epic eq "show") || ($games_epic eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($games_steam eq "show") || ($games_steam eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($games_battlenet eq "show") || ($games_battlenet eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($games_origin eq "show") || ($games_origin eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($games_uplay eq "show") || ($games_uplay eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($games_nes eq "show") || ($games_nes eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($games_wii eq "show") || ($games_wii eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($games_ps2 eq "show") || ($games_ps2 eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($games_xboxone eq "show") || ($games_xboxone eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($games_xbox360 eq "show") || ($games_xbox360 eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($games_purchasedate eq "show") || ($games_purchasedate eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+			}
+		}
+		print "     </tr>\n";
+		print "    </tbody>\n";
+		print "   </table>\n";
+
+		print "   <table cellspacing=10 cellpadding=10 id=\"mytable\">\n";
+		print "    <tbody>\n";
+
+		# Read the entry for $media_music.
+		open (music,"$basedir/$media_music") || &error("error: media_music data /$media_music");
+		@media_music = <music>;
+		close (music);
+
+		print "     <tr>\n      <th>MUSIC</th>\n      <th>artist</th>\n      <th>title</th>\n     <th>eacupc</th>\n      <th>cd</th>\n      <th>amazon</th>\n      <th>djbooth</th>\n      <th>googleplay</th>\n      <th>groove</th>\n      <th>itunes</th>\n      <th>reverbnation</th>\n      <th>rhapsody</th>\n      <th>topspin</th>\n      <th>purchasedate</th>\n     </tr>\n";
+
+		print "     <tr>\n";
+		foreach $music_line(@media_music) {
+			$music_line =~ s/\n//g;                                                  # Strips new line character
+			$music_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
+			$music_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
+
+			($music_artist,$music_title,$music_eacupc,$music_cd,$music_amazon,$music_djbooth,$music_googleplay,$music_groove,$music_itunes,$music_reverbnation,$music_topspin,$music_rhapsody,$music_purchasedate) = split(/\|/,$music_line);
+
+			if (substr($music_artist,0,6) eq "#DATE#") {
+				print "      <td><a href=\"/$config_adminsite?dotype=music&dowhat=config_columns_edit\">CHANGE</a></td>\n      <td>artist</td>\n      <td>title</td>\n";
+				if (($music_eacupc eq "show") || ($music_eacupc eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($music_cd eq "show") || ($music_cd eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($music_amazon eq "show") || ($music_amazon eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($music_djbooth eq "show") || ($music_djbooth eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($music_googleplay eq "show") || ($music_googleplay eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($music_groove eq "show") || ($music_groove eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($music_itunes eq "show") || ($music_itunes eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($music_reverbnation eq "show") || ($music_reverbnation eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($music_rhapsody eq "show") || ($music_rhapsody eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($music_topspin eq "show") || ($music_topspin eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($music_purchasedate eq "show") || ($music_purchasedate eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+			}
+		}
+		print "     </tr>\n";
+		print "    </tbody>\n";
+		print "   </table>\n";
+
+		print "   <table cellspacing=10 cellpadding=10 id=\"mytable\">\n";
+		print "    <tbody>\n";
+
+		# Read the entry for $media_videos.
+		open (video,"$basedir/$media_videos") || &error("error: media_videos data /$media_videos");
+		@media_videos = <video>;
+		close (video);
+
+		print "     <tr>\n      <th>VIDEOS</th>\n      <th>title</th>\n      <th>year</th>\n      <th>eacupc</th>\n      <th>type</th>\n      <th>media</th>\n      <th>amazon</th>\n      <th>disneyanywhere</th>\n      <th>googleplay</th>\n      <th>itunes</th>\n      <th>uvvu</th>\n      <th>isbn</th>\n      <th>microsoft</th>\n      <th>purchasedate</th>\n     </tr>\n";
+ 
+		print "     <tr>\n";
+		foreach $video_line(@media_videos) {
+			$video_line =~ s/\n//g;                                                  # Strips new line character
+			$video_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
+			$video_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
+
+			($video_title,$video_type,$video_media,$video_amazon,$video_disneyanywhere,$video_googleplay,$video_itunes,$video_uvvu,$video_eacupc,$video_isbn,$video_microsoft,$video_year,$video_purchasedate) = split(/\|/,$video_line);
+
+			if (substr($video_title,0,6) eq "#DATE#") {
+				print "      <td><a href=\"/$config_adminsite?dotype=videos&dowhat=config_columns_edit\">CHANGE</a></td>\n      <td>title</td>\n      <td>year</td>\n";
+				if (($video_eacupc eq "show") || ($video_eacupc eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($video_type eq "show") || ($video_type eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($video_media eq "show") || ($video_media eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($video_amazon eq "show") || ($video_amazon eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($video_disneyanywhere eq "show") || ($video_disneyanywhere eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($video_googleplay eq "show") || ($video_googleplay eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($video_itunes eq "show") || ($video_itunes eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($video_uvvu eq "show") || ($video_uvvu eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($video_isbn eq "show") || ($video_isbn eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($video_microsoft eq "show") || ($video_microsoft eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($video_purchasedate eq "show") || ($video_purchasedate eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+			}
+		}
+		print "     </tr>\n";
+		print "    </tbody>\n";
+		print "   </table>";
+
+		# Generate the footer
+		&footer;
+	}
+
+	sub config_columns_edit {
+		print "   <table cellspacing=10 cellpadding=10 id=\"mytable\">\n";
+		print "    <tbody>\n";
+
+		if (($dotype eq "books") || ($dotype eq "music") || ($dotype eq "videos")) {$columns=3;} else {$columns=2;}
+		if ($dotype eq "books") {
+			# Read the entry for $media_books.
+			open (books,"$basedir/$media_books") || &error("error: media_books data /$media_books");
+			@media_books = <books>;
+			close (books);
+
+			print "     <tr>\n     <th>BOOKS</th>\n      <th>author</th>\n      <th>title</th>\n      <th>eacupc</th>\n      <th>isbn</th>\n      <th>type</th>\n      <th>purchasedate</th>\n     </tr>\n";
+
+			print "     <tr>\n";
+			foreach $books_line(@media_books) {
+				$books_line =~ s/\n//g;                                                  # Strips new line character
+				$books_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
+				$books_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
+
+				($books_title,$books_author,$books_eacupc,$books_isbn,$books_type,$books_purchasedate) = split(/\|/,$books_line);
+
+				if (substr($books_title,0,6) eq "#DATE#") {
+					print "      <td></td>\n      <td>author</td>\n      <td>title</td>\n";
+
+					if (($books_eacupc eq "show") || ($books_eacupc eq "#")) {$books_eacupc_select_on="selected";} else {$books_eacupc_select_off="selected";}
+					print "      <td class=edit><select name=column_books_eacupc><option value=\"show\" $books_eacupc_select_on>show</option><option value=\"hide\" $books_eacupc_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($books_isbn eq "show") || ($books_isbn eq "#")) {$books_isbn_select_on="selected";} else {$books_isbn_select_off="selected";}
+					print "      <td class=edit><select name=column_books_isbn><option value=\"show\" $books_isbn_select_on>show</option><option value=\"hide\" $books_isbn_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($books_type eq "show") || ($books_type eq "#")) {$books_type_select_on="selected";} else {$books_type_select_off="selected";}
+					print "      <td class=edit><select name=column_books_type><option value=\"show\" $books_type_select_on>show</option><option value=\"hide\" $books_type_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($books_purchasedate eq "show") || ($books_purchasedate eq "#")) {$books_purchasedate_select_on="selected";} else {$books_purchasedate_select_off="selected";}
+					print "      <td class=edit><select name=column_books_purchasedate><option value=\"show\" $books_purchasedate_select_on>show</option><option value=\"hide\" $books_purchasedate_select_off>hide</option></select></td>\n";
+					$columns++;
+				}
+			}
+			print "     </tr>\n";
+		} elsif ($dotype eq "games") {
+			# Read the entry for $media_games.
+			open (games,"$basedir/$media_games") || &error("error: media_games data /$media_games");
+			@media_games = <games>;
+			close (games);
+
+			print "     <tr>\n      <th>GAMES</th>      <th>title</th>      <th>eacupc</th>      <th>epic</th>      <th>steam</th>      <th>battlenet</th>      <th>origin</th>      <th>uplay</th>      <th>nes</th>      <th>wii</th>      <th>ps2</th>      <th>xboxone</th>      <th>xbox360</th>      <th>purchasedate</th>     </tr>";
+
+			print "     <tr>\n";
+			foreach $games_line(@media_games) {
+				$games_line =~ s/\n//g;                                                  # Strips new line character
+				$games_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
+				$games_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
+
+				($games_title,$games_epic,$games_steam,$games_battlenet,$games_origin,$games_uplay,$games_nes,$games_wii,$games_ps2,$games_xboxone,$games_xbox360,$games_eacupc,$games_purchasedate) = split(/\|/,$games_line);
+
+				if (substr($games_title,0,6) eq "#DATE#") {
+					print "      <td></td>\n      <td>title</td>\n";
+
+					if (($games_eacupc eq "show") || ($games_eacupc eq "#")) {$games_eacupc_select_on="selected";} else {$games_eacupc_select_off="selected";}
+					print "      <td class=edit><select name=column_games_eacupc><option value=\"show\" $games_eacupc_select_on>show</option><option value=\"hide\" $games_eacupc_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($games_epic eq "show") || ($games_epic eq "#")) {$games_epic_select_on="selected";} else {$games_epic_select_off="selected";}
+					print "      <td class=edit><select name=column_games_epic><option value=\"show\" $books_eacupc_select_on>show</option><option value=\"hide\" $games_epic_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($games_steam eq "show") || ($games_steam eq "#")) {$games_steam_select_on="selected";} else {$games_steam_select_off="selected";}
+					print "      <td class=edit><select name=column_games_steam><option value=\"show\" $games_steam_select_on>show</option><option value=\"hide\" $games_steam_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($games_battlenet eq "show") || ($games_battlenet eq "#")) {$games_battlenet_select_on="selected";} else {$games_battlenet_select_off="selected";}
+					print "      <td class=edit><select name=column_games_battlenet><option value=\"show\" $games_battlenet_select_on>show</option><option value=\"hide\" $games_battlenet_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($games_origin eq "show") || ($games_origin eq "#")) {$games_origin_select_on="selected";} else {$games_origin_select_off="selected";}
+					print "      <td class=edit><select name=column_games_origin><option value=\"show\" $games_origin_select_on>show</option><option value=\"hide\" $games_origin_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($games_uplay eq "show") || ($games_uplay eq "#")) {$games_uplay_select_on="selected";} else {$games_uplay_select_off="selected";}
+					print "      <td class=edit><select name=column_games_uplay><option value=\"show\" $games_uplay_select_on>show</option><option value=\"hide\" $games_uplay_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($games_nes eq "show") || ($games_nes eq "#")) {$games_nes_select_on="selected";} else {$games_nes_select_off="selected";}
+					print "      <td class=edit><select name=column_games_nes><option value=\"show\" $games_nes_select_on>show</option><option value=\"hide\" $games_nes_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($games_wii eq "show") || ($games_wii eq "#")) {$games_wii_select_on="selected";} else {$games_wii_select_off="selected";}
+					print "      <td class=edit><select name=column_games_wii><option value=\"show\" $games_wii_select_on>show</option><option value=\"hide\" $games_wii_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($games_ps2 eq "show") || ($games_ps2 eq "#")) {$games_ps2_select_on="selected";} else {$games_ps2_select_off="selected";}
+					print "      <td class=edit><select name=column_games_ps2><option value=\"show\" $games_ps2_select_on>show</option><option value=\"hide\" $games_ps2_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($games_xboxone eq "show") || ($games_xboxone eq "#")) {$games_xboxone_select_on="selected";} else {$games_xboxone_select_off="selected";}
+					print "      <td class=edit><select name=column_games_xboxone><option value=\"show\" $games_xboxone_select_on>show</option><option value=\"hide\" $games_xboxone_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($games_xbox360 eq "show") || ($games_xbox360 eq "#")) {$games_xbox360_select_on="selected";} else {$games_xbox360_select_off="selected";}
+					print "      <td class=edit><select name=column_games_xbox360><option value=\"show\" $games_xbox360_select_on>show</option><option value=\"hide\" $games_xbox360_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($games_purchasedate eq "show") || ($games_purchasedate eq "#")) {$games_purchasedate_select_on="selected";} else {$games_purchasedate_select_off="selected";}
+					print "      <td class=edit><select name=column_games_purchasedate><option value=\"show\" $games_purchasedate_select_on>show</option><option value=\"hide\" $games_purchasedate_select_off>hide</option></select></td>\n";
+					$columns++;
+				}
+			}
+			print "     </tr>\n";
+		} elsif ($dotype eq "music") {
+			# Read the entry for $media_music.
+			open (music,"$basedir/$media_music") || &error("error: media_music data /$media_music");
+			@media_music = <music>;
+			close (music);
+
+			print "     <tr>\n      <th>MUSIC</th>      <th>artist</th>      <th>title</th>     <th>eacupc</th>      <th>cd</th>      <th>amazon</th>      <th>djbooth</th>      <th>googleplay</th>     <th>groove</th>      <th>itunes</th>      <th>reverbnation</th>      <th>rhapsody</th>      <th>topspin</th>      <th>purchasedate</th>\n     </tr>";
+
+			print "<tr>\n";
+			foreach $music_line(@media_music) {
+				$music_line =~ s/\n//g;                                                  # Strips new line character
+				$music_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
+				$music_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
+
+				($music_artist,$music_title,$music_eacupc,$music_cd,$music_amazon,$music_djbooth,$music_googleplay,$music_groove,$music_itunes,$music_reverbnation,$music_topspin,$music_rhapsody,$music_purchasedate) = split(/\|/,$music_line);
+
+				if (substr($music_artist,0,6) eq "#DATE#") {
+					print "<td></td><td>artist</td><td>title</td>";
+					if (($music_eacupc eq "show") || ($music_eacupc eq "#")) {$music_eacupc_select_on="selected";} else {$music_eacupc_select_off="selected";}
+					print "      <td class=edit><select name=column_music_eacupc><option value=\"show\" $music_eacupc_select_on>show</option><option value=\"hide\" $music_eacupc_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($music_cd eq "show") || ($music_cd eq "#")) {$music_cd_select_on="selected";} else {$music_cd_select_off="selected";}
+					print "      <td class=edit><select name=column_music_cd><option value=\"show\" $music_cd_select_on>show</option><option value=\"hide\" $music_cd_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($music_amazon eq "show") || ($music_amazon eq "#")) {$music_amazon_select_on="selected";} else {$music_amazon_select_off="selected";}
+					print "      <td class=edit><select name=column_music_amazon><option value=\"show\" $music_amazon_select_on>show</option><option value=\"hide\" $music_amazon_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($music_djbooth eq "show") || ($music_djbooth eq "#")) {$music_djbooth_select_on="selected";} else {$music_djbooth_select_off="selected";}
+					print "      <td class=edit><select name=column_music_djbooth><option value=\"show\" $music_djbooth_select_on>show</option><option value=\"hide\" $music_djbooth_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($music_googleplay eq "show") || ($music_googleplay eq "#")) {$music_googleplay_select_on="selected";} else {$music_googleplay_select_off="selected";}
+					print "      <td class=edit><select name=column_music_googleplay><option value=\"show\" $music_googleplay_select_on>show</option><option value=\"hide\" $music_googleplay_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($music_groove eq "show") || ($music_groove eq "#")) {$music_groove_select_on="selected";} else {$music_groove_select_off="selected";}
+					print "      <td class=edit><select name=column_music_groove><option value=\"show\" $music_groove_select_on>show</option><option value=\"hide\" $music_groove_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($music_itunes eq "show") || ($music_itunes eq "#")) {$music_itunes_select_on="selected";} else {$music_itunes_select_off="selected";}
+					print "      <td class=edit><select name=column_music_itunes><option value=\"show\" $music_itunes_select_on>show</option><option value=\"hide\" $music_itunes_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($music_reverbnation eq "show") || ($music_reverbnation eq "#")) {$music_reverbnation_select_on="selected";} else {$music_reverbnation_select_off="selected";}
+					print "      <td class=edit><select name=column_music_reverbnation><option value=\"show\" $music_reverbnation_select_on>show</option><option value=\"hide\" $music_reverbnation_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($music_rhapsody eq "show") || ($music_rhapsody eq "#")) {$music_rhapsody_select_on="selected";} else {$music_rhapsody_select_off="selected";}
+					print "      <td class=edit><select name=column_music_rhapsody><option value=\"show\" $music_rhapsody_select_on>show</option><option value=\"hide\" $music_rhapsody_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($music_topspin eq "show") || ($music_topspin eq "#")) {$gmusic_topspin_select_on="selected";} else {$music_topspin_select_off="selected";}
+					print "      <td class=edit><select name=column_music_topspin><option value=\"show\" $music_topspin_select_on>show</option><option value=\"hide\" $music_topspin_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($music_purchasedate eq "show") || ($music_purchasedate eq "#")) {$music_purchasedate_select_on="selected";} else {$music_purchasedate_select_off="selected";}
+					print "      <td class=edit><select name=column_music_purchasedate><option value=\"show\" $music_purchasedate_select_on>show</option><option value=\"hide\" $music_purchasedate_select_off>hide</option></select></td>\n";
+					$columns++;
+				}
+			}
+			print "     </tr>\n";
+		} elsif ($dotype eq "videos") {
+			# Read the entry for $media_videos.
+			open (video,"$basedir/$media_videos") || &error("error: media_videos data /$media_videos");
+			@media_videos = <video>;
+			close (video);
+
+			print "     <tr>\n      <th>VIDEOS</th>      <th>title</th>      <th>year</th>      <th>eacupc</th>      <th>type</th>      <th>media</th>      <th>amazon</th>      <th>disneyanywhere</th>      <th>googleplay</th>     <th>itunes</th>      <th>uvvu</th>      <th>isbn</th>      <th>microsoft</th>      <th>purchasedate</th>     </tr>";
+	 
+			print "<tr>\n";
+			foreach $video_line(@media_videos) {
+				$video_line =~ s/\n//g;                                                  # Strips new line character
+				$video_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
+				$video_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
+
+				($video_title,$video_type,$video_media,$video_amazon,$video_disneyanywhere,$video_googleplay,$video_itunes,$video_uvvu,$video_eacupc,$video_isbn,$video_microsoft,$video_year,$video_purchasedate) = split(/\|/,$video_line);
+
+				if (substr($video_title,0,6) eq "#DATE#") {
+					print "<td></td><td>title</td><td>year</td>";
+					if (($video_eacupc eq "show") || ($video_eacupc eq "#")) {$video_eacupc_select_on="selected";} else {$video_eacupc_select_off="selected";}
+					print "      <td class=edit><select name=column_video_eacupc><option value=\"show\" $video_eacupc_select_on>show</option><option value=\"hide\" $video_eacupc_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($video_type eq "show") || ($video_type eq "#")) {$video_type_select_on="selected";} else {$video_type_select_off="selected";}
+					print "      <td class=edit><select name=column_video_type><option value=\"show\" $video_type_select_on>show</option><option value=\"hide\" $video_type_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($video_media eq "show") || ($video_media eq "#")) {$video_media_select_on="selected";} else {$video_media_select_off="selected";}
+					print "      <td class=edit><select name=column_video_media><option value=\"show\" $video_media_select_on>show</option><option value=\"hide\" $video_media_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($video_amazon eq "show") || ($video_amazon eq "#")) {$video_amazon_select_on="selected";} else {$video_amazon_select_off="selected";}
+					print "      <td class=edit><select name=column_video_amazon><option value=\"show\" $video_amazon_select_on>show</option><option value=\"hide\" $video_amazon_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($video_disneyanywhere eq "show") || ($video_disneyanywhere eq "#")) {$video_disneyanywhere_select_on="selected";} else {$video_disneyanywhere_select_off="selected";}
+					print "      <td class=edit><select name=column_video_disneyanywhere><option value=\"show\" $video_disneyanywhere_select_on>show</option><option value=\"hide\" $video_disneyanywhere_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($video_googleplay eq "show") || ($video_googleplay eq "#")) {$video_googleplay_select_on="selected";} else {$video_googleplay_select_off="selected";}
+					print "      <td class=edit><select name=column_video_googleplay><option value=\"show\" $video_googleplay_select_on>show</option><option value=\"hide\" $video_googleplay_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($video_itunes eq "show") || ($video_itunes eq "#")) {$video_itunes_select_on="selected";} else {$video_itunes_select_off="selected";}
+					print "      <td class=edit><select name=column_video_itunes><option value=\"show\" $video_itunes_select_on>show</option><option value=\"hide\" $video_itunes_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($video_uvvu eq "show") || ($video_uvvu eq "#")) {$video_uvvu_select_on="selected";} else {$video_uvvu_select_off="selected";}
+					print "      <td class=edit><select name=column_video_uvvu><option value=\"show\" $video_uvvu_select_on>show</option><option value=\"hide\" $video_uvvu_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($video_isbn eq "show") || ($video_isbn eq "#")) {$video_isbn_select_on="selected";} else {$video_isbn_select_off="selected";}
+					print "      <td class=edit><select name=column_video_isbn><option value=\"show\" $video_isbn_select_on>show</option><option value=\"hide\" $video_isbn_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($video_microsoft eq "show") || ($video_microsoft eq "#")) {$video_microsoft_select_on="selected";} else {$video_microsoft_select_off="selected";}
+					print "      <td class=edit><select name=column_video_microsoft><option value=\"show\" $video_microsoft_select_on>show</option><option value=\"hide\" $video_microsoft_select_off>hide</option></select></td>\n";
+					$columns++;
+
+					if (($video_purchasedate eq "show") || ($video_purchasedate eq "#")) {$video_purchasedate_select_on="selected";} else {$video_purchasedate_select_off="selected";}
+					print "      <td class=edit><select name=column_video_purchasedate><option value=\"show\" $video_purchasedate_select_on>show</option><option value=\"hide\" $video_purchasedate_select_off>hide</option></select></td>\n";
+					$columns++;
+				}
+			}
+			print "     </tr>\n";
+		}
+
+		print "     <tr>\n      <td colspan=$columns align=center>\n       <input type=button value=\"Cancel\" onClick=\"history.back()\">\n       <input type=submit value=\"Submit\">\n      </td>\n     </tr>\n";
+		print "     <input type=hidden name=dowhat value=config_columns_write>\n";
+		print "     <input type=hidden name=dotype value=$dotype>\n";
+		print "     <input type=hidden name=fromtype value=config_columns_view>\n";
+		print "    </tbody>\n";
+		print "   </table>";
+
+		# Generate the footer
+		&footer;
+	}
+
+	sub config_columns_write{
+		print "   <table cellspacing=10 cellpadding=10 id=\"mytable\">\n";
+		print "    <tbody>\n";
+		print "     <tr>\n     <td>\n";
+
+		if (($dotype eq "books") || ($dotype eq "music") || ($dotype eq "videos")) {$columns=3;} else {$columns=2;}
+		if ($dotype eq "books") {
+			$writedatabase=$media_books;
+			# Read the entry for $media_books.
+			open (books,"$basedir/$media_books") || &error("error: media_books data /$media_books");
+			@media_books = <books>;
+			close (books);
+
+			foreach $books_line(@media_books) {
+				$books_line =~ s/\n//g;                                                  # Strips new line character
+				$books_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
+				$books_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
+
+				($books_title,$books_author,$books_eacupc,$books_isbn,$books_type,$books_purchasedate) = split(/\|/,$books_line);
+
+				if (substr($books_title,0,6) eq "#DATE#") {
+					$dbentry="$books_title|$booksauthor|";
+					if ($column_books_eacupc eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_books_isbn eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_books_type eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_books_purchasedate eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					push(@database_entries,"$dbentry\n");
+				} else {
+					push(@database_entries,"$books_title|$books_author|$books_eacupc|$books_isbn|$books_type|$books_purchasedate|\n");
+				}
+			}
+		} elsif ($dotype eq "games") {
+			$writedatabase=$media_games;
+			# Read the entry for $media_games.
+			open (games,"$basedir/$media_games") || &error("error: media_games data /$media_games");
+			@media_games = <games>;
+			close (games);
+
+			foreach $games_line(@media_games) {
+				$games_line =~ s/\n//g;                                                  # Strips new line character
+				$games_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
+				$games_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
+
+				($games_title,$games_epic,$games_steam,$games_battlenet,$games_origin,$games_uplay,$games_nes,$games_wii,$games_ps2,$games_xboxone,$games_xbox360,$games_eacupc,$games_purchasedate) = split(/\|/,$games_line);
+
+				if (substr($games_title,0,6) eq "#DATE#") {
+					$dbentry="$games_title|";
+					if ($column_games_epic eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_games_steam eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_games_battlenet eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_games_origin eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_games_uplay eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_games_nes eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_games_wii eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_games_ps2 eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_games_xboxone eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_games_xbox360 eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_games_eacupc eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_games_purchasedate eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					push(@database_entries,"$dbentry\n");
+				} else {
+					push(@database_entries,"$games_title|$games_epic|$games_steam|$games_battlenet|$games_origin|$games_uplay|$games_nes|$games_wii|$games_ps2|$games_xboxone|$games_xbox360|$games_eacupc|$games_purchasedate|\n");
+				}
+			}
+		} elsif ($dotype eq "music") {
+			$writedatabase=$media_music;
+			# Read the entry for $media_music.
+			open (music,"$basedir/$media_music") || &error("error: media_music data /$media_music");
+			@media_music = <music>;
+			close (music);
+
+			foreach $music_line(@media_music) {
+				$music_line =~ s/\n//g;                                                  # Strips new line character
+				$music_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
+				$music_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
+
+				($music_artist,$music_title,$music_eacupc,$music_cd,$music_amazon,$music_djbooth,$music_googleplay,$music_groove,$music_itunes,$music_reverbnation,$music_topspin,$music_rhapsody,$music_purchasedate) = split(/\|/,$music_line);
+
+				if (substr($music_artist,0,6) eq "#DATE#") {
+					$dbentry="$music_artist|$music_title|";
+					if ($column_music_eacupc eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_music_cd eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_music_amazon eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_music_djbooth eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_music_googleplay eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_music_groove eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_music_itunes eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_music_reverbnation eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_music_rhapsody eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_music_topspin eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_music_purchasedate eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					push(@database_entries,"$dbentry\n");
+				} else {
+					push(@database_entries,"$music_artist|$music_title|$music_eacupc|$music_cd|$music_amazon|$music_djbooth|$music_googleplay|$music_groove|$music_itunes|$music_reverbnation|$music_topspin|$music_rhapsody|$music_purchasedate|\n");
+				}
+			}
+		} elsif ($dotype eq "videos") {
+			$writedatabase=$media_videos;
+			# Read the entry for $media_videos.
+			open (video,"$basedir/$media_videos") || &error("error: media_videos data /$media_videos");
+			@media_videos = <video>;
+			close (video);
+
+			foreach $video_line(@media_videos) {
+				$video_line =~ s/\n//g;                                                  # Strips new line character
+				$video_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
+				$video_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
+
+				($video_title,$video_type,$video_media,$video_amazon,$video_disneyanywhere,$video_googleplay,$video_itunes,$video_uvvu,$video_eacupc,$video_isbn,$video_microsoft,$video_year,$video_purchasedate) = split(/\|/,$video_line);
+
+				if (substr($video_title,0,6) eq "#DATE#") {
+					$dbentry="$video_title|";
+					if ($column_video_type eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_video_media eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_video_amazon eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_video_disneyanywhere eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_video_googleplay eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_video_itunes eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_video_uvvu eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_video_eacupc eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_video_isbn eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_video_microsoft eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					$dbentry.="$video_year|";
+					if ($column_video_purchasedate eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					push(@database_entries,"$dbentry\n");
+				} else {
+					push(@database_entries,"$video_title|$video_type|$video_media|$video_amazon|$video_disneyanywhere|$video_googleplay|$video_itunes|$video_uvvu|$video_eacupc|$video_isbn|$video_microsoft|$video_year|$video_purchasedate|\n");
+				}
+			}
+		}
+
+		if ($config_previewshow eq "1") {
+			print "<p><b>database_entries</b>: <div style=\"text-align:left;width:700px;\">\n";
+			foreach (@database_entries) {
+				print "$_<br>\n";
+			}
+			print "</div></p>\n";
+		}
+
+
+		# If $config_write is equal to "1", then writing is enabled
+		if ($config_write eq "1") {
+			open (WRITEINFO,">$basedir/$writedatabase") || &error("error: writedatabase $writedatabases<br>");
+			print (WRITEINFO @database_entries);
+			close (WRITEINFO);
+			print "Updated table header visibility!<br>";
+		}
+
+		print "      </td>\n";
+		print "     </tr>\n";
+		print "    </tbody>\n";
+		print "   </table>";
+
+		# Forward you back to the media database table
+		print "     <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"$wait;URL=/$config_adminsite?dowhat=config_columns_view&dotype=config\">\n";
+		print "     <p><a href=\"/$config_adminsite?dowhat=config_columns_view&dotype=config\">main screen</a>";
 
 		# Generate the footer
 		&footer;
@@ -2084,18 +2657,20 @@ sub header {
 	}
 
 	if (($dotype eq "books") || ($dotype eq "music") || ($dotype eq "games") || ($dotype eq "videos")) {
-		print " <script type=\"text/javascript\" src=\"/javascripts/gs_sortable.js\"></script>\n";
-		print " <script type=\"text/javascript\">\n  <!--\n";
+		if (($dowhat ne "config_columns_view") && ($dowhat ne "config_columns_edit")) {
+			print " <script type=\"text/javascript\" src=\"/javascripts/gs_sortable.js\"></script>\n";
+			print " <script type=\"text/javascript\">\n  <!--\n";
 
-		print "   var TSort_Data = new Array ('mytable'";
-		$sortcolumns=1;
-		while($sortcolumns < $columns){
-			print ",'s'";
-			$sortcolumns = $sortcolumns + 1;
+			print "   var TSort_Data = new Array ('mytable'";
+			$sortcolumns=1;
+			while($sortcolumns < $columns){
+				print ",'s'";
+				$sortcolumns = $sortcolumns + 1;
+			}
+			print ");\n";
+			print "  -->\n";
+			print " </script>\n";
 		}
-		print ");\n";
-		print "  -->\n";
-		print " </script>\n";
 	}
 
 	if ($dowhat eq "media_edit") {
@@ -2351,24 +2926,63 @@ sub getqueries {
 	$editconfig_previewhide=$FORM{'config_previewhide'};
 	$editconfig_previewshow=$FORM{'config_previewshow'};
 	$editconfig_thesort=$FORM{'config_thesort'};
+	# Column edits
+	$column_video_eacupc=$FORM{'column_video_eacupc'};
+	$column_video_type=$FORM{'column_video_type'};
+	$column_video_media=$FORM{'column_video_media'};
+	$column_video_amazon=$FORM{'column_video_amazon'};
+	$column_video_disneyanywhere=$FORM{'column_video_disneyanywhere'};
+	$column_video_googleplay=$FORM{'column_video_googleplay'};
+	$column_video_itunes=$FORM{'column_video_itunes'};
+	$column_video_uvvu=$FORM{'column_video_uvvu'};
+	$column_video_isbn=$FORM{'column_video_isbn'};
+	$column_video_microsoft=$FORM{'column_video_microsoft'};
+	$column_video_purchasedate=$FORM{'column_video_purchasedate'};
+	$column_books_eacupc=$FORM{'column_books_eacupc'};
+	$column_books_isbn=$FORM{'column_books_isbn'};
+	$column_books_purchasedate=$FORM{'column_books_purchasedate'};
+	$column_books_type=$FORM{'column_books_type'};
+	$column_music_amazon=$FORM{'column_music_amazon'};
+	$column_music_cd=$FORM{'column_music_cd'};
+	$column_music_djbooth=$FORM{'column_music_djbooth'};
+	$column_music_eacupc=$FORM{'column_music_eacupc'};
+	$column_music_googleplay=$FORM{'column_music_googleplay'};
+	$column_music_groove=$FORM{'column_music_groove'};
+	$column_music_itunes=$FORM{'column_music_itunes'};
+	$column_music_purchasedate=$FORM{'column_music_purchasedate'};
+	$column_music_reverbnation=$FORM{'column_music_reverbnation'};
+	$column_music_rhapsody=$FORM{'column_music_rhapsody'};
+	$column_music_topspin=$FORM{'column_music_topspin'};
+	$column_games_battlenet=$FORM{'column_games_battlenet'};
+	$column_games_eacupc=$FORM{'column_games_eacupc'};
+	$column_games_epic=$FORM{'column_games_epic'};
+	$column_games_nes=$FORM{'column_games_nes'};
+	$column_games_origin=$FORM{'column_games_origin'};
+	$column_games_purchasedate=$FORM{'column_games_purchasedate'};
+	$column_games_ps2=$FORM{'column_games_ps2'};
+	$column_games_steam=$FORM{'column_games_steam'};
+	$column_games_uplay=$FORM{'column_games_uplay'};
+	$column_games_wii=$FORM{'column_games_wii'};
+	$column_games_xbox360=$FORM{'column_games_xbox360'};
+	$column_games_xboxone=$FORM{'column_games_xboxone'};
 
 	## The next few lines define the location of $media_read for media types, and how many columns are in the data display table.
 	if ($dotype eq "books") {
 		$media_read.="books.txt";
 		$media_text="Book";
-		$columns=7;
+		#$columns=8;
 	} elsif ($dotype eq "games") {
 		$media_read.="games.txt";
 		$media_text="Game";
-		$columns=14;
+		#$columns=15;
 	} elsif ($dotype eq "music") {
 		$media_read.="music.txt";
 		$media_text="Music";
-		$columns=13;
+		#$columns=14;
 	} elsif ($dotype eq "videos") {
 		$media_read.="videos.txt";
 		$media_text="Video";
-		$columns=13;
+		#$columns=14;
 	} elsif ($dotype eq "config") {
 		if ($dowhat eq "") {$dowhat="config_view";}
 		$columns=4;
