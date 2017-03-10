@@ -20,7 +20,7 @@ $media_read="cgi-bin/media/media_";
 	$media_videos=$media_read."videos.txt";
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2017.03.09";
+$dateupdated="2017.03.10";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -2720,8 +2720,9 @@ sub header {
 	print "     <td align=center class=header width=30%><b>Media Admin</b><br>$addtext</td>\n";
 
 	if ($dotype ne "config") {
-		$headerlinks="<a href=\"/$config_adminsite?dowhat=media_add&dotype=$dotype\">Add $media_text Manually</a> | <a href=\"/$config_adminsite?dowhat=media_barcode&dotype=$dotype&addtype=eacupc\">Add $media_text by Barcode</a> | <a href=\"/$config_adminsite?dowhat=media_isbn&dotype=$dotype&addtype=isbn\">Add $media_text by ISBN</a>";
+		$headerlinks="<a href=\"/$config_adminsite?dowhat=media_add&dotype=$dotype\">Add $media_text Manually</a> | <a href=\"/$config_adminsite?dowhat=media_barcode&dotype=$dotype&addtype=eacupc\">Add $media_text by Barcode</a> | <a href=\"/$config_adminsite?dowhat=media_isbn&dotype=$dotype&addtype=isbn\">Add $media_text by ISBN</a><br><a href=\"/$config_adminsite?dowhat=config_columns_edit&dotype=$dotype\">Show/Hide Columns</a>";
 	}
+
 	if ($dotype eq "eacupcisbn") {
 		$headerlinks="<a href=\"/$config_adminsite?dotype=eacupcisbn&dowhat=eacupcisbn_generate\">Generate Database</a> | <a href=\"/$config_adminsite?dotype=eacupcisbn&dowhat=eacupcisbn_compare\">Compare Database Entries</a> | <a href=\"/$config_adminsite?dotype=eacupcisbn&dowhat=eacupcisbn_viewall\">View All Entries</a>";
 	}
