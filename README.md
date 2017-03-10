@@ -46,10 +46,11 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 - 2017.03.10
   - Administration: "media.cgi" file contains the following modifications/updates:
     - Thru the administration, you can now show/hide columns from view on the non-administrative pages. To edit these, navigate to the media type and now underneath the "Add by UPC/EAC/ISBN" links at the top, there is also a "Show/Hide Columns" link. Technically, this is integrated into the 'config' pages, so there's also a link to see the current state of each media type's available columns being hidden or shown.
+    - There is now a "Purchased Date" column integrated into the database views for each media type. It can be hidden or shown.
   - Non-administrative: "index.cgi" file contains the following modifications/updates:
     - The automated column count of table headers is now present, and full columns can now be hidden/shown.
-    - The first line of each database had to be changed a bit, as I didn't realize that having the date in the second entry would cause issues for the column show/hide ability. So, rather than "#DATE#|2017.02.18|", this will now be "#DATE#,2017.02.18|". The good news is the database is forgiving for leaving it alone, if you don't want to make the change manually. You won't see the database revision date until this is changed manually, the columns are shown/hidden, or until a new addition is added to the database.
-    - There is now a "Purchased Date" column integrated into the database views for each media type. It can be hidden or shown.
+  - General note
+    - The first line of each database had to be changed a bit, as I didn't realize that having the date in the second entry would cause issues for the column show/hide ability. So, rather than "#DATE#|2017.02.18|", this will now be "#DATE#,2017.02.18|". The good news is the database is forgiving for leaving it alone. If you don't want to make the change manually, you won't see the database revision date until the columns are shown/hidden or until a new addition/revision/deletion is performed on the database.
 - 2017.01.05
   - Administration: Ability to add the date that media was purchased; by default, it'll use the current date, but the date can be changed to be any date. Currently, the only place the dates show up is in the media editing screens, a "most recent purchase" may be implemented in the future.
   - Non-administrative: When browsing the collection pages from a mobile device, it's only a one column view with physical/digital media listed underneath the titles/authors/artists, rather than the full table.
