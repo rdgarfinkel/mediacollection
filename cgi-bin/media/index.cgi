@@ -20,7 +20,7 @@ $empty="0";
 $userAgent=$ENV{"HTTP_USER_AGENT"};
 
 #  headers for the non-admin pages
-$dateupdated="2017.01.28";
+$dateupdated="2017.03.10";
 
 #  Open and process the "debug" file. On this page, the article sort is the only variable that matters.
 open (debug,"$basedir/$debugitem") || &error("error: mediaitem $debugitem");
@@ -30,27 +30,12 @@ for $line(@in) {
 	($debugwrite,$debugpreviewhide,$debugpreviewshow,$debugthesort) = split(/\|/,$line);
 }
 
-#  Set content type of the page.
-print "Content-TYPE: text/html\npragma: no-cache\n\n";
-print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n";
-print "<!--my media collection v$dateupdated-->\n";
-print "<HTML>\n";
-print "<HEAD>\n";
-print " <script type=\"text/javascript\" src=\"/javascripts/gs_sortable.js\"></script>\n";
-#print " <script type=\"text/javascript\" src=\"/javascripts/jquery-1.5.1.min.js\"></script>\n";
-#print " <script type=\"text/javascript\" src=\"/javascripts/jquery.freezeheader.js\"></script>\n";
-print " <script type=\"text/javascript\">\n  <!--\n";
-print "   function SizedPop(dir,page,type,width,height) {\n    window.open('/cgi-bin/' + dir + '/' + page + '?dotype=' + type, dir, \n";
-print "    'toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=yes,resizable=no,width=' + width + ',height=' + height);\n";
-print "   }\n   self.name = \"main\";\n";
-
 #  Get the query from the URI address
 $query=$ENV{"QUERY_STRING"};
 #  if $query equals games, set $mediaitem to look at the games.txt file, set the page title to "game," and set columns
 if ($query eq "games") {
 	$mediaitem.="games.txt";
 	$pagetitle="game";
-	$columns=12;
 #  if $query equals videos, set $mediaitem to look at the videos.txt file, set the page title to "video," and set columns
 } elsif ($query eq "videos") {
 	$mediaitem.="videos.txt";
@@ -73,6 +58,318 @@ if ($query eq "games") {
 	$pagetitle="media";
 }
 
+if ($empty != "1") {
+	open (media,"$basedir/$mediaitem") || print "error: $mediaitem";
+	@in = <media>;
+	close (media);
+	$columns=0;
+
+	if ($pagetitle eq "game") {
+		foreach (@in) {
+			($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$upc,$purchasedate) = split(/\|/,$_);
+			if (substr($title,0,6) eq "#DATE#") {
+				$dataupdated=substr($title,(length($title)-10),10);
+				$showhide_epic=$epic;
+				$showhide_steam=$steam;
+				$showhide_battlenet=$battlenet;
+				$showhide_origin=$origin;
+				$showhide_uplay=$uplay;
+				$showhide_nes=$nes;
+				$showhide_wii=$wii;
+				$showhide_ps2=$ps2;
+				$showhide_xboxone=$xboxone;
+				$showhide_xbox360=$xbox360;
+				$showhide_upc=$upc;
+				$showhide_purchasedate=$purchasedate;
+
+				$table.= "   <th>Title</th>\n";$columns++;
+				if (($showhide_upc eq "show") || ($showhide_upc eq "#")) {$table.="   <th>UPC</th>\n";$columns++;}
+				if (($showhide_battlenet eq "show") || ($showhide_battlenet eq "#")) {$table.="   <th>Battle.net</th>\n";$columns++;}
+				if (($showhide_epic eq "show") || ($showhide_epic eq "#")) {$table.="   <th>Epic</th>\n";$columns++;}
+				if (($showhide_nes eq "show") || ($showhide_nes eq "#")) {$table.="   <th>NES</th>\n";$columns++;}
+				if (($showhide_origin eq "show") || ($showhide_origin eq "#")) {$table.="   <th>Origin</th>\n";$columns++;}
+				if (($showhide_ps2 eq "show") || ($showhide_ps2 eq "#")) {$table.="   <th>PS2</th>\n";$columns++;}
+				if (($showhide_steam eq "show") || ($showhide_steam eq "#")) {$table.="   <th>Steam</th>\n";$columns++;}
+				if (($showhide_uplay eq "show") || ($showhide_uplay eq "#")) {$table.="   <th>uPlay</th>\n";$columns++;}
+				if (($showhide_xbox360 eq "show") || ($showhide_xbox360 eq "#")) {$table.="   <th>XBox360</th>\n";$columns++;}
+				if (($showhide_xboxone eq "show") || ($showhide_xboxone eq "#")) {$table.="   <th>XBoxOne</th>\n";$columns++;}
+				if (($showhide_wii eq "show") || ($showhide_wii eq "#")) {$table.="   <th>Wii</th>\n";$columns++;}
+				if (($showhide_purchasedate eq "show") || ($showhide_purchasedate eq "#")) {$table.="   <th>Purchase<br>Date</th>\n";$columns++;}
+				$table.=" </thead>\n <tbody>\n";
+				$mobiletable.= "   <thead>\n  <tr>\n   <th>Title</th>\n  </tr>\n </thead>\n <tbody>\n";
+			} else {
+				$titledisplay=$title;
+				$titleinformation="";
+				if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+					$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
+				}
+				if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+					$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
+				}
+				$titledisplay =~ s/\'\'/\"/g;
+				$titledisplay =~ s/\(plus\)/+/g;
+				$titledisplay =~ s/\(pound\)/#/g;
+				$titledisplay =~ s/\(amp\)/\&/g;
+				if ($battlenet eq "X") {$titleinformation.="Battle.net<br>";}
+				if ($epic eq "X") {$titleinformation.="Epic<br>";}
+				if ($nes eq "X") {$titleinformation.="Nintendo Entertainment System<br>";}
+				if ($origin eq "X") {$titleinformation.="Origin<br>";}
+				if ($ps2 eq "X") {$titleinformation.="Sony PlayStation 2<br>";}
+				if ($steam eq "X") {$titleinformation.="Steam<br>";}
+				if ($uplay eq "X") {$titleinformation.="uPlay<br>";}
+				if ($wii eq "X") {$titleinformation.="Nintendo Wii<br>";}
+				if ($xbox360 eq "X, DL") {$titleinformation.="XBox360 Download<br>";} elsif ($xbox360 eq "X, DK") {$titleinformation.="XBox360 Disk<br>";}
+				if ($xboxone eq "X, DL") {$titleinformation.="XBoxOne Download";}  elsif ($xboxone eq "X, DK") {$titleinformation.="XBoxOne Disk";} elsif ($xboxone eq "X, BC") {$titleinformation.="XBoxOne Backwards Compatibility";}
+
+				$table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td>";
+				if (($showhide_upc eq "show") || ($showhide_upc eq "#")) {$table.="<td>$upc</td>";}
+				if (($showhide_battlenet eq "show") || ($showhide_battlenet eq "#")) {$table.="<td>$battlenet</td>";}
+				if (($showhide_epic eq "show") || ($showhide_epic eq "#")) {$table.="<td>$epic</td>";}
+				if (($showhide_nes eq "show") || ($showhide_nes eq "#")) {$table.="<td>$nes</td>";}
+				if (($showhide_origin eq "show") || ($showhide_origin eq "#")) {$table.="<td>$origin</td>";}
+				if (($showhide_ps2 eq "show") || ($showhide_ps2 eq "#")) {$table.="<td>$ps2</td>";}
+				if (($showhide_steam eq "show") || ($showhide_steam eq "#")) {$table.="<td>$steam</td>";}
+				if (($showhide_uplay eq "show") || ($showhide_uplay eq "#")) {$table.="<td>$uplay</td>";}
+				if (($showhide_xbox360 eq "show") || ($showhide_xbox360 eq "#")) {$table.="<td>$xbox360</td>";}
+				if (($showhide_xboxone eq "show") || ($showhide_xboxone eq "#")) {$table.="<td>$xboxone</td>";}
+				if (($showhide_wii eq "show") || ($showhide_wii eq "#")) {$table.="<td>$wii</td>";}
+				if (($showhide_purchasedate eq "show") || ($showhide_purchasedate eq "#")) {$table.="<td>$purchasedate</td>";}
+				$table.= "\n  </tr>\n";
+				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
+			}
+		}
+		$table.= " </tbody>\n";
+		$mobiletable.= " </tbody>\n";
+	} elsif ($pagetitle eq "video") {
+		foreach (@in) {
+			($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn,$microsoft,$year,$purchasedate) = split(/\|/,$_);
+			if (substr($title,0,6) eq "#DATE#") {
+				$dataupdated=substr($title,(length($title)-10),10);
+				$showhide_type=$type;
+				$showhide_media=$media;
+				$showhide_amazon=$amazon;
+				$showhide_disneyanywhere=$disneyanywhere;
+				$showhide_googleplay=$googleplay;
+				$showhide_itunes=$itunes;
+				$showhide_uvvu=$uvvu;
+				$showhide_isbn=$isbn;
+				$showhide_microsoft=$microsoft;
+				$showhide_upc=$upc;
+				$showhide_purchasedate=$purchasedate;
+
+				$table.= "   <th>Title (Year)</th>\n";$columns++;
+				if (($showhide_upc eq "show") || ($showhide_upc eq "#")) {$table.="   <th>UPC</th>\n";$columns++;}
+				if (($showhide_isbn eq "show") || ($showhide_isbn eq "#")) {$table.="   <th>ISBN</th>\n";$columns++;}
+				if (($showhide_media eq "show") || ($showhide_media eq "#")) {$table.="   <th>Movie/TV</th>\n";$columns++;}
+				if (($showhide_type eq "show") || ($showhide_type eq "#")) {$table.="   <th>Physical<br>Media</th>\n";$columns++;}
+				if (($showhide_amazon eq "show") || ($showhide_amazon eq "#")) {$table.="   <th>Amazon</th>\n";$columns++;}
+				if (($showhide_disneyanywhere eq "show") || ($showhide_disneyanywhere eq "#")) {$table.="   <th>Disney<br>Anywhere</th>\n";$columns++;}
+				if (($showhide_googleplay eq "show") || ($showhide_googleplay eq "#")) {$table.="   <th>Google<br>Play</th>\n";$columns++;}
+				if (($showhide_itunes eq "show") || ($showhide_itunes eq "#")) {$table.="   <th>iTunes</th>\n";$columns++;}
+				if (($showhide_microsoft eq "show") || ($showhide_microsoft eq "#")) {$table.="   <th>Microsoft</th>\n";$columns++;}
+				if (($showhide_uvvu eq "show") || ($showhide_uvvu eq "#")) {$table.="   <th>UVVU</th>";$columns++;}
+				if (($showhide_purchasedate eq "show") || ($showhide_purchasedate eq "#")) {$table.="   <th>Purchase<br>Date</th>\n";$columns++;}
+				$table.="\n  </tr>\n </thead>\n <tbody>\n";
+				$mobiletable.= " <thead>\n  <tr>\n   <th>Title (Year)</th>\n  </tr>\n </thead>\n <tbody>\n";
+			} else {
+				$mediadisplay="";
+				if ($media eq "bluray") {
+					$mediadisplay="BluRay";
+				} elsif ($media eq "dvd") {
+					$mediadisplay="DVD";
+				} elsif ($media eq "diskcombo") {
+					$mediadisplay="BluRay/DVD";
+				} else {
+					$mediadisplay="Streaming";
+				}
+				$titledisplay=$title;
+				if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+					$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
+				}
+				if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+					$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
+				}
+				$titledisplay =~ s/\'\'/\"/g;
+				$titledisplay =~ s/\(plus\)/+/g;
+				$titledisplay =~ s/\(pound\)/#/g;
+				$titledisplay =~ s/\(amp\)/\&/g;
+
+				if ($year) {$titledisplay.=" ($year)";}
+
+				$titleinformation="$mediadisplay, $type<br>";
+				if ($amazon eq "X") {$titleinformation.="Amazon Video<br>";}
+				if ($itunes eq "X") {$titleinformation.="Apple iTunes<br>";}
+				if ($disneyanywhere eq "X") {$titleinformation.="Disney Anywhere<br>";}
+				if ($googleplay eq "X") {$titleinformation.="Google Play Video<br>";}
+				if ($microsoft eq "X") {$titleinformation.="Microsoft Movies & TV<br>";}
+				if ($uvvu eq "X") {$titleinformation.="UltraViolet<br>";}
+
+				$table.= "  <tr class=\"grid\">\n   <td class=\"title\"><div><b>$titledisplay</b></div></td>";
+				if (($showhide_upc eq "show") || ($showhide_upc eq "#")) {$table.="<td>$upc</td>";}
+				if (($showhide_isbn eq "show") || ($showhide_isbn eq "#")) {$table.="<td>$isbn</td>";}
+				if (($showhide_type eq "show") || ($showhide_type eq "#")) {$table.="<td>$type</td>";}
+				if (($showhide_media eq "show") || ($showhide_media eq "#")) {$table.="<td>$mediadisplay</td>";}
+				if (($showhide_amazon eq "show") || ($showhide_amazon eq "#")) {$table.="<td>$amazon</td>";}
+				if (($showhide_disneyanywhere eq "show") || ($showhide_disneyanywhere eq "#")) {$table.="<td>$disneyanywhere</td>";}
+				if (($showhide_googleplay eq "show") || ($showhide_googleplay eq "#")) {$table.="<td>$googleplay</td>";}
+				if (($showhide_itunes eq "show") || ($showhide_itunes eq "#")) {$table.="<td>$itunes</td>";}
+				if (($showhide_microsoft eq "show") || ($showhide_microsoft eq "#")) {$table.="<td>$microsoft</td>";}
+				if (($showhide_uvvu eq "show") || ($showhide_uvvu eq "#")) {$table.="<td>$uvvu</td>";}
+				if (($showhide_purchasedate eq "show") || ($showhide_purchasedate eq "#")) {$table.="<td>$purchasedate</td>";}
+				$table.="\n  </tr>\n";
+				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
+			}
+		}
+		$table.= " </tbody>\n";
+		$mobiletable.= " </tbody>\n";
+	}  elsif ($pagetitle eq "book") {
+		foreach (@in) {
+			($title,$author,$upc,$isbn,$type,$purchasedate) = split(/\|/,$_);
+			if (substr($title,0,6) eq "#DATE#") {
+				$dataupdated=substr($title,(length($title)-10),10);
+				$showhide_type=$type;
+				$showhide_isbn=$isbn;
+				$showhide_upc=$upc;
+				$showhide_purchasedate=$purchasedate;
+
+				$table.= "   <th>Title</th>\n   <th>Author(s)</th>\n";
+				$columns=$columns+2;
+				if (($showhide_upc eq "show") || ($showhide_upc eq "#")) {$table.="   <th>UPC</th>\n";$columns++;}
+				if (($showhide_isbn eq "show") || ($showhide_isbn eq "#")) {$table.="   <th>ISBN</th>\n";$columns++;}
+				if (($showhide_type eq "show") || ($showhide_type eq "#")) {$table.="   <th>Type</th>\n";$columns++;}
+				if (($showhide_purchasedate eq "show") || ($showhide_purchasedate eq "#")) {$table.="   <th>Purchase<br>Date</th>\n";$columns++;}
+				$table.= "</tr>\n </thead>\n <tbody>\n";
+				$mobiletable.= "   <th>Title &ndash; Author(s)</th>\n  </tr>\n </thead>\n <tbody>\n";
+			} else {
+				$titledisplay=$title;
+				if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+					$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
+				}
+				if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+					$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
+				}
+				$titledisplay =~ s/\'\'/\"/g;
+				$titledisplay =~ s/\(plus\)/+/g;
+				$titledisplay =~ s/\(pound\)/#/g;
+				$titledisplay =~ s/\(amp\)/\&/g;
+				$authordisplay=$author;
+				$authordisplay =~ s/\'\'/\"/g;
+				$authordisplay =~ s/\(plus\)/+/g;
+				$authordisplay =~ s/\(pound\)/#/g;
+				$authordisplay =~ s/\(amp\)/\&/g;
+				if (($author) && $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {$titledisplay.=" &ndash; $authordisplay";}
+
+				$titleinformation="";
+				if ($type eq "book") {$titleinformation.="Book<br>";} else {$titleinformation.="eBook<br>";}
+				$table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td><td><div>$authordisplay</div></td>";
+				if (($showhide_upc eq "show") || ($showhide_upc eq "#")) {$table.="<td>$upc</td>";}
+				if (($showhide_isbn eq "show") || ($showhide_isbn eq "#")) {$table.="<td>$isbn</td>";}
+				if (($showhide_type eq "show") || ($showhide_type eq "#")) {$table.="<td>$type</td>";}
+				if (($showhide_purchasedate eq "show") || ($showhide_purchasedate eq "#")) {$table.="<td>$purchasedate</td>";}
+				$table.="\n  </tr>\n";
+				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay $authordisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
+			}
+		}
+		$table.= " </tbody>\n";
+		$mobiletable.= " </tbody>\n";
+	}  elsif ($pagetitle eq "music") {
+		foreach (@in) {
+			($artist,$title,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody,$purchasedate) = split(/\|/,$_);
+			if (substr($artist,0,6) eq "#DATE#") {
+				$dataupdated=substr($artist,(length($artist)-10),10);
+				$showhide_cd=$cd;
+				$showhide_djbooth=$djbooth;
+				$showhide_amazon=$amazon;
+				$showhide_groove=$groove;
+				$showhide_googleplay=$googleplay;
+				$showhide_itunes=$itunes;
+				$showhide_reverbnation=$reverbnation;
+				$showhide_topspin=$topspin;
+				$showhide_rhapsody=$rhapsody;
+				$showhide_upc=$upc;
+				$showhide_purchasedate=$purchasedate;
+
+				$table.= "   <th>Artist &ndash; Album</th>\n\n";
+				$columns++;
+				if (($showhide_upc eq "show") || ($showhide_upc eq "#")) {$table.="   <th>UPC</th>\n";$columns++;}
+				if (($showhide_cd eq "show") || ($showhide_cd eq "#")) {$table.="   <th>CD</th>\n";$columns++;}
+				if (($showhide_amazon eq "show") || ($showhide_amazon eq "#")) {$table.="   <th>Amazon</th>\n";$columns++;}
+				if (($showhide_djbooth eq "show") || ($showhide_djbooth eq "#")) {$table.="   <th>DJ Booth</th>\n";$columns++;}
+				if (($showhide_googleplay eq "show") || ($showhide_googleplay eq "#")) {$table.="   <th>Google<br>Play</th>\n";$columns++;}
+				if (($showhide_groove eq "show") || ($showhide_groove eq "#")) {$table.="   <th>Groove</th>\n";$columns++;}
+				if (($showhide_itunes eq "show") || ($showhide_itunes eq "#")) {$table.="   <th>iTunes</th>\n";$columns++;}
+				if (($showhide_reverbnation eq "show") || ($showhide_reverbnation eq "#")) {$table.="   <th>ReverbNation</th>\n";$columns++;}
+				if (($showhide_rhapsody eq "show") || ($showhide_rhapsody eq "#")) {$table.="   <th>Rhapsody</th>\n";$columns++;}
+				if (($showhide_topspin eq "show") || ($showhide_topspin eq "#")) {$table.="   <th>TopSpin</th>\n";$columns++;}
+				if (($showhide_purchasedate eq "show") || ($showhide_purchasedate eq "#")) {$table.="   <th>Purchase<br>Date</th>\n";$columns++;}
+				$table.= "  </tr>\n </thead>\n <tbody>\n";
+				$mobiletable.= " <thead>\n  <tr>\n   <th>Title</th>\n  </tr>\n </thead>\n <tbody>\n";
+			} else {
+				$titledisplay=$title;
+				if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
+					$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
+				}
+				if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
+					$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
+				}
+				$titledisplay =~ s/\'\'/\"/g;
+				$titledisplay =~ s/\(plus\)/+/g;
+				$titledisplay =~ s/\(pound\)/#/g;
+				$titledisplay =~ s/\(amp\)/\&/g;
+				$artistdisplay=$artist;
+				$artistdisplay =~ s/\'\'/\"/g;
+				$artistdisplay =~ s/\(plus\)/+/g;
+				$artistdisplay =~ s/\(pound\)/#/g;
+				$artistdisplay =~ s/\(amp\)/\&/g;
+
+				$titleinformation="";
+				if ($amazon eq "X") {$titleinformation.="Amazon MP3<br>";}
+				if ($cd eq "X") {$titleinformation="Compact Disc<br>";}
+				if ($itunes eq "X") {$titleinformation.="Apple iTunes<br>";}
+				if ($djbooth eq "X") {$titleinformation.="DJ Booth<br>";}
+				if ($googleplay eq "X") {$titleinformation.="Google Play Music<br>";}
+				if ($groove eq "X") {$titleinformation.="Microsoft Groove<br>";}
+				if ($reverbnation eq "X") {$titleinformation.="ReverbNation<br>";}
+				if ($rhapsody eq "X") {$titleinformation.="Rhapsody<br>";}
+				if ($topspin eq "X") {$titleinformation.="TopSpin<br>";}
+
+				$table.= "  <tr class=\"grid\">\n   <td><div>$artistdisplay &ndash; $titledisplay</div></td>";
+				if (($showhide_upc eq "show") || ($showhide_upc eq "#")) {$table.="<td>$upc</td>";}
+				if (($showhide_cd eq "show") || ($showhide_cd eq "#")) {$table.="<td>$cd</td>";}
+				if (($showhide_amazon eq "show") || ($showhide_amazon eq "#")) {$table.="<td>$amazon</td>";}
+				if (($showhide_djbooth eq "show") || ($showhide_djbooth eq "#")) {$table.="<td>$djbooth</td>";}
+				if (($showhide_googleplay eq "show") || ($showhide_googleplay eq "#")) {$table.="<td>$googleplay</td>";}
+				if (($showhide_groove eq "show") || ($showhide_groove eq "#")) {$table.="<td>$groove</td>";}
+				if (($showhide_itunes eq "show") || ($showhide_itunes eq "#")) {$table.="<td>$itunes</td>";}
+				if (($showhide_reverbnation eq "show") || ($showhide_reverbnation eq "#")) {$table.="<td>$reverbnation</td>";}
+				if (($showhide_rhapsody eq "show") || ($showhide_rhapsody eq "#")) {$table.="<td>$rhapsody</td>";}
+				if (($showhide_topspin eq "show") || ($showhide_topspin eq "#")) {$table.="<td>$topspin</td>\n";}
+				if (($showhide_purchasedate eq "show") || ($showhide_purchasedate eq "#")) {$table.="<td>$purchasedate</td>";}
+				$table.="\n  </tr>\n";
+				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$artistdisplay &ndash; $titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
+			}
+		}
+		$table.= " </tbody>\n";
+		$mobiletable.= " </tbody>\n";
+	}
+	$table.= "</table>\n</div>\n";
+	$mobiletable.= "</table>\n</div>\n";
+}
+
+######  Set content type of the page.
+print "Content-TYPE: text/html\npragma: no-cache\n\n";
+print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n";
+print "<!--my media collection v$dateupdated-->\n";
+print "<HTML>\n";
+print "<HEAD>\n";
+print " <script type=\"text/javascript\" src=\"/javascripts/gs_sortable.js\"></script>\n";
+#print " <script type=\"text/javascript\" src=\"/javascripts/jquery-1.5.1.min.js\"></script>\n";
+#print " <script type=\"text/javascript\" src=\"/javascripts/jquery.freezeheader.js\"></script>\n";
+print " <script type=\"text/javascript\">\n  <!--\n";
+print "   function SizedPop(dir,page,type,width,height) {\n    window.open('/cgi-bin/' + dir + '/' + page + '?dotype=' + type, dir, \n";
+print "    'toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=yes,resizable=no,width=' + width + ',height=' + height);\n";
+print "   }\n   self.name = \"main\";\n";
+
 print "   var TSort_Data = new Array ('mytable'";
 $sortcolumns=0;
 while($sortcolumns < $columns){
@@ -80,8 +377,8 @@ while($sortcolumns < $columns){
 	$sortcolumns = $sortcolumns + 1;
 }
 print ");\n";
-
 print "   tsRegister();\n";
+
 print "  -->\n";
 print " </script>\n";
 
@@ -93,217 +390,36 @@ print "  #mytable td, #my_table th {\n    border: 1px solid #ddd;\n    padding: 
 print "  #mytable tr:nth-child(even){background-color: #f2f2f2;}\n\n";
 print "  #mytable tr:hover {background-color: #ccc;}\n\n";
 print "  #mytable th {\n    padding-top: 12px;\n    padding-bottom: 12px;\n    background-color: #4CAF50;\n    color: white;\n  }\n";
+if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
+	#skip
+} else {
+	print "  TD DIV {width: 250px;}";
+}
+
 print " </style>\n";
 
 if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
 	print " <META NAME=\"VIEWPORT\" CONTENT=\"WIDTH=DEVICE-WIDTH\"/>\n";
 }
-
 print "</HEAD>\n";
+
 print "<BODY BGCOLOR=#ffffff>\n";
 
-
-if ($empty != "1") {
-	open (media,"$basedir/$mediaitem") || print "error: $mediaitem";
-	@in = <media>;
-	close (media);
-
-	#print "<!--@in-->";
-
-	$table= "<div align=center>\n<table cellspacing=10 cellpadding=10 id=\"mytable\" class=\"data-table\">\n";
-	$mobiletable="<div align=center>\n<table cellspacing=10 cellpadding=10 id=\"mytable\" class=\"data-table\">\n";
-	$table.= " <colgroup>\n";
-	$table.= "  <col style=\"background-color: #ddd\">\n";
-  
-	$mediacolumns=1;
+print "<div align=center>\n<table cellspacing=10 cellpadding=10 id=\"mytable\" class=\"data-table\">\n";
+if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
+	print " <colgroup>\n"; 
+	$mediacolumns=0;
 	while($mediacolumns < $columns){
 		$mediacolumns = $mediacolumns + 1;
-		$table.= "  <col>\n";
+		print "  <col>\n";
 	}
-	$table.= " </colgroup>\n";
-
-	if ($pagetitle eq "game") {
-		##Video Games#|#Epic#|#Steam#|#Battle.net#|#Origin#|#uplay#|#NES#|#Wii#|#PS2#|#Xbox One#|#Xbox 360#|#UPC#|||||||||||
-		$table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>UPC</th>\n   <th>Battle.net</th>\n   <th>Epic</th>\n   <th>NES</th>\n   <th>Origin</th>\n   <th>PS2</th>\n   <th>Steam</th>\n   <th>Uplay</th>\n   <th>XBox 360</th>\n   <th>XBox One</th>\n   <th>Wii</th>\n  </tr>\n </thead>\n";
-		$mobiletable.= " <thead>\n  <tr>\n   <th>Title</th>\n  </tr>\n </thead>\n";
-
-		$table.= " <tbody>\n";
-		$mobiletable.= " <tbody>\n";
-
-		foreach (@in) {
-			($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$upc) = split(/\|/,$_);
-			$titledisplay=$title;
-			if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
-				$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
-			}
-			if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
-				$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
-			}
-			$titledisplay =~ s/\'\'/\"/g;
-			$titledisplay =~ s/\(plus\)/+/g;
-			$titledisplay =~ s/\(pound\)/#/g;
-			$titledisplay =~ s/\(amp\)/\&/g;
-			$titleinformation="";
-			if ($battlenet eq "X") {$titleinformation.="Battle.net<br>";}
-			if ($epic eq "X") {$titleinformation.="Epic<br>";}
-			if ($nes eq "X") {$titleinformation.="Nintendo Entertainment System<br>";}
-			if ($origin eq "X") {$titleinformation.="Origin<br>";}
-			if ($ps2 eq "X") {$titleinformation.="Sony PlayStation 2<br>";}
-			if ($steam eq "X") {$titleinformation.="Steam<br>";}
-			if ($uplay eq "X") {$titleinformation.="uPlay<br>";}
-			if ($wii eq "X") {$titleinformation.="Nintendo Wii<br>";}
-			if ($xbox360 eq "X, DL") {$titleinformation.="XBox360 Download<br>";} elsif ($xbox360 eq "X, DK") {$titleinformation.="XBox360 Disk<br>";}
-			if ($xboxone eq "X, DL") {$titleinformation.="XBoxOne Download";}  elsif ($xboxone eq "X, DK") {$titleinformation.="XBoxOne Disk";} elsif ($xboxone eq "X, BC") {$titleinformation.="XBoxOne Backwards Compatibility";}
-			if ($title eq "#DATE#") {
-				$dataupdated=$epic;
-			} else {
-				$table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td><td>$upc</td><td>$battlenet</td><td>$epic</td><td>$nes</td><td>$origin</td><td>$ps2</td><td>$steam</td><td>$uplay</td><td>$xbox360</td><td>$xboxone</td><td>$wii</td>\n  </tr>\n";
-				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
-			}
-		}
-		$table.= " </tbody>\n";
-		$mobiletable.= " </tbody>\n";
-	} elsif ($pagetitle eq "video") {
-		##Movie#|#Movie/TV#|#Media#|#Amazon#|#Disney Anywhere#|#Google Play#|#iTunes#|#UVVU#|#UPC#|#ISBN#|#Microsoft#|
-		$table.= " <thead>\n  <tr>\n   <th>Title (Year)</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Movie/TV</th>\n   <th>Physical<br>Media</th>\n   <th>Amazon</th>\n   <th>Disney<br>Anywhere</th>\n   <th>Google<br>Play</th>\n   <th>iTunes</th>\n   <th>Microsoft</th>\n<th>UVVU</th>\n  </tr>\n </thead>\n";
-		$mobiletable.= " <thead>\n  <tr>\n   <th>Title</th>\n  </tr>\n </thead>\n";
-
-		$table.= " <tbody>\n";
-		$mobiletable.= " <tbody>\n";
-
-		foreach (@in) {
-			($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn,$microsoft,$year) = split(/\|/,$_);
-			$mediadisplay="";
-			if ($media eq "bluray") {
-				$mediadisplay="BluRay";
-			} elsif ($media eq "dvd") {
-				$mediadisplay="DVD";
-			} elsif ($media eq "diskcombo") {
-				$mediadisplay="BluRay/DVD";
-			} else {
-				$mediadisplay="Streaming";
-			}
-			$titledisplay=$title;
-			if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
-				$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
-			}
-			if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
-				$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
-			}
-			$titledisplay =~ s/\'\'/\"/g;
-			$titledisplay =~ s/\(plus\)/+/g;
-			$titledisplay =~ s/\(pound\)/#/g;
-			$titledisplay =~ s/\(amp\)/\&/g;
-			$titleinformation="$mediadisplay, $type<br>";
-			if ($amazon eq "X") {$titleinformation.="Amazon Video<br>";}
-			if ($itunes eq "X") {$titleinformation.="Apple iTunes<br>";}
-			if ($disneyanywhere eq "X") {$titleinformation.="Disney Anywhere<br>";}
-			if ($googleplay eq "X") {$titleinformation.="Google Play Video<br>";}
-			if ($microsoft eq "X") {$titleinformation.="Microsoft Movies & TV<br>";}
-			if ($uvvu eq "X") {$titleinformation.="UltraViolet<br>";}
-			if ($year) {
-				$titledisplay.=" ($year)";
-			}
-			if ($title eq "#DATE#") {
-				$dataupdated=$type;
-			} else {
-				$table.= "  <tr class=\"grid\">\n   <td class=\"title\"><div><b>$titledisplay</b></div></td><td>$upc</td><td>$isbn</td><td>$type</td><td>$mediadisplay</td><td>$amazon</td><td>$disneyanywhere</td><td>$googleplay</td><td>$itunes</td><td>$microsoft</td><td>$uvvu</td>\n  </tr>\n";
-				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
-			}
-		}
-		$table.= " </tbody>\n";
-		$mobiletable.= " </tbody>\n";
-	}  elsif ($pagetitle eq "book") {
-		##Books#|#Authors#|#UPC#|#ISBN#|#Type#|
-		$table.= " <thead>\n  <tr>\n   <th>Title</th>\n   <th>Authors</th>\n   <th>UPC</th>\n   <th>ISBN</th>\n   <th>Type</th>\n  </tr>\n </thead>\n";
-		$mobiletable.= " <thead>\n  <tr>\n   <th>Title</th>\n  </tr>\n </thead>\n";
-
-		$table.= " <tbody>\n";
-		$mobiletable.= " <tbody>\n";
-
-		foreach (@in) {
-			($title,$author,$upc,$isbn,$type) = split(/\|/,$_);
-			$titledisplay=$title;
-			if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
-				$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
-			}
-			if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
-				$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
-			}
-			$titledisplay =~ s/\'\'/\"/g;
-			$titledisplay =~ s/\(plus\)/+/g;
-			$titledisplay =~ s/\(pound\)/#/g;
-			$titledisplay =~ s/\(amp\)/\&/g;
-			$authordisplay=$author;
-			$authordisplay =~ s/\'\'/\"/g;
-			$authordisplay =~ s/\(plus\)/+/g;
-			$authordisplay =~ s/\(pound\)/#/g;
-			$authordisplay =~ s/\(amp\)/\&/g;
-			if (($author) && $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {$titledisplay.=" &ndash; ";}
-
-			$titleinformation="";
-			if ($type eq "book") {$titleinformation.="Book<br>";} else {$titleinformation.="eBook<br>";}
-			if ($title eq "#DATE#") {
-				$dataupdated=$author;
-			} else {
-				$table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td><td><div>$authordisplay</div></td><td>$upc</td><td>$isbn</td><td>$type</td>\n  </tr>\n";
-				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay $authordisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
-			}
-		}
-		$table.= " </tbody>\n";
-		$mobiletable.= " </tbody>\n";
-	}  elsif ($pagetitle eq "music") {
-		##Artist#|#Title#|#UPC#|#CD#|#Amazon#|#DJBooth#|#Google#|#Groove#|#iTunes#|#ReverbNation#|#TopSpin#|#Rhapsody#|
-		$table.= " <thead>\n  <tr>\n   <th>Artist &ndash; Album</th>\n   <th>UPC</th>\n   <th>CD</th>\n   <th>Amazon</th>\n   <th>DJ Booth</th>\n   <th>Google Play</th>\n   <th>Groove</th>\n   <th>iTunes</th>\n   <th>ReverbNation</th>\n   <th>Rhapsody</th>\n   <th>TopSpin</th>\n  </tr>\n </thead>\n";
-		$mobiletable.= " <thead>\n  <tr>\n   <th>Title</th>\n  </tr>\n </thead>\n";
-
-		$table.= " <tbody>\n";
-		$mobiletable.= " <tbody>\n";
-
-		foreach (@in) {
-			($artist,$title,$upc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody) = split(/\|/,$_);
-			$titledisplay=$title;
-			if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
-				$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
-			}
-			if ($debugthesort == "1" && substr($titledisplay,0,4) eq "The ") {
-				$titledisplay=substr($titledisplay,4,length($titledisplay)).", The";
-			}
-			$titledisplay =~ s/\'\'/\"/g;
-			$titledisplay =~ s/\(plus\)/+/g;
-			$titledisplay =~ s/\(pound\)/#/g;
-			$titledisplay =~ s/\(amp\)/\&/g;
-			$artistdisplay=$artist;
-			$artistdisplay =~ s/\'\'/\"/g;
-			$artistdisplay =~ s/\(plus\)/+/g;
-			$artistdisplay =~ s/\(pound\)/#/g;
-			$artistdisplay =~ s/\(amp\)/\&/g;
-			$titleinformation="";
-			if ($amazon eq "X") {$titleinformation.="Amazon MP3<br>";}
-			if ($cd eq "X") {$titleinformation="Compact Disc<br>";}
-			if ($itunes eq "X") {$titleinformation.="Apple iTunes<br>";}
-			if ($djbooth eq "X") {$titleinformation.="DJ Booth<br>";}
-			if ($googleplay eq "X") {$titleinformation.="Google Play Music<br>";}
-			if ($groove eq "X") {$titleinformation.="Microsoft Groove<br>";}
-			if ($reverbnation eq "X") {$titleinformation.="ReverbNation<br>";}
-			if ($rhapsody eq "X") {$titleinformation.="Rhapsody<br>";}
-			if ($topspin eq "X") {$titleinformation.="TopSpin<br>";}
-			if ($artist eq "#DATE#") {
-				$dataupdated=$title;
-			} else {
-				$table.= "  <tr class=\"grid\">\n   <td><div>$artistdisplay &ndash; $titledisplay</div></td><td>$upc</td><td>$cd</td><td>$amazon</td><td>$djbooth</td><td>$googleplay</td><td>$groove</td><td>$itunes</td><td>$reverbnation</td><td>$rhapsody</td><td>$topspin</td>\n  </tr>\n";
-				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$artistdisplay &ndash; $titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
-			}
-		}
-		$table.= " </tbody>\n";
-		$mobiletable.= " </tbody>\n";
-	}
-	$table.= "</table>\n</div>\n";
-	$mobiletable.= "</table>\n</div>\n";
+	print " </colgroup>\n";
 }
+print " <thead>\n  <tr>\n";
 
 print "<div align=center>";
 if ($empty != "1") {
+	#print "columns: $columns | ";
 	print "data updated: $dataupdated";
 	if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
 		print "<br>";
@@ -314,7 +430,7 @@ if ($empty != "1") {
 if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
 	#skip
 } else {
-	print "<a href=\"javascript:SizedPop('$admindirectory','media.pl','$query',1325,625);\">admin</a> | ";
+	print "<a href=\"javascript:SizedPop('$admindirectory','media.pl','$query',1350,625);\">admin</a> | ";
 }
 print "<a href=\"$thispage?books\">books</a> | ";
 print "<a href=\"$thispage?games\">games</a> | ";
@@ -336,3 +452,4 @@ print "</div>\n";
 
 print "</body>\n";
 print "</html>";
+exit;
