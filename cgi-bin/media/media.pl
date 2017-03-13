@@ -20,7 +20,7 @@ $media_read="cgi-bin/media/media_";
 	$media_videos=$media_read."videos.txt";
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2017.03.10";
+$dateupdated="2017.03.12";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -2260,7 +2260,7 @@ sub media {
 		foreach $line(@in) {
 			($title,$author,$eacupc,$isbn,$type,$purchasedate) = split(/\|/,$line);
 			$mediawrite_books="books|$title|$author|$eacupc|$isbn|$type||";
-			if ($title ne "#DATE#") {
+			if (substr($title,0,6) ne "#DATE#") {
 				if ($isbn ne "") {
 					print "ISBN: $mediawrite_books $basedir/$media_check_isbn/$isbn<br>";
 					unless (-e "$basedir/$media_check_isbn/$isbn") {
@@ -2292,7 +2292,7 @@ sub media {
 		foreach $line(@in) {
 			($title,$epic,$steam,$battlenet,$origin,$uplay,$nes,$wii,$ps2,$xboxone,$xbox360,$eacupc,$purchasedate) = split(/\|/,$line);
 			$mediawrite_games="games|$title||$eacupc||||";
-			if ($title ne "#DATE#") {
+			if (substr($title,0,6) ne "#DATE#") {
 				if ($eacupc ne "") {
 					unless (-e "$basedir/$media_check_eacupc/$eacupc") {
 						#print "EAC/UPC: $mediawrite_games<br>";
@@ -2315,7 +2315,7 @@ sub media {
 		foreach $line(@in) {
 			($artist,$title,$eacupc,$cd,$amazon,$djbooth,$googleplay,$groove,$itunes,$reverbnation,$topspin,$rhapsody,$purchasedate) = split(/\|/,$line);
 			$mediawrite_music="music|$title|$artist|$eacupc||||";
-			if ($artist ne "#DATE#") {
+			if (substr($artist,0,6) ne "#DATE#") {
 				if ($eacupc ne "") {
 					unless (-e "$basedir/$media_check_eacupc/$eacupc") {
 						#print "EAC/UPC: $mediawrite_music<br>";
@@ -2338,7 +2338,7 @@ sub media {
 		foreach $line(@in) {
 			($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year,$purchasedate) = split(/\|/,$line);
 			$mediawrite_videos="videos|$title||$eacupc|$isbn|$type|$year|";
-			if ($title ne "#DATE#") {
+			if (substr($title,0,6) ne "#DATE#") {
 				if ($isbn ne "") {
 					unless (-e "$basedir/$media_check_isbn/$isbn") {
 						#print "ISBN: $mediawrite_videos<br>";
@@ -2971,19 +2971,19 @@ sub getqueries {
 	if ($dotype eq "books") {
 		$media_read.="books.txt";
 		$media_text="Book";
-		#$columns=8;
+		$columns=8;
 	} elsif ($dotype eq "games") {
 		$media_read.="games.txt";
 		$media_text="Game";
-		#$columns=15;
+		$columns=15;
 	} elsif ($dotype eq "music") {
 		$media_read.="music.txt";
 		$media_text="Music";
-		#$columns=14;
+		$columns=14;
 	} elsif ($dotype eq "videos") {
 		$media_read.="videos.txt";
 		$media_text="Video";
-		#$columns=14;
+		$columns=14;
 	} elsif ($dotype eq "config") {
 		if ($dowhat eq "") {$dowhat="config_view";}
 		$columns=4;
