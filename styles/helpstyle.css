@@ -3,3 +3,4 @@ BODY,A,A.out {FONT-FAMILY: UBUNTU, VERDANA; COLOR: #000000;}
 A,TH,TD,.section {FONT-SIZE: 11PT;}
 .link {FONT-SIZE: 20PT;}
 .out {FONT-SIZE: 16PT;}
+TD DIV {width: 250px;}
