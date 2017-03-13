@@ -42,6 +42,8 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 - TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
 
 # change log
+- 2017.03.12
+  - Administration: with the 2017.03.12 update, the database changes broke the EAC/UPC/ISBN database generation, this is now fixed.
 - 2017.03.10
   - Administration: "media.cgi" file contains the following modifications/updates:
     - Thru the administration, you can now show/hide columns from view on the non-administrative pages. To edit these, navigate to the media type and now underneath the "Add by UPC/EAC/ISBN" links at the top, there is also a "Show/Hide Columns" link. Technically, this is integrated into the 'config' pages, so there's also a link to see the current state of each media type's available columns being hidden or shown.
