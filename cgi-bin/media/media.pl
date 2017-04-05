@@ -20,7 +20,7 @@ $media_read="cgi-bin/media/media_";
 	$media_videos=$media_read."videos.txt";
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2017.03.12";
+$dateupdated="2017.04.04";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -331,6 +331,8 @@ sub media {
 						$count_bluray=$count_bluray+1;
 						$count_dvd=$count_dvd+1;
 						$mediadisplay="BluRay/DVD";
+					} elsif (($mediadisplay eq "") && ($amazon eq "X") || ($disneyanywhere eq "X") || ($googleplay eq "X") || ($itunes eq "X") || ($microsoft eq "X") || ($uvvu eq "X")) {
+						$mediadisplay="Streaming";
 					}
 
 					# The code below breaks out the count of TV and Movie media types.
