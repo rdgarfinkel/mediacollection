@@ -42,6 +42,8 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 - TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
 
 # change log
+- 2017.04.04
+  - On the videos section, I had included an if/then statement that would change the media type of entries to "Streaming" if there wasn't a media type option selected. This revision modifies this slightly, in that "Streaming" will only show if a streaming service is selected per entry, otherwise it won't show anything.
 - 2017.03.12
   - Administration: with the 2017.03.12 update, the database changes broke the EAC/UPC/ISBN database generation, this is now fixed.
 - 2017.03.10
