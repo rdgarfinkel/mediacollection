@@ -20,7 +20,7 @@ $empty="0";
 $userAgent=$ENV{"HTTP_USER_AGENT"};
 
 #  headers for the non-admin pages
-$dateupdated="2017.03.10";
+$dateupdated="2017.04.04";
 
 #  Open and process the "debug" file. On this page, the article sort is the only variable that matters.
 open (debug,"$basedir/$debugitem") || &error("error: mediaitem $debugitem");
@@ -179,9 +179,10 @@ if ($empty != "1") {
 					$mediadisplay="DVD";
 				} elsif ($media eq "diskcombo") {
 					$mediadisplay="BluRay/DVD";
-				} else {
+				} elsif (($mediadisplay eq "") && ($amazon eq "X") || ($disneyanywhere eq "X") || ($googleplay eq "X") || ($itunes eq "X") || ($microsoft eq "X") || ($uvvu eq "X")) {
 					$mediadisplay="Streaming";
 				}
+
 				$titledisplay=$title;
 				if ($debugthesort == "0" && substr($titledisplay,length($titledisplay)-5,5) eq ", The") {
 					$titledisplay="The ".substr($titledisplay,0,length($titledisplay)-5);
