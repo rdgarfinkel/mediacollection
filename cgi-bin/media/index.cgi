@@ -20,14 +20,14 @@ $empty="0";
 $userAgent=$ENV{"HTTP_USER_AGENT"};
 
 #  headers for the non-admin pages
-$dateupdated="2017.04.04";
+$dateupdated="2017.06.20";
 
 #  Open and process the "debug" file. On this page, the article sort is the only variable that matters.
 open (debug,"$basedir/$debugitem") || &error("error: mediaitem $debugitem");
 @in = <debug>;
 close (debug);
 for $line(@in) {
-	($debugwrite,$debugpreviewhide,$debugpreviewshow,$debugthesort) = split(/\|/,$line);
+	($debugwrite,$debugpreviewhide,$debugpreviewshow,$debugthesort,$debugmobile) = split(/\|/,$line);
 }
 
 #  Get the query from the URI address
@@ -135,7 +135,12 @@ if ($empty != "1") {
 				if (($showhide_wii eq "show") || ($showhide_wii eq "#")) {$table.="<td>$wii</td>";}
 				if (($showhide_purchasedate eq "show") || ($showhide_purchasedate eq "#")) {$table.="<td>$purchasedate</td>";}
 				$table.= "\n  </tr>\n";
-				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
+				if ($debugmobile == "1") {
+					$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
+				} else {
+					$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b></div></td>\n  </tr>\n";
+				}				
+				
 			}
 		}
 		$table.= " </tbody>\n";
@@ -197,13 +202,16 @@ if ($empty != "1") {
 
 				if ($year) {$titledisplay.=" ($year)";}
 
-				$titleinformation="$mediadisplay, $type<br>";
-				if ($amazon eq "X") {$titleinformation.="Amazon Video<br>";}
-				if ($itunes eq "X") {$titleinformation.="Apple iTunes<br>";}
-				if ($disneyanywhere eq "X") {$titleinformation.="Disney Anywhere<br>";}
-				if ($googleplay eq "X") {$titleinformation.="Google Play Video<br>";}
-				if ($microsoft eq "X") {$titleinformation.="Microsoft Movies & TV<br>";}
-				if ($uvvu eq "X") {$titleinformation.="UltraViolet<br>";}
+				$titleinformation="$mediadisplay, $type";
+				if ($debugmobile == "1") {
+					print "<br>";
+					if ($amazon eq "X") {$titleinformation.="Amazon Video<br>";}
+					if ($itunes eq "X") {$titleinformation.="Apple iTunes<br>";}
+					if ($disneyanywhere eq "X") {$titleinformation.="Disney Anywhere<br>";}
+					if ($googleplay eq "X") {$titleinformation.="Google Play Video<br>";}
+					if ($microsoft eq "X") {$titleinformation.="Microsoft Movies & TV<br>";}
+					if ($uvvu eq "X") {$titleinformation.="UltraViolet<br>";}
+				}
 
 				$table.= "  <tr class=\"grid\">\n   <td class=\"title\"><div><b>$titledisplay</b></div></td>";
 				if (($showhide_upc eq "show") || ($showhide_upc eq "#")) {$table.="<td>$upc</td>";}
@@ -218,7 +226,11 @@ if ($empty != "1") {
 				if (($showhide_uvvu eq "show") || ($showhide_uvvu eq "#")) {$table.="<td>$uvvu</td>";}
 				if (($showhide_purchasedate eq "show") || ($showhide_purchasedate eq "#")) {$table.="<td>$purchasedate</td>";}
 				$table.="\n  </tr>\n";
-				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
+				if ($debugmobile == "1") {
+					$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
+				} else {
+					$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b></div></td>\n  </tr>\n";
+				}
 			}
 		}
 		$table.= " </tbody>\n";
@@ -268,7 +280,11 @@ if ($empty != "1") {
 				if (($showhide_type eq "show") || ($showhide_type eq "#")) {$table.="<td>$type</td>";}
 				if (($showhide_purchasedate eq "show") || ($showhide_purchasedate eq "#")) {$table.="<td>$purchasedate</td>";}
 				$table.="\n  </tr>\n";
-				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay $authordisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
+				if ($debugmobile == "1") {
+					$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
+				} else {
+					$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$titledisplay</b></div></td>\n  </tr>\n";
+				}
 			}
 		}
 		$table.= " </tbody>\n";
@@ -324,15 +340,17 @@ if ($empty != "1") {
 				$artistdisplay =~ s/\(amp\)/\&/g;
 
 				$titleinformation="";
-				if ($amazon eq "X") {$titleinformation.="Amazon MP3<br>";}
-				if ($cd eq "X") {$titleinformation="Compact Disc<br>";}
-				if ($itunes eq "X") {$titleinformation.="Apple iTunes<br>";}
-				if ($djbooth eq "X") {$titleinformation.="DJ Booth<br>";}
-				if ($googleplay eq "X") {$titleinformation.="Google Play Music<br>";}
-				if ($groove eq "X") {$titleinformation.="Microsoft Groove<br>";}
-				if ($reverbnation eq "X") {$titleinformation.="ReverbNation<br>";}
-				if ($rhapsody eq "X") {$titleinformation.="Rhapsody<br>";}
-				if ($topspin eq "X") {$titleinformation.="TopSpin<br>";}
+				if ($debugmobile == "1") {
+					if ($amazon eq "X") {$titleinformation.="Amazon MP3<br>";}
+					if ($cd eq "X") {$titleinformation="Compact Disc<br>";}
+					if ($itunes eq "X") {$titleinformation.="Apple iTunes<br>";}
+					if ($djbooth eq "X") {$titleinformation.="DJ Booth<br>";}
+					if ($googleplay eq "X") {$titleinformation.="Google Play Music<br>";}
+					if ($groove eq "X") {$titleinformation.="Microsoft Groove<br>";}
+					if ($reverbnation eq "X") {$titleinformation.="ReverbNation<br>";}
+					if ($rhapsody eq "X") {$titleinformation.="Rhapsody<br>";}
+					if ($topspin eq "X") {$titleinformation.="TopSpin<br>";}
+				}
 
 				$table.= "  <tr class=\"grid\">\n   <td><div>$artistdisplay &ndash; $titledisplay</div></td>";
 				if (($showhide_upc eq "show") || ($showhide_upc eq "#")) {$table.="<td>$upc</td>";}
@@ -347,7 +365,11 @@ if ($empty != "1") {
 				if (($showhide_topspin eq "show") || ($showhide_topspin eq "#")) {$table.="<td>$topspin</td>\n";}
 				if (($showhide_purchasedate eq "show") || ($showhide_purchasedate eq "#")) {$table.="<td>$purchasedate</td>";}
 				$table.="\n  </tr>\n";
-				$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$artistdisplay &ndash; $titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
+				if ($debugmobile == "1") {
+					$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$artistdisplay &ndash; $titledisplay</b><br>$titleinformation</div></td>\n  </tr>\n";
+				} else {
+					$mobiletable.="  <tr class=\"grid\">\n   <td><div><b>$artistdisplay &ndash; $titledisplay</b></div></td>\n  </tr>\n";
+				}				
 			}
 		}
 		$table.= " </tbody>\n";
@@ -363,22 +385,30 @@ print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/T
 print "<!--my media collection v$dateupdated-->\n";
 print "<HTML>\n";
 print "<HEAD>\n";
-print " <script type=\"text/javascript\" src=\"/javascripts/gs_sortable.js\"></script>\n";
-#print " <script type=\"text/javascript\" src=\"/javascripts/jquery-1.5.1.min.js\"></script>\n";
-#print " <script type=\"text/javascript\" src=\"/javascripts/jquery.freezeheader.js\"></script>\n";
+if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
+	#skip
+} else {
+	print " <script type=\"text/javascript\" src=\"/javascripts/gs_sortable.js\"></script>\n";
+	#print " <script type=\"text/javascript\" src=\"/javascripts/jquery-1.5.1.min.js\"></script>\n";
+	#print " <script type=\"text/javascript\" src=\"/javascripts/jquery.freezeheader.js\"></script>\n";
+}
 print " <script type=\"text/javascript\">\n  <!--\n";
 print "   function SizedPop(dir,page,type,width,height) {\n    window.open('/cgi-bin/' + dir + '/' + page + '?dotype=' + type, dir, \n";
-print "    'toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=yes,resizable=no,width=' + width + ',height=' + height);\n";
-print "   }\n   self.name = \"main\";\n";
+print "    'toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=yes,resizable=no,width=' + width + ',height=' + height);\n   }\n";
+print "   self.name = \"main\";\n";
 
-print "   var TSort_Data = new Array ('mytable'";
-$sortcolumns=0;
-while($sortcolumns < $columns){
-	print ",'s'";
-	$sortcolumns = $sortcolumns + 1;
+if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
+	#skip
+} else {
+	print "   var TSort_Data = new Array ('mytable'";
+	$sortcolumns=0;
+	while($sortcolumns < $columns){
+		print ",'s'";
+		$sortcolumns = $sortcolumns + 1;
+	}
+	print ");\n";
+	print "   tsRegister();\n";
 }
-print ");\n";
-print "   tsRegister();\n";
 
 print "  -->\n";
 print " </script>\n";
@@ -399,7 +429,7 @@ if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/i
 
 print " </style>\n";
 
-if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
+if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i) {
 	print " <META NAME=\"VIEWPORT\" CONTENT=\"WIDTH=DEVICE-WIDTH\"/>\n";
 }
 print "</HEAD>\n";
@@ -441,7 +471,7 @@ print "</div>\n";
 
 print "<br>\n";
 
-if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
+if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i) {
 	print $mobiletable;
 } else {
 	print $table;
