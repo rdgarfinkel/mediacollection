@@ -20,7 +20,7 @@ $media_read="cgi-bin/media/media_";
 	$media_videos=$media_read."videos.txt";
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2017.04.04";
+$dateupdated="2017.06.21";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -1545,11 +1545,13 @@ sub media {
 		if ($config_previewhide eq 0) {$dashpreviewhide="off";} else {$dashpreviewhide="on";}
 		if ($config_previewshow eq 0) {$dashpreviewshow="off";} else {$dashpreviewshow="on";}
 		if ($config_thesort eq 0) {$dashthesort="off";} else {$dashthesort="on";}
+		if ($config_mobile eq 0) {$dashmobile="off";} else {$dashmobile="on";}
 
 		print "     <tr class=\"grid\">\n      <th>enable write</th>\n      <td>$dashwrite</td>\n      <td>on</td>\n     </tr>\n";
 		print "     <tr class=\"grid\">\n      <th>preview hidden</th>\n      <td>$dashpreviewhide</td>\n      <td>off</td>\n     </tr>\n";
 		print "     <tr class=\"grid\">\n      <th>preview shown</th>\n      <td>$dashpreviewshow</td>\n      <td>off</td>\n     </tr>\n";
 		print "     <tr class=\"grid\">\n      <th>sort by</th>\n      <td>$dashthesort</td>\n      <td>off</td>\n     </tr>\n";
+		print "     <tr class=\"grid\">\n      <th>mobile information</th>\n      <td>$dashmobile</td>\n      <td>off</td>\n     </tr>\n";
 
 		print "     <tr><td align=center colspan=3><a href=\"/$config_adminsite?dowhat=config_edit&dotype=$dotype&fromtype=$fromtype\">Change Configuration</a> | <a href=\"/$config_adminsite?dotype=config&dowhat=config_columns_view\">Show/Hide Headers</a></td></tr>\n";
 		print "     <tr>\n";
@@ -1560,6 +1562,7 @@ sub media {
 		print "      <b>sort by</b>: when on, titles beginning with 'The' appear with '<i>, The</i>' at the end, off disables<br>\n";
 		print "      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This applies to both the administrative and non-administrative pages, but not to the<br>\n";
 		print "      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;database. This is primarily for sorting purposes.<br>\n";
+		print "      <b>mobile information</b>: when on, media type services are included under the entries, off disables<br>\n";
 		print "      </td>\n";
 		print "     </tr>\n";
 		print "    </tbody>\n   </table>\n";
@@ -1632,6 +1635,21 @@ sub media {
 		print "       </select>\n";
 		print "      </td>\n      <td>off</td>\n    </tr>\n";
 
+		print "    <tr class=\"grid\">\n     <th>mobile information</th>\n      <td>\n";
+		print "       <select name=config_mobile>\n";
+		if ($config_mobile eq '0'){
+			print "        <option value=\"0\" selected>off</option>\n";
+		} else {
+			print "        <option value=\"0\">off</option>\n";
+		}
+		if ($config_mobile eq '1'){
+			print "        <option value=\"1\" selected>on</option>\n";
+		} else {
+			print "        <option value=\"1\">on</option>\n";
+		}
+		print "       </select>\n";
+		print "      </td>\n      <td>off</td>\n    </tr>\n";
+
 		print "     <tr>\n      <td colspan=$columns align=center>\n       <input type=button value=\"Cancel\" onClick=\"history.back()\">\n       <input type=submit value=\"Submit\">\n      </td>\n     </tr>\n";
 		print "     <tr>\n";
 		print "      <td style=\"text-align:left\" colspan=$columns>\n";
@@ -1651,7 +1669,7 @@ sub media {
 	}
 
 	sub config_write {
-		$writenew="$editconfig_write|$editconfig_previewhide|$editconfig_previewshow|$editconfig_thesort|";
+		$writenew="$editconfig_write|$editconfig_previewhide|$editconfig_previewshow|$editconfig_thesort|$editconfig_mobile|";
 
 		if ($config_previewhide eq "1") {
 			print "<!--\n";
@@ -1660,6 +1678,7 @@ sub media {
 			print "    editconfig_previewhide: $editconfig_previewhide\n";
 			print "    editconfig_previewshow: $editconfig_previewshow\n";
 			print "    editconfig_thesort: $editconfig_thesort\n";
+			print "    editconfig_mobile|: $editconfig_mobile\n";
 			print "-->\n";
 		}
 		if ($config_previewshow eq "1") {
@@ -1668,6 +1687,7 @@ sub media {
 			print "editconfig_previewhide: $editconfig_previewhide<br>";
 			print "editconfig_previewshow: $editconfig_previewshow<br>";
 			print "editconfig_thesort: $editconfig_thesort<br>";
+			print "editconfig_mobile|: $editconfig_mobile\n";
 		}
 		open (WRITEINFO,"+>$basedir/$config_data") || &error("error: config_data $basedir/$config_data");
 		print (WRITEINFO $writenew);
@@ -2264,7 +2284,7 @@ sub media {
 			$mediawrite_books="books|$title|$author|$eacupc|$isbn|$type||";
 			if (substr($title,0,6) ne "#DATE#") {
 				if ($isbn ne "") {
-					print "ISBN: $mediawrite_books $basedir/$media_check_isbn/$isbn<br>";
+					#print "ISBN: $mediawrite_books $basedir/$media_check_isbn/$isbn<br>";
 					unless (-e "$basedir/$media_check_isbn/$isbn") {
 						open (WRITEINFO,"+>$basedir/$media_check_isbn/$isbn") || &error("error: mediaitem $basedir/$media_check_isbn/$isbn<br>");
 						print (WRITEINFO $mediawrite_books);
@@ -2785,7 +2805,7 @@ sub getqueries {
 	@in = <config>;
 	close (config);
 	for $line(@in) {
-		($config_write,$config_previewhide,$config_previewshow,$config_thesort) = split(/\|/,$line);
+		($config_write,$config_previewhide,$config_previewshow,$config_thesort,$config_mobile) = split(/\|/,$line);
 	}
 
 	# Delay write information display
@@ -2810,7 +2830,7 @@ sub getqueries {
 	### Retrieve information passed from/to scripts
 
 	# $delay is for diagnostic purposes, just to check that all variables appear correctly when running
-	$delay="<!--ez editor v$dateupdated || today $today || config_previewshow $config_previewshow || config_previewhide $config_previewhide || wait $wait";
+	$delay="<!--ez editor v$dateupdated || today $today || config_previewshow $config_previewshow || config_previewhide $config_previewhide || config_mobile $config_mobile || wait $wait";
 
 	# if the form request is a 'get', then process it, otherwise...
 	if ($ENV{'REQUEST_METHOD'} eq 'GET') {
@@ -2929,6 +2949,7 @@ sub getqueries {
 	$editconfig_previewhide=$FORM{'config_previewhide'};
 	$editconfig_previewshow=$FORM{'config_previewshow'};
 	$editconfig_thesort=$FORM{'config_thesort'};
+	$editconfig_mobile=$FORM{'config_mobile'};
 	# Column edits
 	$column_video_eacupc=$FORM{'column_video_eacupc'};
 	$column_video_type=$FORM{'column_video_type'};
