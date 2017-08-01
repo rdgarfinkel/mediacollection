@@ -2,7 +2,7 @@
 Simple data (no images to load) display and management for physical and digital music, video (movies/tv), books, and games collections
 
 # first things first
-If you will be using this on a public server, put the /cgi-bin/media/media.pl file within a separate directory that is password protected so that only you can add/amend/delete your database entries.<br>
+If you will be using this on a public server, put the /cgi-bin/media/media.pl file within a separate directory that is password protected so that only you can add/amend/delete your database entries. Also, you'll need to adjust line 11 on both index.cgi and media.pl, should you decide to move the directory.<br>
 Aside from editing the "#!/usr/bin/perl" line at the top of each script, things *should* work "directly out of the box." 
 
 # demonstration
@@ -15,7 +15,7 @@ I use Aprelium's Abyss Web Server for local server scripting/testing, free and a
 The public server I use for the demonstration (as well as my other sites there) is also free; http://heliohost.org. You do need to remember to login to your account once a month to keep your account active, though I can say comfortably that your account and all files will be recovered if you do forget.
 
 # optional
-I highly recommend an external barcode scanner, since it will help tremendously when initially entering your items into the database; it will act as a keyboard input when adding thru either the EAC/UPC/ISBN entry, or as a manual entry. Personally,  I use a <b>:CueCat</b> that has been modified to have a USB connector, rather than a PS/2 connector; the :CueCat can be found thru ebay.com for less than $10 USD.
+I highly recommend an external barcode scanner, since it will help tremendously when initially entering your items into the database; it will act as a keyboard input when adding thru either the EAC/UPC/ISBN entry, or as a manual entry. Personally,  I use a <b>:CueCat</b> that has been modified to have a USB connector, rather than a PS/2 connector; the :CueCat can be found thru ebay.com for less than $10 USD. Just note that when using the :CueCat, after scanning the barcode, the "Enter" key is submitted, so you may have to go back to the entry to make adjustments afterward.
 
 # what is included
 - /javascripts/gs_sortable.js, http://www.allmyscripts.com/Table_Sort/index.html: allows for the dynamic sorting of table headers (only accessible when the page has not been scrolled down)<br>
@@ -28,7 +28,7 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 - When using the <b>#</b> pound symbol in text fields, the editing feature didn't work. I think what happens is the script thinks that the entry is supposed to be hidden, like it is a comment in Perl. When a pound sign is needed in titles, use <b>(pound)</b>. This will be entered into the database, and <b>(pound)</b> will be swapped for <b>#</b> pound symbol in the user facing tables.
 - When using the <b>+</b> plus symbol, the editing feature works, but not as expected. The plus symbol is the indicator that forms use for spaces, and would be interpreted as such. When the <b>+</b> plus symbol is to be used within a text field, use <b>(plus)</b>. This will be entered into the database, and <b>(plus)</b> will be swapped for <b>+</b> plus symbol in the user facing tables.
 - When movies are redone and the titles are the same, you'll get unwanted results when trying to edit one of the two entries. For example, the 1967 movie, *The Jungle Book* and the 2016 movie, *The Jungle Book*. When both exist in the database, both entries would be edited when editing one of the entries. To work around this, there is now a year input box within the media editor for videos, and entries are now compared by title and year, when the year has a value.
-- The columns currently within each media section are the media types that I have. As an example, I don't have a Sony Playstation 1, 3, or 4 system/games, so those columns don't exist yet in the games section. If you need these or other options, file an issue here on Github, and I'll add whatever you need, or if anyone wants to contribute, that's okay too.
+- The columns currently within each media section are the media types that I have. As an example, I don't have a Sony Playstation 1, 3, or 4 system/games, so those columns don't exist yet in the games section. If you need these or other options, file an issue here on Github, and I'll add whatever you need, or if anyone wants to contribute, feel free to.
 
 # things to add/research
 - Make code comments on files and processes for helping others' understand what is doing what. (media.pl is close to finished, index.cgi will be next)
@@ -42,6 +42,9 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 - TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
 
 # change log
+- 2017.06.21
+  - Non-administrative/Administrative: Added ability to show/hide service information for the video games, music, movies/TV, and books listings when viewed on a mobile device.
+  - Non-administrative: Minor tweaks to the mobile device display tables.
 - 2017.04.04
   - Non-administrative/Administrative: On the videos section, I had included an if/then statement that would change the media type of entries to "Streaming" if there wasn't a media type option selected. This revision modifies this slightly, in that "Streaming" will only show if a streaming service is selected per entry, otherwise it won't show anything.
 - 2017.03.12
