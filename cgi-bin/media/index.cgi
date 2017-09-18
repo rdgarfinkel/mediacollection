@@ -20,7 +20,7 @@ $empty="0";
 $userAgent=$ENV{"HTTP_USER_AGENT"};
 
 #  headers for the non-admin pages
-$dateupdated="2017.06.20";
+$dateupdated="2017.09.18";
 
 #  Open and process the "debug" file. On this page, the article sort is the only variable that matters.
 open (debug,"$basedir/$debugitem") || &error("error: mediaitem $debugitem");
@@ -32,25 +32,22 @@ for $line(@in) {
 
 #  Get the query from the URI address
 $query=$ENV{"QUERY_STRING"};
-#  if $query equals games, set $mediaitem to look at the games.txt file, set the page title to "game," and set columns
+#  if $query equals games, set $mediaitem to look at the games.txt file, set the page title to "game"
 if ($query eq "games") {
 	$mediaitem.="games.txt";
 	$pagetitle="game";
-#  if $query equals videos, set $mediaitem to look at the videos.txt file, set the page title to "video," and set columns
+#  if $query equals videos, set $mediaitem to look at the videos.txt file, set the page title to "video"
 } elsif ($query eq "videos") {
 	$mediaitem.="videos.txt";
 	$pagetitle="video";
-	$columns=11;
-#  if $query equals music, set $mediaitem to look at the music.txt file, set the page title to "music," and set columns
+#  if $query equals music, set $mediaitem to look at the music.txt file, set the page title to "music"
 } elsif ($query eq "music") {
 	$mediaitem.="music.txt";
 	$pagetitle="music";
-	$columns=11;
-#  if $query equals books, set $mediaitem to look at the books.txt file, set the page title to "book," and set columns
+#  if $query equals books, set $mediaitem to look at the books.txt file, set the page title to "book"
 } elsif ($query eq "books") {
 	$mediaitem.="books.txt";
 	$pagetitle="book";
-	$columns=5;
 #  if none of the above are true, then the $query is either incorrect or missing, so now $empty is set to 1, and page title
 #  is set to "media." this also prevents the data table from being created.
 } else {
@@ -110,16 +107,18 @@ if ($empty != "1") {
 				$titledisplay =~ s/\(plus\)/+/g;
 				$titledisplay =~ s/\(pound\)/#/g;
 				$titledisplay =~ s/\(amp\)/\&/g;
-				if ($battlenet eq "X") {$titleinformation.="Battle.net<br>";}
-				if ($epic eq "X") {$titleinformation.="Epic<br>";}
-				if ($nes eq "X") {$titleinformation.="Nintendo Entertainment System<br>";}
-				if ($origin eq "X") {$titleinformation.="Origin<br>";}
-				if ($ps2 eq "X") {$titleinformation.="Sony PlayStation 2<br>";}
-				if ($steam eq "X") {$titleinformation.="Steam<br>";}
-				if ($uplay eq "X") {$titleinformation.="uPlay<br>";}
-				if ($wii eq "X") {$titleinformation.="Nintendo Wii<br>";}
-				if ($xbox360 eq "X, DL") {$titleinformation.="XBox360 Download<br>";} elsif ($xbox360 eq "X, DK") {$titleinformation.="XBox360 Disk<br>";}
-				if ($xboxone eq "X, DL") {$titleinformation.="XBoxOne Download";}  elsif ($xboxone eq "X, DK") {$titleinformation.="XBoxOne Disk";} elsif ($xboxone eq "X, BC") {$titleinformation.="XBoxOne Backwards Compatibility";}
+				if ($debugmobile == "1") {
+					if ($battlenet eq "X") {$titleinformation.="Battle.net<br>";}
+					if ($epic eq "X") {$titleinformation.="Epic<br>";}
+					if ($nes eq "X") {$titleinformation.="Nintendo Entertainment System<br>";}
+					if ($origin eq "X") {$titleinformation.="Origin<br>";}
+					if ($ps2 eq "X") {$titleinformation.="Sony PlayStation 2<br>";}
+					if ($steam eq "X") {$titleinformation.="Steam<br>";}
+					if ($uplay eq "X") {$titleinformation.="uPlay<br>";}
+					if ($wii eq "X") {$titleinformation.="Nintendo Wii<br>";}
+					if ($xbox360 eq "X, DL") {$titleinformation.="XBox360 Download<br>";} elsif ($xbox360 eq "X, DK") {$titleinformation.="XBox360 Disk<br>";}
+					if ($xboxone eq "X, DL") {$titleinformation.="XBoxOne Download";}  elsif ($xboxone eq "X, DK") {$titleinformation.="XBoxOne Disk";} elsif ($xboxone eq "X, BC") {$titleinformation.="XBoxOne Backwards Compatibility";}
+				}
 
 				$table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td>";
 				if (($showhide_upc eq "show") || ($showhide_upc eq "#")) {$table.="<td>$upc</td>";}
@@ -204,7 +203,7 @@ if ($empty != "1") {
 
 				$titleinformation="$mediadisplay, $type";
 				if ($debugmobile == "1") {
-					print "<br>";
+					$titleinformation.="<br>";
 					if ($amazon eq "X") {$titleinformation.="Amazon Video<br>";}
 					if ($itunes eq "X") {$titleinformation.="Apple iTunes<br>";}
 					if ($disneyanywhere eq "X") {$titleinformation.="Disney Anywhere<br>";}
@@ -273,7 +272,9 @@ if ($empty != "1") {
 				if (($author) && $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {$titledisplay.=" &ndash; $authordisplay";}
 
 				$titleinformation="";
-				if ($type eq "book") {$titleinformation.="Book<br>";} else {$titleinformation.="eBook<br>";}
+				if ($debugmobile == "1") {
+					if ($type eq "book") {$titleinformation.="Book<br>";} else {$titleinformation.="eBook<br>";}
+				}
 				$table.= "  <tr class=\"grid\">\n   <td><div>$titledisplay</div></td><td><div>$authordisplay</div></td>";
 				if (($showhide_upc eq "show") || ($showhide_upc eq "#")) {$table.="<td>$upc</td>";}
 				if (($showhide_isbn eq "show") || ($showhide_isbn eq "#")) {$table.="<td>$isbn</td>";}
@@ -380,7 +381,7 @@ if ($empty != "1") {
 }
 
 ######  Set content type of the page.
-print "Content-TYPE: text/html\npragma: no-cache\n\n";
+print "Content-TYPE: text/html\n\n";
 print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n";
 print "<!--my media collection v$dateupdated-->\n";
 print "<HTML>\n";
@@ -393,7 +394,7 @@ if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/i
 	#print " <script type=\"text/javascript\" src=\"/javascripts/jquery.freezeheader.js\"></script>\n";
 }
 print " <script type=\"text/javascript\">\n  <!--\n";
-print "   function SizedPop(dir,page,type,width,height) {\n    window.open('/cgi-bin/' + dir + '/' + page + '?dotype=' + type, dir, \n";
+print "   function SizedPop(dir,page,type,width,height) {\n    window.open('/cgi-bin/' + dir + '/' + page + '?dotype=' + type, dir,\n";
 print "    'toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=yes,resizable=no,width=' + width + ',height=' + height);\n   }\n";
 print "   self.name = \"main\";\n";
 
@@ -426,7 +427,6 @@ if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/i
 } else {
 	print "  TD DIV {width: 250px;}";
 }
-
 print " </style>\n";
 
 if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i) {
