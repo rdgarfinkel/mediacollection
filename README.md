@@ -1,5 +1,5 @@
 # mediacollection
-Simple data (no images to load) display and management for physical and digital music, video (movies/tv), books, and games collections
+Simple data (as in there's no images to load) display and management for physical and digital music, videos (movies/tv), books, and games collections
 
 # first things first
 If you will be using this on a public server, put the /cgi-bin/media/media.pl file within a separate directory that is password protected so that only you can add/amend/delete your database entries. Also, you'll need to adjust line 11 on both index.cgi and media.pl, should you decide to move the directory.<br>
@@ -31,7 +31,7 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 - The columns currently within each media section are the media types that I have. As an example, I don't have a Sony Playstation 1, 3, or 4 system/games, so those columns don't exist yet in the games section. If you need these or other options, file an issue here on Github, and I'll add whatever you need, or if anyone wants to contribute, feel free to.
 
 # things to add/research
-- Make code comments on files and processes for helping others' understand what is doing what. (media.pl is close to finished, index.cgi will be next)
+- Make code comments on files and processes for helping others' understand what is doing what. (media.pl is finished, index.cgi will be next)
 - Work on the wiki for this project.
 - EAC/UPC/ISBN approval script to verify that public entries are at a good quality.
 - Researching other options for having a fixed header upon scrolling. The one that was in place is not 100% reliable.
@@ -39,11 +39,13 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 - With games having additional downloadable content, I'll be adding an option for this specifically just for games, where ideally the entries will show up indented underneath the game the content is connected to. I'm not sure how I'll implement it yet.
 
 # things to add way down the road<br>
-- TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these, hopefully someone can step up with these abilities.
+- TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these. hopefully someone can step up with these abilities.
 
 # change log
+- 2017.09.18
+  - Non-administrative: I found a bug I introduced in which having "mobile information" enabled would cause the videos section to most likely show a 500 error page on the server. This is due to a number of repeated "&lt;BR&gt;" entries which would show up at the top of the script and this would be interpreted as a CGI header. When I introduced the "mobile information" option, I didn't test all possibilities, and discovered this. This update to the index.cgi file corrects this problem, as well as a little bit of code cleanup.
 - 2017.06.21
-  - Non-administrative/Administrative: Added ability to show/hide service information for the video games, music, movies/TV, and books listings when viewed on a mobile device.
+  - Non-administrative/Administrative: Added ability to show or hide condensed service information for the video games, music, movies/TV, and books listings when viewed on a mobile device.
   - Non-administrative: Minor tweaks to the mobile device display tables.
 - 2017.04.04
   - Non-administrative/Administrative: On the videos section, I had included an if/then statement that would change the media type of entries to "Streaming" if there wasn't a media type option selected. This revision modifies this slightly, in that "Streaming" will only show if a streaming service is selected per entry, otherwise it won't show anything.
