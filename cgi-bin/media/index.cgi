@@ -20,7 +20,7 @@ $empty="0";
 $userAgent=$ENV{"HTTP_USER_AGENT"};
 
 #  headers for the non-admin pages
-$dateupdated="2017.09.18";
+$dateupdated="2017.10.13";
 
 #  Open and process the "debug" file. On this page, the article sort is the only variable that matters.
 open (debug,"$basedir/$debugitem") || &error("error: mediaitem $debugitem");
@@ -146,13 +146,13 @@ if ($empty != "1") {
 		$mobiletable.= " </tbody>\n";
 	} elsif ($pagetitle eq "video") {
 		foreach (@in) {
-			($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn,$microsoft,$year,$purchasedate) = split(/\|/,$_);
+			($title,$type,$media,$amazon,$moviesanywhere,$googleplay,$itunes,$uvvu,$upc,$isbn,$microsoft,$year,$purchasedate) = split(/\|/,$_);
 			if (substr($title,0,6) eq "#DATE#") {
 				$dataupdated=substr($title,(length($title)-10),10);
 				$showhide_type=$type;
 				$showhide_media=$media;
 				$showhide_amazon=$amazon;
-				$showhide_disneyanywhere=$disneyanywhere;
+				$showhide_moviesanywhere=$moviesanywhere;
 				$showhide_googleplay=$googleplay;
 				$showhide_itunes=$itunes;
 				$showhide_uvvu=$uvvu;
@@ -167,7 +167,7 @@ if ($empty != "1") {
 				if (($showhide_media eq "show") || ($showhide_media eq "#")) {$table.="   <th>Movie/TV</th>\n";$columns++;}
 				if (($showhide_type eq "show") || ($showhide_type eq "#")) {$table.="   <th>Physical<br>Media</th>\n";$columns++;}
 				if (($showhide_amazon eq "show") || ($showhide_amazon eq "#")) {$table.="   <th>Amazon</th>\n";$columns++;}
-				if (($showhide_disneyanywhere eq "show") || ($showhide_disneyanywhere eq "#")) {$table.="   <th>Disney<br>Anywhere</th>\n";$columns++;}
+				if (($showhide_moviesanywhere eq "show") || ($showhide_moviesanywhere eq "#")) {$table.="   <th>Movies<br>Anywhere</th>\n";$columns++;}
 				if (($showhide_googleplay eq "show") || ($showhide_googleplay eq "#")) {$table.="   <th>Google<br>Play</th>\n";$columns++;}
 				if (($showhide_itunes eq "show") || ($showhide_itunes eq "#")) {$table.="   <th>iTunes</th>\n";$columns++;}
 				if (($showhide_microsoft eq "show") || ($showhide_microsoft eq "#")) {$table.="   <th>Microsoft</th>\n";$columns++;}
@@ -183,7 +183,7 @@ if ($empty != "1") {
 					$mediadisplay="DVD";
 				} elsif ($media eq "diskcombo") {
 					$mediadisplay="BluRay/DVD";
-				} elsif (($mediadisplay eq "") && ($amazon eq "X") || ($disneyanywhere eq "X") || ($googleplay eq "X") || ($itunes eq "X") || ($microsoft eq "X") || ($uvvu eq "X")) {
+				} elsif (($mediadisplay eq "") && ($amazon eq "X") || ($moviesanywhere eq "X") || ($googleplay eq "X") || ($itunes eq "X") || ($microsoft eq "X") || ($uvvu eq "X")) {
 					$mediadisplay="Streaming";
 				}
 
@@ -206,7 +206,7 @@ if ($empty != "1") {
 					$titleinformation.="<br>";
 					if ($amazon eq "X") {$titleinformation.="Amazon Video<br>";}
 					if ($itunes eq "X") {$titleinformation.="Apple iTunes<br>";}
-					if ($disneyanywhere eq "X") {$titleinformation.="Disney Anywhere<br>";}
+					if ($moviesanywhere eq "X") {$titleinformation.="Movies Anywhere<br>";}
 					if ($googleplay eq "X") {$titleinformation.="Google Play Video<br>";}
 					if ($microsoft eq "X") {$titleinformation.="Microsoft Movies & TV<br>";}
 					if ($uvvu eq "X") {$titleinformation.="UltraViolet<br>";}
@@ -218,7 +218,7 @@ if ($empty != "1") {
 				if (($showhide_type eq "show") || ($showhide_type eq "#")) {$table.="<td>$type</td>";}
 				if (($showhide_media eq "show") || ($showhide_media eq "#")) {$table.="<td>$mediadisplay</td>";}
 				if (($showhide_amazon eq "show") || ($showhide_amazon eq "#")) {$table.="<td>$amazon</td>";}
-				if (($showhide_disneyanywhere eq "show") || ($showhide_disneyanywhere eq "#")) {$table.="<td>$disneyanywhere</td>";}
+				if (($showhide_moviesanywhere eq "show") || ($showhide_moviesanywhere eq "#")) {$table.="<td>$moviesanywhere</td>";}
 				if (($showhide_googleplay eq "show") || ($showhide_googleplay eq "#")) {$table.="<td>$googleplay</td>";}
 				if (($showhide_itunes eq "show") || ($showhide_itunes eq "#")) {$table.="<td>$itunes</td>";}
 				if (($showhide_microsoft eq "show") || ($showhide_microsoft eq "#")) {$table.="<td>$microsoft</td>";}
