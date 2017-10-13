@@ -20,7 +20,7 @@ $media_read="cgi-bin/media/media_";
 	$media_videos=$media_read."videos.txt";
 
 ## $dateupdated - Date that the script was last updated
-$dateupdated="2017.06.21";
+$dateupdated="2017.10.13";
 
 ## Calls to the 'getqueries' subroutine.
 &getqueries;
@@ -290,14 +290,14 @@ sub media {
 			$count_bluray=0;
 			$count_dvd=0;
 			$count_amazon=0;
-			$count_disneyanywhere=0;
+			$count_moviesanywhere=0;
 			$count_microsoft=0;
 			$count_googleplay=0;
 			$count_itunes=0;
 			$count_uvvu=0;
 
 			# Generate table headers
-			print "    <thead>\n     <th>#</th>\n     <th>Title (Year)</th>\n     <th>EAC/UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Physical<br>Media</th>\n     <th>Amazon<br>Video</th>\n     <th>Disney<br>Anywhere</th>\n     <th>Google<br>Play</th>\n     <th>iTunes</th>\n     <th>Microsoft</th>\n     <th>UVVU</th>\n    <th>Purchase<br>Date</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n";
+			print "    <thead>\n     <th>#</th>\n     <th>Title (Year)</th>\n     <th>EAC/UPC</th>\n     <th>ISBN</th>\n     <th>Type</th>\n     <th>Physical<br>Media</th>\n     <th>Amazon<br>Video</th>\n     <th>Movies<br>Anywhere</th>\n     <th>Google<br>Play</th>\n     <th>iTunes</th>\n     <th>Microsoft</th>\n     <th>UVVU</th>\n    <th>Purchase<br>Date</th>\n     <th>Delete</th>\n    </tr>\n    </thead>\n";
 
 			# Beginning of table body
 			print "    <tbody>\n";
@@ -309,7 +309,7 @@ sub media {
 				$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
 
 				# Split each variable by the | character
-				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year,$purchasedate) = split(/\|/,$line);
+				($title,$type,$media,$amazon,$moviesanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year,$purchasedate) = split(/\|/,$line);
 
 				# If $title doesn't equal "#DATE#"
 				if (substr($title,0,6) ne "#DATE#") {
@@ -331,7 +331,7 @@ sub media {
 						$count_bluray=$count_bluray+1;
 						$count_dvd=$count_dvd+1;
 						$mediadisplay="BluRay/DVD";
-					} elsif (($mediadisplay eq "") && ($amazon eq "X") || ($disneyanywhere eq "X") || ($googleplay eq "X") || ($itunes eq "X") || ($microsoft eq "X") || ($uvvu eq "X")) {
+					} elsif (($mediadisplay eq "") && ($amazon eq "X") || ($moviesanywhere eq "X") || ($googleplay eq "X") || ($itunes eq "X") || ($microsoft eq "X") || ($uvvu eq "X")) {
 						$mediadisplay="Streaming";
 					}
 
@@ -347,8 +347,8 @@ sub media {
 					if ($amazon eq "X") {
 						$count_amazon=$count_amazon+1;
 					}
-					if ($disneyanywhere eq "X") {
-						$count_disneyanywhere=$count_disneyanywhere+1;
+					if ($moviesanywhere eq "X") {
+						$count_moviesanywhere=$count_moviesanywhere+1;
 					}
 					if ($googleplay eq "X") {
 						$count_googleplay=$count_googleplay+1;
@@ -384,8 +384,9 @@ sub media {
 						$titledisplay.=" ($year)";
 					}
 					# Now display the whole line of information
-					print "    <tr class=\"grid\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td>$mediadisplay</td>\n     <td>$amazon</td>\n     <td>$disneyanywhere</td>\n     <td>$googleplay</td>\n     <td>$itunes</td>\n     <td>$microsoft</td>\n     <td>$uvvu</td>\n     <td>$purchasedate</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
+					print "    <tr class=\"grid\" id=\"$anchor\">\n     <td>$count_title</td><td><div><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_edit&showline=$line\">$titledisplay</a></div></td>\n     <td>$eacupc</td>\n     <td>$isbn</td>\n     <td>$type</td>\n     <td>$mediadisplay</td>\n     <td>$amazon</td>\n     <td>$moviesanywhere</td>\n     <td>$googleplay</td>\n     <td>$itunes</td>\n     <td>$microsoft</td>\n     <td>$uvvu</td>\n     <td>$purchasedate</td>\n     <td><a href=\"/$config_adminsite?dotype=$dotype&dowhat=media_delete&showline=$line\">delete</a></td>\n    </tr>\n";
 				}
+
 				# $title was equal to "#DATE#", so we'll set $update with the date the database was last updated
 				else {
 					$update=substr($title,(length($title)-10),10);
@@ -396,7 +397,7 @@ sub media {
 			print "    </tbody>\n";
 
 			# $tablestats will display the details that have been generated from the above code at a later time
-			$tablestats="<b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>Movies $count_movie || TV $count_tv || BluRay $count_bluray || DVDs $count_dvd || Amazon Video $count_amazon || Disney Anywhere $count_disneyanywhere || Google Play $count_googleplay || iTunes $count_itunes || Microsoft $count_microsoft || UVVU $count_uvvu";
+			$tablestats="<b>script updated $dateupdated || database updated $update || total $dotype $count_title</b><br>Movies $count_movie || TV $count_tv || BluRay $count_bluray || DVDs $count_dvd || Amazon Video $count_amazon || Movies Anywhere $count_moviesanywhere || Google Play $count_googleplay || iTunes $count_itunes || Microsoft $count_microsoft || UVVU $count_uvvu";
 		}
 		# If $dotype equals music...
 		elsif ($dotype eq 'music'){
@@ -760,7 +761,7 @@ sub media {
 				$isbn=$newisbn;
 				$type=$newtype;
 			} else {
-				($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year,$purchasedate)=split(/\|/,$showline);
+				($title,$type,$media,$amazon,$moviesanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year,$purchasedate)=split(/\|/,$showline);
 			}
 
 			print "     <tr>\n      <th align=right width=30%>Title:</th>\n      <td><input type=text name=newtitle value=\"$title\"></td>\n     </tr>\n";
@@ -825,14 +826,14 @@ sub media {
 			print "       </select>\n";
 			print "      </td>\n     </tr>\n";
 
-			print "     <tr>\n      <th align=right>DisneyAnywhere:</th>\n      <td>\n";
-			print "       <select name=newdisneyanywhere>\n";
-			if ($disneyanywhere eq ''){
+			print "     <tr>\n      <th align=right>MoviesAnywhere:</th>\n      <td>\n";
+			print "       <select name=newmoviesanywhere>\n";
+			if ($moviesanywhere eq ''){
 				print "        <option value=\"\" selected></option>\n";
 			} else {
 				print "        <option value=\"\"></option>\n";
 			}
-			if ($disneyanywhere eq 'X'){
+			if ($moviesanywhere eq 'X'){
 				print "        <option value=\"X\" selected>X</option>\n";
 			} else {
 				print "        <option value=\"X\">X</option>\n";
@@ -1177,14 +1178,14 @@ sub media {
 				}
 			}
 		} elsif ($dotype eq 'videos'){
-			($thistitle,$thistype,$thismedia,$thisamazon,$thisdisneyanywhere,$thisgoogleplay,$thisitunes,$thisuvvu,$thiseacupc,$thisisbn,$thismicrosoft,$thisyear,$thispurchasedate)=split(/\|/,$showline);
+			($thistitle,$thistype,$thismedia,$thisamazon,$thismoviesanywhere,$thisgoogleplay,$thisitunes,$thisuvvu,$thiseacupc,$thisisbn,$thismicrosoft,$thisyear,$thispurchasedate)=split(/\|/,$showline);
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
-				($intitle,$intype,$inmedia,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn,$inmicrosoft,$inyear,$inpurchasedate) = split(/\|/,$line);
+				($intitle,$intype,$inmedia,$inamazon,$inmoviesanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn,$inmicrosoft,$inyear,$inpurchasedate) = split(/\|/,$line);
 				if (substr($intitle,0,6) eq "#DATE#") {
-					$writenew="#DATE#,$today|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n";
-					 $preview="#DATE#,$today|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|<br>\n";
+					$writenew="#DATE#,$today|$intype|$inmedia|$inamazon|$inmoviesanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n";
+					 $preview="#DATE#,$today|$intype|$inmedia|$inamazon|$inmoviesanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|<br>\n";
 				} else {
 					if (($intitle eq $thistitle) && ($inyear eq $thisyear)) {
 						if ($thisyear) {
@@ -1192,8 +1193,8 @@ sub media {
 						}
 						print "$thistitle removed<br><br>\n";
 					} else {
-						$writenew.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n";
-						 $preview.="$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|<br>\n";
+						$writenew.="$intitle|$intype|$inmedia|$inamazon|$inmoviesanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n";
+						 $preview.="$intitle|$intype|$inmedia|$inamazon|$inmoviesanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|<br>\n";
 					}
 				}
 			}
@@ -1311,16 +1312,16 @@ sub media {
 				}
 			}
 		} elsif ($dotype eq 'videos'){
-			$update_entry="$newtitle|$newtype|$newmedia|$newamazon|$newdisneyanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|$newmicrosoft|$newyear|$newpurchasedate|\n";
+			$update_entry="$newtitle|$newtype|$newmedia|$newamazon|$newmoviesanywhere|$newgoogleplay|$newitunes|$newuvvu|$neweacupc|$newisbn|$newmicrosoft|$newyear|$newpurchasedate|\n";
 			$previewentry=$update_entry;
 			$mediawrite="$dotype|$newtitle||$neweacupc|$newisbn|$newtype|$newyear|";
 			foreach $line(@infile) {
 				$line=~s/\n//g;
 				# print "$line\n";
-				($intitle,$intype,$inmedia,$inamazon,$indisneyanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn,$inmicrosoft,$inyear,$inpurchasedate) = split(/\|/,$line);
+				($intitle,$intype,$inmedia,$inamazon,$inmoviesanywhere,$ingoogleplay,$initunes,$inuvvu,$ineacupc,$inisbn,$inmicrosoft,$inyear,$inpurchasedate) = split(/\|/,$line);
 				if (substr($intitle,0,6) eq "#DATE#") {
-					push(@unsorted_updateddb,"#DATE#,$today|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
-					push(@unsorted_previewdb,"#DATE#,$today|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
+					push(@unsorted_updateddb,"#DATE#,$today|$intype|$inmedia|$inamazon|$inmoviesanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
+					push(@unsorted_previewdb,"#DATE#,$today|$intype|$inmedia|$inamazon|$inmoviesanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
 				} else {
 					if (substr($intitle,0,4) eq "The ") {
 						$intitle=substr($intitle,4,length($intitle)).", The";
@@ -1334,8 +1335,8 @@ sub media {
 						}
 						print "$newtitle updated<br><br>\n";
 					} else {
-						push(@unsorted_updateddb,"$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
-						push(@unsorted_previewdb,"$intitle|$intype|$inmedia|$inamazon|$indisneyanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
+						push(@unsorted_updateddb,"$intitle|$intype|$inmedia|$inamazon|$inmoviesanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
+						push(@unsorted_previewdb,"$intitle|$intype|$inmedia|$inamazon|$inmoviesanywhere|$ingoogleplay|$initunes|$inuvvu|$ineacupc|$inisbn|$inmicrosoft|$inyear|$inpurchasedate|\n");
 					}
 				}
 			}
@@ -1815,7 +1816,7 @@ sub media {
 		@media_videos = <video>;
 		close (video);
 
-		print "     <tr>\n      <th>VIDEOS</th>\n      <th>title</th>\n      <th>year</th>\n      <th>eacupc</th>\n      <th>type</th>\n      <th>media</th>\n      <th>amazon</th>\n      <th>disneyanywhere</th>\n      <th>googleplay</th>\n      <th>itunes</th>\n      <th>uvvu</th>\n      <th>isbn</th>\n      <th>microsoft</th>\n      <th>purchasedate</th>\n     </tr>\n";
+		print "     <tr>\n      <th>VIDEOS</th>\n      <th>title</th>\n      <th>year</th>\n      <th>eacupc</th>\n      <th>type</th>\n      <th>media</th>\n      <th>amazon</th>\n      <th>moviesanywhere</th>\n      <th>googleplay</th>\n      <th>itunes</th>\n      <th>uvvu</th>\n      <th>isbn</th>\n      <th>microsoft</th>\n      <th>purchasedate</th>\n     </tr>\n";
  
 		print "     <tr>\n";
 		foreach $video_line(@media_videos) {
@@ -1823,7 +1824,7 @@ sub media {
 			$video_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
 			$video_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
 
-			($video_title,$video_type,$video_media,$video_amazon,$video_disneyanywhere,$video_googleplay,$video_itunes,$video_uvvu,$video_eacupc,$video_isbn,$video_microsoft,$video_year,$video_purchasedate) = split(/\|/,$video_line);
+			($video_title,$video_type,$video_media,$video_amazon,$video_moviesanywhere,$video_googleplay,$video_itunes,$video_uvvu,$video_eacupc,$video_isbn,$video_microsoft,$video_year,$video_purchasedate) = split(/\|/,$video_line);
 
 			if (substr($video_title,0,6) eq "#DATE#") {
 				print "      <td><a href=\"/$config_adminsite?dotype=videos&dowhat=config_columns_edit\">CHANGE</a></td>\n      <td>title</td>\n      <td>year</td>\n";
@@ -1831,7 +1832,7 @@ sub media {
 				if (($video_type eq "show") || ($video_type eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
 				if (($video_media eq "show") || ($video_media eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
 				if (($video_amazon eq "show") || ($video_amazon eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
-				if (($video_disneyanywhere eq "show") || ($video_disneyanywhere eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
+				if (($video_moviesanywhere eq "show") || ($video_moviesanywhere eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
 				if (($video_googleplay eq "show") || ($video_googleplay eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
 				if (($video_itunes eq "show") || ($video_itunes eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
 				if (($video_uvvu eq "show") || ($video_uvvu eq "#")) {print "      <td class=edit>show</td>\n";} else {print "      <td class=edit>hide</td>\n";}
@@ -2029,7 +2030,7 @@ sub media {
 			@media_videos = <video>;
 			close (video);
 
-			print "     <tr>\n      <th>VIDEOS</th>      <th>title</th>      <th>year</th>      <th>eacupc</th>      <th>type</th>      <th>media</th>      <th>amazon</th>      <th>disneyanywhere</th>      <th>googleplay</th>     <th>itunes</th>      <th>uvvu</th>      <th>isbn</th>      <th>microsoft</th>      <th>purchasedate</th>     </tr>";
+			print "     <tr>\n      <th>VIDEOS</th>      <th>title</th>      <th>year</th>      <th>eacupc</th>      <th>type</th>      <th>media</th>      <th>amazon</th>      <th>moviesanywhere</th>      <th>googleplay</th>     <th>itunes</th>      <th>uvvu</th>      <th>isbn</th>      <th>microsoft</th>      <th>purchasedate</th>     </tr>";
 	 
 			print "<tr>\n";
 			foreach $video_line(@media_videos) {
@@ -2037,7 +2038,7 @@ sub media {
 				$video_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
 				$video_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
 
-				($video_title,$video_type,$video_media,$video_amazon,$video_disneyanywhere,$video_googleplay,$video_itunes,$video_uvvu,$video_eacupc,$video_isbn,$video_microsoft,$video_year,$video_purchasedate) = split(/\|/,$video_line);
+				($video_title,$video_type,$video_media,$video_amazon,$video_moviesanywhere,$video_googleplay,$video_itunes,$video_uvvu,$video_eacupc,$video_isbn,$video_microsoft,$video_year,$video_purchasedate) = split(/\|/,$video_line);
 
 				if (substr($video_title,0,6) eq "#DATE#") {
 					print "<td></td><td>title</td><td>year</td>";
@@ -2057,8 +2058,8 @@ sub media {
 					print "      <td class=edit><select name=column_video_amazon><option value=\"show\" $video_amazon_select_on>show</option><option value=\"hide\" $video_amazon_select_off>hide</option></select></td>\n";
 					$columns++;
 
-					if (($video_disneyanywhere eq "show") || ($video_disneyanywhere eq "#")) {$video_disneyanywhere_select_on="selected";} else {$video_disneyanywhere_select_off="selected";}
-					print "      <td class=edit><select name=column_video_disneyanywhere><option value=\"show\" $video_disneyanywhere_select_on>show</option><option value=\"hide\" $video_disneyanywhere_select_off>hide</option></select></td>\n";
+					if (($video_moviesanywhere eq "show") || ($video_moviesanywhere eq "#")) {$video_moviesanywhere_select_on="selected";} else {$video_moviesanywhere_select_off="selected";}
+					print "      <td class=edit><select name=column_video_moviesanywhere><option value=\"show\" $video_moviesanywhere_select_on>show</option><option value=\"hide\" $video_moviesanywhere_select_off>hide</option></select></td>\n";
 					$columns++;
 
 					if (($video_googleplay eq "show") || ($video_googleplay eq "#")) {$video_googleplay_select_on="selected";} else {$video_googleplay_select_off="selected";}
@@ -2208,14 +2209,14 @@ sub media {
 				$video_line =~ tr/+/ /;                                                  # Swaps plus signs for spaces
 				$video_line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;        # Swap URIencoded characters for their real characters
 
-				($video_title,$video_type,$video_media,$video_amazon,$video_disneyanywhere,$video_googleplay,$video_itunes,$video_uvvu,$video_eacupc,$video_isbn,$video_microsoft,$video_year,$video_purchasedate) = split(/\|/,$video_line);
+				($video_title,$video_type,$video_media,$video_amazon,$video_moviesanywhere,$video_googleplay,$video_itunes,$video_uvvu,$video_eacupc,$video_isbn,$video_microsoft,$video_year,$video_purchasedate) = split(/\|/,$video_line);
 
 				if (substr($video_title,0,6) eq "#DATE#") {
 					$dbentry="$video_title|";
 					if ($column_video_type eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
 					if ($column_video_media eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
 					if ($column_video_amazon eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
-					if ($column_video_disneyanywhere eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
+					if ($column_video_moviesanywhere eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
 					if ($column_video_googleplay eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
 					if ($column_video_itunes eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
 					if ($column_video_uvvu eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
@@ -2226,7 +2227,7 @@ sub media {
 					if ($column_video_purchasedate eq "show") {$dbentry.="show|";} else {$dbentry.="hide|";}
 					push(@database_entries,"$dbentry\n");
 				} else {
-					push(@database_entries,"$video_title|$video_type|$video_media|$video_amazon|$video_disneyanywhere|$video_googleplay|$video_itunes|$video_uvvu|$video_eacupc|$video_isbn|$video_microsoft|$video_year|$video_purchasedate|\n");
+					push(@database_entries,"$video_title|$video_type|$video_media|$video_amazon|$video_moviesanywhere|$video_googleplay|$video_itunes|$video_uvvu|$video_eacupc|$video_isbn|$video_microsoft|$video_year|$video_purchasedate|\n");
 				}
 			}
 		}
@@ -2358,7 +2359,7 @@ sub media {
 		close (media);
 
 		foreach $line(@in) {
-			($title,$type,$media,$amazon,$disneyanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year,$purchasedate) = split(/\|/,$line);
+			($title,$type,$media,$amazon,$moviesanywhere,$googleplay,$itunes,$uvvu,$eacupc,$isbn,$microsoft,$year,$purchasedate) = split(/\|/,$line);
 			$mediawrite_videos="videos|$title||$eacupc|$isbn|$type|$year|";
 			if (substr($title,0,6) ne "#DATE#") {
 				if ($isbn ne "") {
@@ -2921,8 +2922,8 @@ sub getqueries {
 	## Variable sets for videos
 	$newmedia=$FORM{'newmedia'};
 	$oldmedia=$FORM{'oldmedia'};
-	$newdisneyanywhere=$FORM{'newdisneyanywhere'};
-	$olddisneyanywhere=$FORM{'olddisneyanywhere'};
+	$newmoviesanywhere=$FORM{'newmoviesanywhere'};
+	$oldmoviesanywhere=$FORM{'oldmoviesanywhere'};
 	$newuvvu=$FORM{'newuvvu'};
 	$olduvvu=$FORM{'olduvvu'};
 	$newmicrosoft=$FORM{'newmicrosoft'};
@@ -2955,7 +2956,7 @@ sub getqueries {
 	$column_video_type=$FORM{'column_video_type'};
 	$column_video_media=$FORM{'column_video_media'};
 	$column_video_amazon=$FORM{'column_video_amazon'};
-	$column_video_disneyanywhere=$FORM{'column_video_disneyanywhere'};
+	$column_video_moviesanywhere=$FORM{'column_video_moviesanywhere'};
 	$column_video_googleplay=$FORM{'column_video_googleplay'};
 	$column_video_itunes=$FORM{'column_video_itunes'};
 	$column_video_uvvu=$FORM{'column_video_uvvu'};
@@ -3018,4 +3019,17 @@ sub getqueries {
 		&errorfatal("missing \'dotype\'");
 		&footer;
 	}
+}
+
+sub anchorcharacters {
+	$anchor=~tr/ //ds;
+	$anchor=~tr/(//ds;
+	$anchor=~tr/)//ds;
+	$anchor=~tr/\"//ds;
+	$anchor=~tr/-//ds;
+	$anchor=~tr/://ds;
+	$anchor=~tr/.//ds;
+	$anchor=~tr/\'//ds;
+	$anchor=~tr/,//ds;
+	$anchor=~tr/\///ds;
 }
