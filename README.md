@@ -42,6 +42,10 @@ I highly recommend an external barcode scanner, since it will help tremendously 
 - TheAudioDB.com, imdb.com, themoviedb.org, thetvdb.com, musicbrainz.org and/or thegamesdb.net integration would be awesome, but I don't know enough about API usage currently to do these. hopefully someone can step up with these abilities.
 
 # change log
+- 2018.02.17
+  - Non-administrative: I found an issue where on a separate server, files with the PL extension do not run, so they have to be named .CGI. In this case, I had to manipulate index.cgi to include an editable variable to be programmed should you run into this issue as well.
+- 2017.10.13
+  - Non-administrative/Administrative: With Disney Movies Anywhere retiring at an unspecified time in the future and being replaced with Movies Anywhere, I've made changes to the variables and table headers for this change.
 - 2017.09.18
   - Non-administrative: I found a bug I introduced in which having "mobile information" enabled would cause the videos section to most likely show a 500 error page on the server. This is due to a number of repeated "&lt;BR&gt;" entries which would show up at the top of the script and this would be interpreted as a CGI header. When I introduced the "mobile information" option, I didn't test all possibilities, and discovered this. This update to the index.cgi file corrects this problem, as well as a little bit of code cleanup.
 - 2017.06.21
