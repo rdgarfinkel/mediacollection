@@ -13,14 +13,17 @@ $admindirectory="media";
 $mediaitem="cgi-bin/$directory/media_";
 #  $debugitem is the debug file for the media data.
 $debugitem="cgi-bin/$directory/media_debug.txt";
+#  $thispage is the file name of this file (in case local server can't run default CGI file type, this file can be named index.pl, or any other file name; it will update all links which contain this.
 $thispage="index.cgi";
+#  $adminpage is the file name of the administration file (in case local server can't run default PL file type, this file can be named media.pl, or any other file name; it will update all links which contain this.
+$adminpage="media.pl";
 #  $empty gets the value of 0 here, and will be tested a little later on to be sure that there is a media type.
 $empty="0";
 #  $userAgent gets the platform being used by the browser
 $userAgent=$ENV{"HTTP_USER_AGENT"};
 
 #  headers for the non-admin pages
-$dateupdated="2017.10.13";
+$dateupdated="2018.02.17";
 
 #  Open and process the "debug" file. On this page, the article sort is the only variable that matters.
 open (debug,"$basedir/$debugitem") || &error("error: mediaitem $debugitem");
@@ -461,7 +464,7 @@ if ($empty != "1") {
 if ( $userAgent =~ m/iPhone/i || $userAgent =~ m/IEMobile/i || $userAgent =~ m/iPad/i ) {
 	#skip
 } else {
-	print "<a href=\"javascript:SizedPop('$admindirectory','media.pl','$query',1350,625);\">admin</a> | ";
+	print "<a href=\"javascript:SizedPop('$admindirectory','$adminpage','$query',1350,625);\">admin</a> | ";
 }
 print "<a href=\"$thispage?books\">books</a> | ";
 print "<a href=\"$thispage?games\">games</a> | ";
