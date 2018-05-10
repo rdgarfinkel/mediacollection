@@ -6,13 +6,14 @@ If you will be using this on a public server, put the /cgi-bin/media/media.pl fi
 Aside from editing the "#!/usr/bin/perl" line at the top of each script, things *should* work "directly out of the box." 
 
 # demonstration
-A demonstration of the script and it's abilities is online and available, with editing abilities enabled. No password is required for the admin side. Test it out as you wish, http://rgrfnkl.heliohost.org/cgi-bin/media/index.cgi.<br>
+A demonstration of the script and it's abilities is online and available, with editing abilities enabled. No password is required for the admin side. Test it out as you wish, http://rdgarfinkel.diskstation.me/cgi-bin/media/index.cgi.<br>
 Please note that the "modification" date in the shown/hidden HTML on the demonstration sites may be newer than the one present here on Github. I do the coding offline on a local server, post it to the public site to verify it still works on there, then I'll post it here.
 
 # requirements
 For this script to run, you'll need to have a web server and it needs to be capable of running Perl scripts. It can be a public server or just a local server.<br>
 I use Aprelium's Abyss Web Server for local server scripting/testing, free and available for Windows/Mac/Linux; http://aprelium.com/. Perl installation instructions can be found here: http://aprelium.com/abyssws/perl.html.<br>
-The public server I use for the demonstration (as well as my other sites there) is also free; http://heliohost.org. You do need to remember to login to your account once a month to keep your account active, though I can say comfortably that your account and all files will be recovered if you do forget.
+The public server I now use for the demonstration (as well as my other sites there) is hosted by my network attached storage.<br>
+*Note: I no longer use the heliohost server, but still recommend it for use, http://heliohost.org. You do need to remember to login to your account once a month to keep your account active, though I can say comfortably that your account and all files will be recovered if you do forget.*
 
 # optional
 I highly recommend an external barcode scanner, since it will help tremendously when initially entering your items into the database; it will act as a keyboard input when adding thru either the EAC/UPC/ISBN entry, or as a manual entry. Personally,  I use a <b>:CueCat</b> that has been modified to have a USB connector, rather than a PS/2 connector; the :CueCat can be found thru ebay.com for less than $10 USD. Just note that when using the :CueCat, after scanning the barcode, the "Enter" key is submitted, so you may have to go back to the entry to make adjustments afterward.
