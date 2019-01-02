@@ -6,7 +6,7 @@ If you will be using this on a public server, put the /cgi-bin/media/media.pl fi
 Aside from editing the "#!/usr/bin/perl" line at the top of each script, things *should* work "directly out of the box." 
 
 # demonstration
-A demonstration of the script and it's abilities is online and available, with editing abilities enabled. No password is required for the admin side. Test it out as you wish, http://rdgarfinkel.diskstation.me/cgi-bin/media/index.cgi.<br>
+A demonstration of the script and it's abilities is online and available, with editing abilities enabled. No password is required for the admin side. Test it out as you wish, http://rdgarfinkel.diskstation.me:8000/cgi-bin/media/index.cgi.<br>
 Please note that the "modification" date in the shown/hidden HTML on the demonstration sites may be newer than the one present here on Github. I do the coding offline on a local server, post it to the public site to verify it still works on there, then I'll post it here.
 
 # requirements
@@ -77,7 +77,7 @@ I highly recommend an external barcode scanner, since it will help tremendously 
   - Administrative: Made naming adjustments to the variables, subroutines and links, ie 'debug' is now 'config'.
   - Administrative: Media edits now 'POST' data to the script, so edits are generally unlimited in length.
   - Administrative: The header of the admin pages is now two lines in height, so I spread out the links a bit.
-  - Administrative: The automatic switch of the <b>+</b> plus symbol worked well at times, but I found that it also caused issues. For example, typing the apostrophe would be replaced with <b>(plus)</b> as well, for whatever reason; you'll have to do this manually now.
+  - Administrative: The automatic switch of the <b>+</b> plus symbol worked well at times, but I found that it also caused issues. For example, typing the apostrophe would be replaced with <b>(plus)</b> as well, for whatever reason; you'll have to do this manually now, using <b>(plus)</b>.
 - 2016.10.07
   - Administrative: When adding entries, it will be sorted into the database.
   - Administrative: $basedir is now automatically discovered by the scripts.
